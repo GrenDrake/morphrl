@@ -85,11 +85,12 @@ std::vector<std::string> explodeOnWhitespace(std::string text) {
     return parts;
 }
 
-int strToInt(const std::string &text) {
+bool strToInt(const std::string &text, int &result) {
     char *endPtr = nullptr;
     long num = strtol(text.c_str(), &endPtr, 10);
-    if (*endPtr != 0) return -1;
-    return num;
+    if (*endPtr != 0) return false;
+    result = num;
+    return true;
 }
 
 template<typename CharT>

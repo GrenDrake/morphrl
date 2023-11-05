@@ -284,7 +284,8 @@ std::vector<std::string> explodeOnWhitespace(std::string text);
 const std::string& trim(const std::string &text);
 std::string& trim(std::string &text);
 std::string intToString(long long number);
-int strToInt(const std::string &text);
+// int strToInt(const std::string &text);
+bool strToInt(const std::string &text, int &result);
 
 Image* loadImage(const std::string &filename);
 void drawImage(int originX, int originY, Image *image);

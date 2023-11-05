@@ -5,32 +5,106 @@
 
 #include "morph.h"
 
+
+struct Origin {
+    Origin();
+    Origin(const std::string &filename, unsigned lineNumber);
+    std::string toString() const;
+
+    std::string filename;
+    unsigned lineNumber;
+};
+
+struct ErrorMessage {
+    Origin origin;
+    std::string message;
+};
+
+struct DataProp {
+    Origin origin;
+    std::string name;
+    std::vector<std::string> value;
+};
+
+struct DataTemp {
+    Origin origin;
+    std::string typeName;
+    int ident;
+    std::string idName;
+    std::vector<DataProp> props;
+};
+
+struct DefineValue {
+    Origin origin;
+    std::string name;
+    int value;
+};
+
+struct RawData {
+    ~RawData();
+    void addError(const Origin &origin, const std::string &message);
+    bool hasErrors() const { return !errors.empty(); }
+    bool addDefine(const Origin &origin, const std::string &name, int value);
+    const DefineValue* getDefine(const std::string &name);
+
+    std::vector<DefineValue> defines;
+    std::vector<DataTemp*> data;
+    std::vector<ErrorMessage> errors;
+};
+
+struct DataDef {
+    std::string name;
+    unsigned partCount;
+};
+
 const unsigned BAD_VALUE = 4294967295;
-
-std::vector<ActorData> actorData;
-    // { 0, '@', 127, 255, 127, "player", { 10, 10, 10, 10 } },
-    // { 1, 'g', 255, 127, 127, "goblin", {  8,  8,  8,  8 } },
-
-std::vector<ItemData> itemData;
-    // { 0, '/', 127, 127, 127, "sword",  ItemData::Weapon, 2, 2, 7, 13, { 0, 0, 0, 0 } },
-    // { 1, '/', 127, 127, 127, "dagger", ItemData::Weapon, 3, 4,  3, 7, { 0, 0, 0, 0 } },
-    // { 2, '!', 255,   0,   0, "potion of healing", ItemData::Consumable, 1, 0,  0, 0, { 0, 0, 0, 0 } },
-    // { 3, '!', 255, 127, 127, "potion of flames", ItemData::Consumable, 1, 0,  0, 0, { 0, 0, 0, 0 } },
-    // { 4, '"', 127, 127, 127, "talisman of armour", ItemData::Talisman, 1, 0,  0, 0, { 0, 0, 0, 0 } },
-    // { 5, '"', 127, 127, 127, "talisman of health", ItemData::Talisman, 1, 0,  0, 0, { 0, 0, 0, 0 } },
-    // { 6, '%', 127, 127, 127, "brick", ItemData::Junk, 2, 0, 0, 0, { 0, 0, 0, 0 } },
-
-
-std::vector<TileData> tileData;
-    // { 0, '?', "unassigned", false, true,  255, 0,   255 },
-    // { 1, '#', "wall",       false, true,  127, 127, 127 },
-    // { 2, '.', "floor",      true,  false, 255, 255, 255 },
-    // { 3, '*', "marker",     true,  false, 255, 0,   255 },
-    // { 4, '+', "door",       true,  true,  165, 42,  42  },
-    // { 5, '~', "water",      false, false, 127, 196, 127 },
-
-
+const DataDef BAD_DEF{ "INVALID", BAD_VALUE };
 ActorData BAD_ACTOR{BAD_VALUE, '?', 255, 0, 255, "invalid"};
+std::vector<ActorData> actorData;
+ItemData BAD_ITEM{BAD_VALUE, '?', 255, 0, 255, "invalid", "", ItemData::Invalid};
+std::vector<ItemData> itemData;
+TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
+std::vector<TileData> tileData;
+
+
+Origin::Origin() 
+: filename("(internal)", 0)
+{ }
+
+Origin::Origin(const std::string &filename, unsigned lineNumber)
+: filename(filename), lineNumber(lineNumber)
+{ }
+
+std::string Origin::toString() const {
+    return filename + ": " + std::to_string(lineNumber);
+}
+
+RawData::~RawData() {
+    for (DataTemp *iter : data) {
+        if (iter) delete iter;
+    }
+}
+
+void RawData::addError(const Origin &origin, const std::string &message) {
+    errors.push_back(ErrorMessage{origin, message});
+}
+
+bool RawData::addDefine(const Origin &origin, const std::string &name, int value) {
+    const DefineValue *oldValue = getDefine(name);
+    if (oldValue) return false;
+
+    defines.push_back(DefineValue{origin, name, value});
+    return true;
+}
+
+const DefineValue* RawData::getDefine(const std::string &name) {
+    for (const DefineValue &def : defines) {
+        if (def.name == name) return &def;
+    }
+    return nullptr;
+}
+
+
 const ActorData& getActorData(unsigned ident) {
     for (const ActorData &data : actorData) {
         if (data.ident == ident) return data;
@@ -38,7 +112,6 @@ const ActorData& getActorData(unsigned ident) {
     return BAD_ACTOR;
 }
 
-ItemData BAD_ITEM{BAD_VALUE, '?', 255, 0, 255, "invalid", "", ItemData::Invalid};
 const ItemData& getItemData(unsigned ident) {
     for (const ItemData &data : itemData) {
         if (data.ident == ident) return data;
@@ -46,7 +119,6 @@ const ItemData& getItemData(unsigned ident) {
     return BAD_ITEM;
 }
 
-TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 const TileData& getTileData(unsigned ident) {
     for (const TileData &data : tileData) {
         if (data.ident == ident) return data;
@@ -63,305 +135,335 @@ std::string convertUnderscores(std::string text) {
     return text;
 }
 
-struct DataDef {
-    std::string name;
-    unsigned partCount;
-};
-std::vector<DataDef> dataDefs{
-    { "@tile", 3 },
-    { "@actor", 3 },
-    { "@item", 3 },
-    { ";", 1 },
+int dataAsInt(RawData &rawData, const Origin &origin, const std::string &text) {
+    int value;
+    bool result = strToInt(text, value);
+    if (result) return value;
+    const DefineValue *def = rawData.getDefine(text);
+    if (def) return def->value;
+    rawData.addError(origin, "expected integer, but found " + text);
+    return 0;
+}
 
-    { "glyph", 2 },
-    { "name", 2 },
-    { "description", 2 },
-    { "colour", 4 },
-    { "effect", 5 },
-
-    { "base_strength", 2 },
-    { "base_agility", 2 },
-    { "base_dexterity", 2 },
-    { "base_toughness", 2 },
-
-    { "type", 2 },
-    { "bulk", 2 },
-    { "to_hit", 2 },
-    { "damage", 3 },
-    { "consumeChance", 2 },
-
-    { "isOpaque", 1 },
-    { "isPassable", 1 },
-    { "isUpStair", 1 },
-    { "isDownStair", 1 },
-};
-const DataDef BAD_DEF{ "INVALID", BAD_VALUE };
-const DataDef& getDataDef(const std::string &text) {
-    for (const DataDef &def : dataDefs) {
+const DataDef& getDataDef(const std::vector<DataDef> &defs, const std::string &text) {
+    for (const DataDef &def : defs) {
         if (def.name == text) return def;
     }
     return BAD_DEF;
 }
-bool loadAllData() {
-    const std::string &filename = "resources/game.dat";
+
+
+
+bool loadRawFromFile(const std::string &filename, RawData &rawData) {
     std::ifstream inf(filename);
     if (!inf) {
-        std::cerr << "Failed to load game data from " << filename << ".\n";
+        rawData.addError(Origin(filename, 0), "failed to open " + filename + " for reading.");
         return false;
     }
 
-    // Item *item = nullptr;
-    ActorData actor;
-    ItemData item;
-    TileData tile;
-    const int TYPE_NONE  = 0;
-    const int TYPE_ACTOR = 1;
-    const int TYPE_ITEM  = 2;
-    const int TYPE_TILE  = 3;
-    int currentType = TYPE_NONE;
+    DataTemp *data = nullptr;
 
-    int errorCount = 0;
     int lineNumber = 0;
     std::string line;
     while (std::getline(inf, line)) {
         ++lineNumber;
+        Origin origin(filename, lineNumber);
         auto parts = explodeOnWhitespace(line);
         if (parts.empty() || parts[0][0] == '#') continue;
-
-        const DataDef &def = getDataDef(parts[0]);
-        if (def.partCount == BAD_VALUE) {
-            std::cerr << filename << ':' << lineNumber;
-            std::cerr << "  unknown command or attribute " << parts[0] << ".\n";
-            ++errorCount;
-            continue;
-        }
-        if (def.partCount != parts.size()) {
-            std::cerr << filename << ':' << lineNumber;
-            std::cerr << "  bad argument count for command or attribute ";
-            std::cerr << parts[0] << " (expected " << def.partCount << ", but found ";
-            std::cerr << parts.size() << ").\n";
-            ++errorCount;
-            continue;
-        }
-
-        if (parts[0] == ";") {
-            switch(currentType) {
-                case TYPE_ACTOR:
-                    actorData.push_back(actor);
-                    break;
-                case TYPE_ITEM:
-                    itemData.push_back(item);
-                    break;
-                case TYPE_TILE:
-                    tileData.push_back(tile);
-                    break;
-                case TYPE_NONE:
-                    std::cerr << filename << ':' << lineNumber;
-                    std::cerr << "  encountered ; outside of def\n";
-                    ++errorCount;
-                    break;
-                default:
-                    std::cerr << filename << ':' << lineNumber;
-                    std::cerr << "  encountered ; in unhandled data type\n";
-                    ++errorCount;
-            }
-            currentType = TYPE_NONE;
-
-        // ACTOR SPECIFIC
-        } else if (parts[0] == "@actor") {
-            if (currentType != TYPE_NONE) {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  tried to start actor def while already in def\n";
-                ++errorCount;
+        if (parts[0][0] == '@') {
+            if (parts.size() != 3) {
+                rawData.addError(origin, "malformed object defintition");
                 continue;
             }
-            currentType = TYPE_ACTOR;
-            unsigned ident = strToInt(parts[1]);
-            actor.ident = ident;
-            actor.name = "unknown";
-            actor.desc = "";
-            actor.glyph = '?';
-            actor.r = 255; actor.g = 0; actor.b = 255;
-            for (int i = 0; i < STAT_BASE_COUNT; ++i) {
-                actor.baseStats[STAT_BASE_COUNT] = 1;
+            data = new DataTemp;
+            rawData.data.push_back(data);
+            data->origin = origin;
+            data->typeName = parts[0];
+            data->ident = dataAsInt(rawData, origin, parts[2]);
+            if (parts[1] != "-") {
+                data->idName = parts[1];
+                if (!rawData.addDefine(origin, data->idName, data->ident)) {
+                    const DefineValue *oldDefine = rawData.getDefine(data->idName);
+                    if (oldDefine) {
+                        rawData.addError(origin, data->idName + " already defined at " + oldDefine->origin.toString());
+                    } else {
+                        rawData.addError(origin, "failed to add define " + data->idName);
+                    }
+                }
             }
-        } else if (parts[0] == "base_strength") {
-            actor.baseStats[STAT_STRENGTH] = strToInt(parts[1]);
-        } else if (parts[0] == "base_agility") {
-            actor.baseStats[STAT_AGILITY] = strToInt(parts[1]);
-        } else if (parts[0] == "base_dexterity") {
-            actor.baseStats[STAT_DEXTERITY] = strToInt(parts[1]);
-        } else if (parts[0] == "base_toughness") {
-            actor.baseStats[STAT_TOUGHNESS] = strToInt(parts[1]);
-
-        // ITEM SPECIFIC
-        } else if (parts[0] == "@item") {
-            if (currentType != TYPE_NONE) {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  tried to start item def while already in def\n";
-                ++errorCount;
-                continue;
-            }
-            currentType = TYPE_ITEM;
-            unsigned ident = strToInt(parts[1]);
-            item.ident = ident;
-            item.name = "unknown";
-            item.desc = "";
-            item.glyph = '?';
-            item.r = 255; actor.g = 0; actor.b = 255;
-            item.type = ItemData::Junk;
-            item.bulk = 1;
-            item.toHit = 0;
-            item.minDamage = 0;
-            item.maxDamage = 0;
-            item.consumeChance = 0;
-            item.effects.clear();
-            for (int i = 0; i < STAT_BASE_COUNT; ++i) {
-                item.statMods[STAT_BASE_COUNT] = 1;
-            }
-        } else if (parts[0] == "bulk") {
-            item.bulk = strToInt(parts[1]);
-        } else if (parts[0] == "to_hit") {
-            item.toHit = strToInt(parts[1]);
-        } else if (parts[0] == "damage") {
-            item.minDamage = strToInt(parts[1]);
-            item.maxDamage = strToInt(parts[2]);
-        } else if (parts[0] == "consumeChance") {
-            item.consumeChance = strToInt(parts[1]);
-        } else if (parts[0] == "type") {
-            if (parts[1] == "weapon") item.type = ItemData::Weapon;
-            else if (parts[1] == "consumable") item.type = ItemData::Consumable;
-            else if (parts[1] == "talisman") item.type = ItemData::Talisman;
-            else if (parts[1] == "junk") item.type = ItemData::Junk;
-            else {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  unknown item type " << parts[1] << '\n';
-                ++errorCount;
-                continue;
-            }
-
-
-        // TILE SPECIFIC
-        } else if (parts[0] == "@tile") {
-            if (currentType != TYPE_NONE) {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  tried to start tile def while already in def\n";
-                ++errorCount;
-                continue;
-            }
-            currentType = TYPE_TILE;
-            unsigned ident = strToInt(parts[1]);
-            tile.ident = ident;
-            tile.name = "unknown";
-            tile.desc = "";
-            tile.glyph = '?';
-            tile.r = 255; tile.g = 0; tile.b = 255;
-            tile.isPassable = false;
-            tile.isOpaque = false;
-            tile.isDownStair = false;
-            tile.isUpStair = false;
-        } else if (parts[0] == "isPassable") {
-            tile.isPassable = true;
-        } else if (parts[0] == "isOpaque") {
-            tile.isOpaque = true;
-        } else if (parts[0] == "isDownStair") {
-            tile.isDownStair = true;
-        } else if (parts[0] == "isUpStair") {
-            tile.isUpStair = true;
-
-        // ALL TYPES SHARED
-        } else if (parts[0] == "glyph") {
-            if (parts[1].size() != 1) {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  glyph must be exactly one character\n";
-                ++errorCount;
-                continue;
-            }
-            switch(currentType) {
-                case TYPE_ACTOR:
-                    actor.glyph = parts[1][0];
-                    break;
-                case TYPE_ITEM:
-                    item.glyph = parts[1][0];
-                    break;
-                case TYPE_TILE:
-                    tile.glyph = parts[1][0];
-                    break;
-            }
-        } else if (parts[0] == "name") {
-            std::string nameText = convertUnderscores(parts[1]);
-            switch(currentType) {
-                case TYPE_ACTOR:
-                    actor.name = nameText;
-                    break;
-                case TYPE_ITEM:
-                    item.name = nameText;
-                    break;
-                case TYPE_TILE:
-                    tile.name = nameText;
-                    break;
-            }
-        } else if (parts[0] == "description") {
-            std::string descriptionText = convertUnderscores(parts[1]);
-            switch(currentType) {
-                case TYPE_ACTOR:
-                    actor.desc = descriptionText;
-                    break;
-                case TYPE_ITEM:
-                    item.desc = descriptionText;
-                    break;
-                case TYPE_TILE:
-                    tile.desc = descriptionText;
-                    break;
-            }
-        } else if (parts[0] == "colour") {
-            int r = strToInt(parts[1]);
-            int g = strToInt(parts[2]);
-            int b = strToInt(parts[3]);
-            switch(currentType) {
-                case TYPE_ACTOR:
-                    actor.r = r;
-                    actor.g = g;
-                    actor.b = b;
-                    break;
-                case TYPE_ITEM:
-                    item.r = r;
-                    item.g = g;
-                    item.b = b;
-                    break;
-                case TYPE_TILE:
-                    tile.r = r;
-                    tile.g = g;
-                    tile.b = b;
-                    break;
-            }
-        } else if (parts[0] == "effect") {
-            EffectData ed;
-            ed.trigger = strToInt(parts[1]);
-            ed.effectChance = strToInt(parts[1]);
-            ed.effectId = strToInt(parts[1]);
-            ed.effectStrength = strToInt(parts[1]);
-            switch(currentType) {
-                case TYPE_TILE:
-                case TYPE_ACTOR:
-                    std::cerr << filename << ':' << lineNumber;
-                    std::cerr << "  effect data not supported.\n";
-                    ++errorCount;
-                    break;
-                case TYPE_ITEM:
-                    item.effects.push_back(ed);
-                    break;
-            }
+        } else if (data == nullptr) {
+            rawData.addError(origin, "tried to add property outside of object def");
         } else {
-            std::cerr << filename << ':' << lineNumber;
-            std::cerr << "  unhandled command or attribute " << parts[0] << ".\n";
-            ++errorCount;
+            DataProp prop;
+            prop.origin = origin;
+            prop.name = parts[0];
+            for (unsigned i = 1; i < parts.size(); ++i) {
+                prop.value.push_back(parts[i]);
+            }
+            data->props.push_back(prop);
+        }
+        
+    }
+    return !rawData.hasErrors();
+}
+
+
+std::vector<DataDef> actorPropData{
+    { "glyph",          1 },
+    { "name",           1 },
+    { "description",    1 },
+    { "colour",         3 },
+    { "base_strength",  1 },
+    { "base_agility",   1 },
+    { "base_dexterity", 1 },
+    { "base_toughness", 1 },
+};
+bool processActorData(RawData &rawData, const DataTemp *rawActor) {
+    if (!rawActor || rawActor->typeName != "@actor") {
+        rawData.addError(Origin(), "processActorData passed malformed data");
+        return false;
+    }
+    
+    ActorData resultData;
+    resultData.name = "unknown";
+    resultData.glyph = '?';
+    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    for (int i = 0; i < STAT_BASE_COUNT; ++i) {
+        resultData.baseStats[i] = 1;
+    }
+    resultData.ident = rawActor->ident;
+    for (const DataProp &prop : rawActor->props) {
+        const DataDef &dataDef = getDataDef(actorPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown actor property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
+                                          + " values, but found " 
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "glyph") {
+                if (prop.value[0].size() != 1) {
+                    rawData.addError(prop.origin, "glyph must be single character");
+                } else resultData.glyph = prop.value[0][0];
+            } else if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "colour") {
+                resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
+                resultData.b = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "base_strength") {
+                resultData.baseStats[STAT_STRENGTH] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "base_agility") {
+                resultData.baseStats[STAT_AGILITY] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "base_dexterity") {
+                resultData.baseStats[STAT_DEXTERITY] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "base_toughness") {
+                resultData.baseStats[STAT_TOUGHNESS] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    actorData.push_back(resultData);
+    
+    return true;
+}
+
+std::vector<DataDef> itemPropData{
+    { "glyph",          1 },
+    { "name",           1 },
+    { "description",    1 },
+    { "colour",         3 },
+    { "type",           1 },
+    { "bulk",           1 },
+    { "to_hit",         1 },
+    { "damage",         2 },
+    { "effect",         4 },
+    { "consumeChance",  1 },
+};
+bool processItemData(RawData &rawData, const DataTemp *rawItem) {
+    if (!rawItem || rawItem->typeName != "@item") {
+        rawData.addError(Origin(), "processItemData passed malformed data");
+        return false;
+    }
+    
+    ItemData resultData;
+    resultData.name = "unknown";
+    resultData.glyph = '?';
+    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    resultData.type = ItemData::Junk;
+    resultData.bulk = 1;
+    resultData.toHit = 0;
+    resultData.minDamage = 0;
+    resultData.maxDamage = 0;
+    resultData.consumeChance = 0;
+
+    resultData.ident = rawItem->ident;
+    for (const DataProp &prop : rawItem->props) {
+        const DataDef &dataDef = getDataDef(itemPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown item property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
+                                          + " values, but found " 
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "glyph") {
+                if (prop.value[0].size() != 1) {
+                    rawData.addError(prop.origin, "glyph must be single character");
+                } else resultData.glyph = prop.value[0][0];
+            } else if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "colour") {
+                resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
+                resultData.b = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "type") {
+                resultData.type = static_cast<ItemData::Type>(dataAsInt(rawData, prop.origin, prop.value[0]));
+            } else if (prop.name == "bulk") {
+                resultData.bulk = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "to_hit") {
+                resultData.toHit = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "damage") {
+                resultData.minDamage = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.maxDamage = dataAsInt(rawData, prop.origin, prop.value[1]);
+            } else if (prop.name == "effect") {
+                EffectData effectData;
+                effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);
+                effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
+                effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                resultData.effects.push_back(effectData);
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    itemData.push_back(resultData);
+    
+    return true;
+}
+
+std::vector<DataDef> tilePropData{
+    { "glyph",          1 },
+    { "name",           1 },
+    { "description",    1 },
+    { "colour",         3 },
+    { "isOpaque",       0 },
+    { "isPassable",     0 },
+    { "isUpStair",      0 },
+    { "isDownStair",    0 },
+};
+bool processTileData(RawData &rawData, const DataTemp *rawTile) {
+    if (!rawTile || rawTile->typeName != "@tile") {
+        rawData.addError(Origin(), "processTileData passed malformed data");
+        return false;
+    }
+    
+    TileData resultData;
+    resultData.name = "unknown";
+    resultData.glyph = '?';
+    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    resultData.isOpaque = false;
+    resultData.isPassable = false;
+    resultData.isUpStair = false;
+    resultData.isDownStair = false;
+    resultData.ident = rawTile->ident;
+    for (const DataProp &prop : rawTile->props) {
+        const DataDef &dataDef = getDataDef(tilePropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown tile property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
+                                          + " values, but found " 
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "glyph") {
+                if (prop.value[0].size() != 1) {
+                    rawData.addError(prop.origin, "glyph must be single character");
+                } else resultData.glyph = prop.value[0][0];
+            } else if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "colour") {
+                resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
+                resultData.b = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "isOpaque") {
+                resultData.isOpaque = true;
+            } else if (prop.name == "isPassable") {
+                resultData.isPassable = true;
+            } else if (prop.name == "isUpStair") {
+                resultData.isUpStair = true;
+            } else if (prop.name == "isDownStair") {
+                resultData.isDownStair = true;
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    tileData.push_back(resultData);
+    
+    return true;
+}
+
+
+bool loadAllData() {
+    RawData rawData;
+    loadRawFromFile("resources/game.dat", rawData);
+
+    if (rawData.hasErrors()) {
+        for (const ErrorMessage &msg : rawData.errors) {
+            std::cerr << msg.origin.toString() << "  " << msg.message << '\n';
+        }
+        return false;
+    }
+
+    for (const DataTemp *data : rawData.data) {
+        if (!data) continue;
+        if (data->typeName == "@define") {
+            // we don't need to do anything for this case
+        } else if (data->typeName == "@tile") {
+            processTileData(rawData, data);
+        } else if (data->typeName == "@actor") {
+            processActorData(rawData, data);
+        } else if (data->typeName == "@item") {
+            processItemData(rawData, data);
+        } else {
+            rawData.addError(data->origin, "unknown object type " + data->typeName);
         }
     }
 
-    if (errorCount > 0) {
-        std::cerr << "FOUND " << errorCount << " ERRORS IN DATA.\n";
+    // for (const DataTemp *data : rawData.data) {
+        // std::cerr << "-> '" << data->typeName << "' (" << data->ident << ") '" << data->idName << "'\n";
+        // for (const DataProp &prop : data->props) {
+            // std::cerr << "    '" << prop.name << "' =";
+            // for (const std::string &text : prop.value) {
+                // std::cerr << " '" << text << '\'';
+            // }
+            // std::cerr << '\n';
+        // }
+    // }
+    
+    // for (const DefineValue &def : rawData.defines) {
+        // std::cerr << def.origin.toString() << "  " << def.name << " = " << def.value << '\n';
+    // }
+
+    if (rawData.hasErrors()) {
+        for (const ErrorMessage &msg : rawData.errors) {
+            std::cerr << msg.origin.toString() << "  " << msg.message << '\n';
+        }
         return false;
-    } else return true;
+    }
+    
+    std::cerr << "LOADED " << tileData.size() << " tiles\n";
+    std::cerr << "LOADED " << itemData.size() << " items\n";
+    std::cerr << "LOADED " << actorData.size() << " actors\n";
+    return true;
 }
 
