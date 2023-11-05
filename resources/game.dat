@@ -1,10 +1,29 @@
-# comment line
-
+# item types
 @define IT_JUNK         1
 @define IT_WEAPON       2
 @define IT_TALISMAN     3
 @define IT_CONSUMABLE   4
 
+# effect types
+@define ET_BOOST        0
+@define ET_GIVE_ABILITY 1
+@define ET_ON_HIT       2
+@define ET_ON_USE       3
+@define ET_ON_TICK      4
+
+# actor stats
+@define STAT_STRENGTH   0
+@define STAT_AGILITY    1
+@define STAT_DEXTERITY  2
+@define STAT_TOUGHNESS  3
+@define STAT_TO_HIT     4
+@define STAT_EVASION    5
+@define STAT_BULK_MAX   8
+@define STAT_HEALTH     9
+@define STAT_ENERGY     10
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Tile defs
 @tile TILE_NONE 0
     glyph           ?
     name            unassigned
@@ -58,6 +77,8 @@
     isUpStair
 
 
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Actor defs
 @actor - 0
     glyph           @
     name            player
@@ -78,6 +99,8 @@
     base_toughness  -4
 
 
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Item defs
 @item - 0
     glyph           /
     name            sword
@@ -87,6 +110,7 @@
     bulk            2
     to_hit          2
     damage          7 13
+    effect          ET_BOOST 100 STAT_TO_HIT -1
 
 @item - 1
     glyph           /
@@ -96,13 +120,16 @@
     bulk            3
     to_hit          4
     damage          3 7
+    effect          ET_BOOST 100 STAT_TO_HIT 2
+    effect          ET_BOOST 100 STAT_STRENGTH 4
+    effect          ET_BOOST 100 STAT_BULK_MAX 69
 
 @item - 2
     glyph           !
     name            potion_of_healing
     colour          255 0 0
     type            IT_CONSUMABLE
-    effect          3 1 2 0
+    effect          ET_ON_USE 1 2 0
 
 @item - 3
     glyph           !

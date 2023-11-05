@@ -6,7 +6,7 @@
 
 
 
-Actor::Actor(const ActorData &data, unsigned myIdent) 
+Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
   isPlayer(false), xp(0), playerLastSeenPosition(-1, -1)
 { }
@@ -118,14 +118,21 @@ std::string Item::getName(bool definitive) const {
 }
 
 int Item::getStatBonus(int statNumber) const {
-    // items can never provide a static bonus to current bulk (use the bulk
-    // attribute instead) or to current XP
+    // items can never provide a static bonus to current bulk (use the bulk_max
+    // stat instead) or to current XP
     if (statNumber == STAT_BULK || statNumber == STAT_XP) return 0;
-    
-    return 1;
+
+    int result = 0;
+    for (const EffectData &effect : data.effects) {
+        if (effect.trigger == ET_BOOST && effect.effectId == statNumber) {
+            result += effect.effectStrength;
+        }
+    }
+
+    return result;
 }
 
-MapTile::MapTile() 
+MapTile::MapTile()
 : floor(0), actor(nullptr), item(nullptr), temperature(0), isSeen(false), everSeen(false)
 { }
 
@@ -225,7 +232,7 @@ void Dungeon::calcDistances(const Coord &fromWhere) {
     MapTile *originTile = at(fromWhere);
     if (!originTile) return;
     originTile->distanceValue = 0;
-    
+
     while (!worklist.empty()) {
         const Coord work = worklist.front();
         worklist.pop_front();
@@ -250,10 +257,10 @@ Coord Dungeon::nearestOpenTile(const Coord &source, bool allowActor, bool allowI
     if (!isValidPosition(source)) return Coord(-1, -1);
     const MapTile *originTile = at(source);
     const TileData &originData = getTileData(originTile->floor);
-    if ( (allowActor || !originTile->actor) && 
+    if ( (allowActor || !originTile->actor) &&
          (allowItem || !originTile->item) &&
          (originData.isPassable)) return source;
-    
+
     Direction dir = Direction::North;
     do {
         bool isGood = true;
@@ -267,7 +274,7 @@ Coord Dungeon::nearestOpenTile(const Coord &source, bool allowActor, bool allowI
         }
         dir = rotate45(dir);
     } while (dir != Direction::North);
-    
+
     return Coord(-1, -1);
 }
 
@@ -536,7 +543,7 @@ void Dungeon::tick(World &world) {
             }
         }
     }
-    
+
     clearDeadActors();
 }
 
