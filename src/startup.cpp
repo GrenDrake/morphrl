@@ -94,6 +94,7 @@ DocPage creditsPage1{
         "    BearLibTerminal    http://foo.wyrd.name/en:bearlibterminal",
         "    libfov             https://github.com/google-code-export/libfov",
         "    DejaVu Fonts       https://dejavu-fonts.github.io/",
+        "    stb                https://github.com/nothings/stb",
     }, "resources/logo.png", DocImageAlign::None
 };
 
