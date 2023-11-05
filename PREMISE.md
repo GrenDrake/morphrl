@@ -71,7 +71,7 @@ const int ET_GIVE_ABILITY
 // effectId = ability to give
 const int ET_ON_HIT
 // triggers a special effect every time the actor makes a successful attack
-const int ET_ON_USE          
+const int ET_ON_USE
 // triggers a special effect when the item is used from the inventory (item may be destroyed)
 const int ET_ON_TICK
 // triggers a special effect at the end of the actor's turn, every turn
@@ -100,7 +100,7 @@ StatusData
 ItemData/MutationData/StatusData
     bonuses
         type
-            STATIC_BONUS,toWhat,amount 
+            STATIC_BONUS,toWhat,amount
             - provides bonus to stat when item is equipped
             - no effect on non-equipables
             GIVE_ABILITY,abilityId
@@ -121,6 +121,15 @@ mutations, status effects, and equipment use the same bonus data
 - count mutations as "equipped" when gained
 - mutations cannot be "used" - have mutations give specific abilities to simulate
 
+
+
+Effects
+    ID  Name                        Strength
+    0   Instant healing             percent health healed
+    1   Applies regeneration status regeneration status strength
+    2   Mutate                      # of mutations to add
+    3   Purification                # of mutations to remove
+    4   Apply poison status         poison status strength
 
 
 

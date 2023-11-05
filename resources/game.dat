@@ -22,6 +22,15 @@
 @define STAT_HEALTH     9
 @define STAT_ENERGY     10
 
+# effect effects
+@define EFFECT_HEALING  0
+@define EFFECT_REGEN    1
+@define EFFECT_MUTATE   2
+@define EFFECT_PURIFY   3
+@define EFFECT_POISON   4
+@define EFFECT_BOOST    5
+
+
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Tile defs
 @tile TILE_NONE 0
@@ -129,12 +138,14 @@
     name            potion_of_healing
     colour          255 0 0
     type            IT_CONSUMABLE
-    effect          ET_ON_USE 1 2 0
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_HEALING 20
 
 @item - 3
     glyph           !
     name            potion_of_mutation
     colour          127 127 255
+    consumeChance   100
     type            IT_CONSUMABLE
 
 @item - 4
@@ -154,3 +165,11 @@
     name            brick
     colour          127 127 127
     type            IT_JUNK
+
+@item - 7
+    glyph           \
+    name            wand_of_healing
+    colour          255 127 127
+    consumeChance   25
+    type            IT_CONSUMABLE
+    effect          ET_ON_USE 100 EFFECT_HEALING 20

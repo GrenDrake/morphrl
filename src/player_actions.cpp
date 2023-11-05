@@ -67,7 +67,7 @@ void tryPlayerTakeItem(World &world) {
 
 void tryPlayerDropItem(World &world) {
     Coord dropWhere = world.map->nearestOpenTile(world.player->position);
-    
+
     if (dropWhere.x == -1) {
         world.addMessage("No room to drop item.");
         return;
@@ -81,6 +81,42 @@ void tryPlayerDropItem(World &world) {
     world.tick();
 }
 
+
+
+void activateItem(World &world, Item *item, Actor *user) {
+    std::stringstream msg;
+    bool didEffect = false;
+    if (user == world.player)   msg << "Used ";
+    else                        msg << ucFirst(user->getName()) << " used ";
+    msg << "[color=yellow]" << item->getName() << "[/color]: ";
+
+    for (const EffectData &data : item->data.effects) {
+        if (data.trigger != ET_ON_USE) continue;
+        if (rand() % 100 >= data.effectChance) continue;
+        didEffect = true;
+        switch (data.effectId) {
+            case EFFECT_HEALING: {
+                int amount = data.effectStrength * user->getStat(STAT_HEALTH) / 100;
+                user->takeDamage(-amount);
+                msg << "Received " << amount << " healing. ";
+                break; }
+            default:
+                msg << "Unhandled effect " << data.effectId << ". ";
+        }
+    }
+
+    if (!didEffect) {
+        msg << "no effect. ";
+    }
+    int roll = rand() % 100;
+    if (item->data.consumeChance > roll) {
+        user->removeItem(item);
+        msg << "[color=yellow]" << ucFirst(item->getName(true)) << "[/color] was used up.";
+        delete item;
+    }
+    world.addMessage(msg.str());
+
+}
 
 
 void tryPlayerUseItem(World &world) {
@@ -126,26 +162,7 @@ void tryPlayerUseItem(World &world) {
             world.tick();
             return;
         case ItemData::Consumable: { // activate it
-            std::stringstream msg;
-            bool didEffect = false;
-            msg << "Using [color=yellow]" << ucFirst(item->getName(true)) << "[/color]: ";
-            std::cerr << item->data.effects.size() << '\n';
-            for (const EffectData &data : item->data.effects) {
-                if (data.trigger != ET_ON_USE) continue;
-                msg << "Effect " << data.effectId << ". ";
-                didEffect = true;
-            }
-
-            if (!didEffect) {
-                msg << "no effect. ";
-            }
-            int roll = rand() % 100;
-            if (item->data.consumeChance > roll) {
-                world.player->removeItem(item);
-                delete item;
-                msg << "Consumed.";
-            }
-            world.addMessage(msg.str());
+            activateItem(world, item, world.player);
             break; }
         default:
             world.addMessage("[color=yellow]" + ucFirst(item->getName(true)) +

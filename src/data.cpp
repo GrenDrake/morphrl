@@ -67,7 +67,7 @@ TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 std::vector<TileData> tileData;
 
 
-Origin::Origin() 
+Origin::Origin()
 : filename("(internal)", 0)
 { }
 
@@ -202,7 +202,7 @@ bool loadRawFromFile(const std::string &filename, RawData &rawData) {
             }
             data->props.push_back(prop);
         }
-        
+
     }
     return !rawData.hasErrors();
 }
@@ -223,11 +223,11 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
         rawData.addError(Origin(), "processActorData passed malformed data");
         return false;
     }
-    
+
     ActorData resultData;
     resultData.name = "unknown";
     resultData.glyph = '?';
-    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    resultData.r = 255; resultData.g = 255; resultData.b = 255;
     for (int i = 0; i < STAT_BASE_COUNT; ++i) {
         resultData.baseStats[i] = 1;
     }
@@ -237,8 +237,8 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
         if (dataDef.partCount == BAD_VALUE) {
             rawData.addError(prop.origin, "unknown actor property " + prop.name);
         } else if (dataDef.partCount != prop.value.size()) {
-            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
-                                          + " values, but found " 
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
                                           + std::to_string(prop.value.size()));
         } else {
             if (prop.name == "glyph") {
@@ -267,7 +267,7 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
         }
     }
     actorData.push_back(resultData);
-    
+
     return true;
 }
 
@@ -288,11 +288,11 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
         rawData.addError(Origin(), "processItemData passed malformed data");
         return false;
     }
-    
+
     ItemData resultData;
     resultData.name = "unknown";
     resultData.glyph = '?';
-    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    resultData.r = 255; resultData.g = 255; resultData.b = 255;
     resultData.type = ItemData::Junk;
     resultData.bulk = 1;
     resultData.toHit = 0;
@@ -306,8 +306,8 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
         if (dataDef.partCount == BAD_VALUE) {
             rawData.addError(prop.origin, "unknown item property " + prop.name);
         } else if (dataDef.partCount != prop.value.size()) {
-            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
-                                          + " values, but found " 
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
                                           + std::to_string(prop.value.size()));
         } else {
             if (prop.name == "glyph") {
@@ -331,6 +331,8 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
             } else if (prop.name == "damage") {
                 resultData.minDamage = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.maxDamage = dataAsInt(rawData, prop.origin, prop.value[1]);
+            } else if (prop.name == "consumeChance") {
+                resultData.consumeChance = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "effect") {
                 EffectData effectData;
                 effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);
@@ -344,7 +346,7 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
         }
     }
     itemData.push_back(resultData);
-    
+
     return true;
 }
 
@@ -363,11 +365,11 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
         rawData.addError(Origin(), "processTileData passed malformed data");
         return false;
     }
-    
+
     TileData resultData;
     resultData.name = "unknown";
     resultData.glyph = '?';
-    resultData.r = 255; resultData.g = 255; resultData.b = 255; 
+    resultData.r = 255; resultData.g = 255; resultData.b = 255;
     resultData.isOpaque = false;
     resultData.isPassable = false;
     resultData.isUpStair = false;
@@ -378,8 +380,8 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
         if (dataDef.partCount == BAD_VALUE) {
             rawData.addError(prop.origin, "unknown tile property " + prop.name);
         } else if (dataDef.partCount != prop.value.size()) {
-            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount) 
-                                          + " values, but found " 
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
                                           + std::to_string(prop.value.size()));
         } else {
             if (prop.name == "glyph") {
@@ -408,7 +410,7 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
         }
     }
     tileData.push_back(resultData);
-    
+
     return true;
 }
 
@@ -449,7 +451,7 @@ bool loadAllData() {
             // std::cerr << '\n';
         // }
     // }
-    
+
     // for (const DefineValue &def : rawData.defines) {
         // std::cerr << def.origin.toString() << "  " << def.name << " = " << def.value << '\n';
     // }
@@ -460,7 +462,7 @@ bool loadAllData() {
         }
         return false;
     }
-    
+
     std::cerr << "LOADED " << tileData.size() << " tiles\n";
     std::cerr << "LOADED " << itemData.size() << " items\n";
     std::cerr << "LOADED " << actorData.size() << " actors\n";

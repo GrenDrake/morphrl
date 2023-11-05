@@ -52,6 +52,14 @@ const int STAT_ENERGY       = 10;
 const int STAT_ALL_COUNT    = 11;
 
 
+const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
+const int EFFECT_REGEN      = 1; // regen status - strength = regen rate
+const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
+const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
+const int EFFECT_POISON     = 4; // poison status - strength = damage rate
+const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
+
+
 enum class Direction {
     Unknown, Here,
     North, Northeast, East, Southeast, South, Southwest, West, Northwest,

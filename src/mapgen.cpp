@@ -60,8 +60,8 @@ void buildMaze(Dungeon &d) {
             steps.pop_back();
             continue;
         }
-        // pick a direction and try to tunnel in that direction. if we've 
-        // already got a passage in that direction, rotate direction and try 
+        // pick a direction and try to tunnel in that direction. if we've
+        // already got a passage in that direction, rotate direction and try
         // again. if no direction succeeds, remove this point from the list and
         // stop trying
         Direction dir = randomCardinalDirection();
@@ -110,7 +110,7 @@ void createRoom(Dungeon &d, const Room &room) {
 void buildRooms(Dungeon &d) {
     int xRange = ROOM_MAX_WIDTH - 2;
     int yRange = ROOM_MAX_HEIGHT - 2;
-    
+
     for (int i = 0; i < ROOM_ATTEMPTS; ++i) {
         int x = 1 + rand() % (d.width() - 2);
         x = x / 2 * 2;
@@ -170,7 +170,7 @@ void setupRooms(Dungeon &d) {
                 addDoorToRoom(d, room);
             }
         }
-        
+
         if (room.type == RT_ENTRANCE) {
             for (int y = 0; y < room.h; ++y) {
                 for (int x = 0; x < room.w; ++x) {
@@ -213,7 +213,7 @@ void trimDeadEnds(Dungeon &d) {
                         workdir = rotate90(workdir);
                     } while (workdir != dir);
                 }
-                    
+
             }
         }
     }
@@ -295,7 +295,7 @@ void addEntranceHall(Dungeon &d) {
     while (d.isValidPosition(pos.shift(room.roomDirection))) {
         pos = pos.shift(room.roomDirection);
     }
-    
+
     room.x = pos.x - 5;
     room.y = pos.y - 5;
     if (isOdd(room.x)) --room.x;
@@ -349,8 +349,8 @@ void doMapgen(Dungeon &d) {
             --iterations;
         } while (!isGood);
         if (!isGood) continue;
-        
-        Item *item = new Item(getItemData(rand()%7));
+
+        Item *item = new Item(getItemData(rand()%8));
         d.addItem(item, c);
     }
 
