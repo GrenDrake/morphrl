@@ -140,6 +140,7 @@ int main() {
     terminal_set("font: resources/DejaVuSansMono.ttf, size=24;");
     terminal_set("italic font: resources/DejaVuSansMono-Oblique.ttf, size=24;");
 
+    World *world = nullptr;
     std::cerr << "ENTERING main menu\n";
     const std::string versionString = "Development Release 1";
     const int versionX = 79 - versionString.size();
@@ -156,9 +157,10 @@ int main() {
         terminal_print(25, 11, "[font=italic]Delving the Mutagenic Dungeon");
         terminal_print(versionX, 24, ("[font=italic]" + versionString).c_str());
         terminal_print(8, 16, "Start new game");
-        terminal_print(8, 17, "Story");
-        terminal_print(8, 18, "Credits");
-        terminal_print(8, 19, "Quit");
+        terminal_print(8, 17, "Resume current game");
+        terminal_print(8, 18, "Story");
+        terminal_print(8, 19, "Credits");
+        terminal_print(8, 20, "Quit");
         terminal_put(6, 16+selection, '*');
         terminal_color(fgColorDark);
         terminal_print(31, 12, "Pre-Alpha Release");
@@ -169,24 +171,36 @@ int main() {
         if (key == TK_ESCAPE || key == TK_Q || key == TK_CLOSE) {
             break;
         }
-        if (key == TK_UP && selection > 0) --selection;
-        if (key == TK_DOWN && selection < 3) ++selection;
-        if (key == TK_SPACE || key == TK_ENTER) {
+        if (key == TK_HOME) selection = 0;
+        if ((key == TK_UP || key == TK_KP_8) && selection > 0) --selection;
+        if (key == TK_END) selection = 4;
+        if ((key == TK_DOWN || key == TK_KP_2) && selection < 4) ++selection;
+        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
             switch(selection) {
                 case 0: {
                     // start new game
-                    World *world = createGame();
+                    if (world) {
+                        std::cerr << "FREEING old game\n";
+                        delete world;
+                    }
+                    world = createGame();
                     gameloop(*world);
-                    delete world;
-                    done = true;
+                    ++selection;
                     break; }
                 case 1:
-                    showDocument(gameStory);
+                    if (world) {
+                        gameloop(*world);
+                    } else {
+                        ui_alertBox("Error", "No game in progress.");
+                    }
                     break;
                 case 2:
-                    showDocument(gameCredits);
+                    showDocument(gameStory);
                     break;
                 case 3:
+                    showDocument(gameCredits);
+                    break;
+                case 4:
                     // quit
                     done = true;
                     break;
@@ -194,7 +208,7 @@ int main() {
         }
     }
 
-
+    if (world) delete world;
     delete logo;
     terminal_close();
 

@@ -97,11 +97,11 @@ struct ActorData {
 };
 struct ItemData {
     enum Type {
-        Invalid, 
-        Junk, 
+        Invalid,
+        Junk,
         //              arg1        arg2        arg3
         Weapon,      // attackBonus minDamage   maxDamage
-        Talisman, 
+        Talisman,
         Consumable
     };
 
@@ -188,7 +188,7 @@ struct Room {
     int x, y, w, h;
     Direction roomDirection;
     bool isFilled;
-    
+
     int area() const;
     Coord getPointWithin() const;
 };
@@ -308,5 +308,7 @@ const TileData& getTileData(unsigned ident);
 
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
+
+void ui_alertBox(const std::string &title, const std::string &message);
 
 #endif // MORPH_H

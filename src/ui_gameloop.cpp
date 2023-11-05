@@ -52,10 +52,10 @@ void examineMapSpace(World &world, const Coord &where) {
             terminal_color(textColour);
             dimensions_t printedSize = terminal_print_ext(0, nextY+1, textWidth, 5, TK_ALIGN_DEFAULT, tile->actor->data.desc.c_str());
             std::string healthLine = "Health: " + std::to_string(percentOf(tile->actor->health, tile->actor->getStat(STAT_HEALTH))) + "%";
-            
+
             terminal_print(column2x, nextY + 1, healthLine.c_str());
             if (printedSize.height < 1) printedSize.height = 1;
-            nextY += printedSize.height + 2;            
+            nextY += printedSize.height + 2;
         }
 
         if (tile->item) {
@@ -66,7 +66,7 @@ void examineMapSpace(World &world, const Coord &where) {
             nextY += printedSize.height + 2;
         }
         terminal_refresh();
-        
+
         int key = terminal_read();
         if (key != TK_MOUSE_MOVE && key != TK_MOUSE_SCROLL) break;
     }
@@ -165,13 +165,13 @@ void gameloop(World &world) {
                 if (isVisible && actor) {
                     terminal_color(color_from_argb(255,
                                                    actor->data.r,
-                                                   actor->data.g, 
+                                                   actor->data.g,
                                                    actor->data.b));
                     terminal_put(x, y, actor->data.glyph);
                 } else if (isVisible && item) {
                     terminal_color(color_from_argb(255,
                                                    item->data.r,
-                                                   item->data.g, 
+                                                   item->data.g,
                                                    item->data.b));
                     terminal_put(x, y, item->data.glyph);
                 } else {
@@ -191,7 +191,7 @@ void gameloop(World &world) {
         int healthPercent = 0;
         if (world.player->health < 1) healthPercent = 0;
         else {
-            healthPercent = percentOf(world.player->health, 
+            healthPercent = percentOf(world.player->health,
                                       world.player->getStat(STAT_HEALTH)) / 10;
             if (world.player->health > 0 && healthPercent < 1) healthPercent = 1;
         }
@@ -203,7 +203,7 @@ void gameloop(World &world) {
         int energyPercent = 0;
         if (world.player->energy < 1) energyPercent = 0;
         else {
-            energyPercent = percentOf(world.player->energy, 
+            energyPercent = percentOf(world.player->energy,
                                       world.player->getStat(STAT_ENERGY)) / 10;
             if (world.player->energy > 0 && energyPercent < 1) energyPercent = 1;
         }
@@ -241,8 +241,8 @@ void gameloop(World &world) {
         terminal_print(61, 18, ("Turn: " + std::to_string(world.currentTurn)).c_str());
 
         terminal_refresh();
-        
-        
+
+
         int key = terminal_read();
         if (key == TK_ESCAPE)   break;
         if (key == TK_CLOSE)    break;
@@ -278,6 +278,7 @@ void gameloop(World &world) {
             }
         }
         if (key == TK_F8)   world.map->calcDistances(world.player->position);
+        if (key == TK_F9)   ui_alertBox("Testing", "This is a really long message for testing purposes and so I can see how well word wrap works from messages and so one and so forth and such is what this message is for.");
     }
 
     return;
