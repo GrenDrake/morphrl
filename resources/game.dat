@@ -1,0 +1,142 @@
+# comment line
+
+# @tile
+
+
+@tile 0 -
+    glyph           ?
+    name            unassigned
+    colour          255 0 255
+    isOpaque
+;
+
+@tile 1 -
+    glyph           #
+    name            wall
+    colour          127 127 127
+    isOpaque
+;
+
+@tile 2 -
+    glyph           .
+    name            floor
+    description     An_entirely_unremarkable_patch_of_floor.
+    colour          255 255 255
+    isPassable
+;
+
+@tile 3 -
+    glyph           *
+    name            marker
+    colour          255 0 255
+    isPassable
+;
+
+@tile 4 -
+    glyph           +
+    name            door
+    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    colour          165 42 42
+    isPassable
+    isOpaque
+;
+
+@tile 5 -
+    glyph           ~
+    name            water
+    colour          127 196 127
+;
+
+@tile 6 -
+    glyph           <
+    name            stairs_down
+    colour          255 255 255
+    isPassable
+    isDownStair
+;
+
+@tile 7 -
+    glyph           >
+    name            stairs_up
+    colour          255 255 255
+    isPassable
+    isUpStair
+;
+
+@actor 0 -
+    glyph           @
+    name            player
+    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    colour          127 255 127
+    base_strength   0
+    base_agility    0
+    base_dexterity  0
+    base_toughness  0
+;
+
+@actor 1 -
+    glyph           g
+    name            goblin
+    colour          255 127 127
+    base_strength   -2
+    base_agility    -3
+    base_dexterity  -2
+    base_toughness  -4
+;
+
+@item 0 -
+    glyph           /
+    name            sword
+    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    colour          127 127 127
+    type            weapon
+    bulk            2
+    to_hit          2
+    damage          7 13
+;
+
+@item 1 -
+    glyph           /
+    name            dagger
+    colour          127 127 127
+    type            weapon
+    bulk            3
+    to_hit          4
+    damage          3 7
+;
+
+@item 2 -
+    glyph           !
+    name            potion_of_healing
+    colour          255 0 0
+    type            consumable
+    effect          3 1 2 0
+;
+
+@item 3 -
+    glyph           !
+    name            potion_of_mutation
+    colour          127 127 255
+    type            consumable
+;
+
+@item 4 -
+    glyph           "
+    name            talisman_of_armour
+    colour          63 63 127
+    type            talisman
+;
+
+@item 5 -
+    glyph           "
+    name            talisman_of_health
+    colour          63 127 63
+    type            talisman
+;
+
+@item 6 -
+    glyph           %
+    name            brick
+    colour          127 127 127
+    type            junk
+;

@@ -1,0 +1,252 @@
+#include <cstdint>
+#include <ctime>
+#include <fstream>
+#include <iostream>
+#include <string>
+#include <vector>
+
+#include "BearLibTerminal.h"
+#include "morph.h"
+
+
+enum class DocImageAlign {
+    None, Left, Right
+};
+struct DocPage {
+    std::vector<std::string> text;
+    std::string imageFilename;
+    DocImageAlign align;
+    Image *image;
+};
+struct DocStory {
+    std::vector<DocPage> pages;
+};
+
+
+void showDocument(DocStory &story);
+void gameloop(World &world);
+
+
+DocPage storyPage1{
+    {
+        "",
+        "The Great War began nearly 300 years ago. Archmages fought",
+        "each other, seeking to destroy their rivals and dominate",
+        "the world. Decades later it ended not in victory, but with",
+        "the Rending. The very forces of reality were torn apart;",
+        "the lands shattered, rocks ran as water, the oceans",
+        "hardened like stone, and the newborn Winds of Change ran",
+        "rampant over the lands. The Winds twisted and changed",
+        "everything they touched.",
+        "",
+        "Thankfully, the Rendering lasted only a few years and its",
+        "aftereffects have diminshed over time. The surivors have",
+        "learned to deal with what remains and have blamed the",
+        "archmages, causing magery to be shunned and, eventually,",
+        "forgotten.",
+        "",
+        "The city of Sanctuary was established as the last bastion",
+        "of hope for humanity (though over the past three",
+        "centuries, many such \"last bastions\" have been",
+        "discovered). A powerful barrier surronds and protects the",
+        "city and its surronding lands from the ravages of the",
+        "shattered world. The population within live in relative",
+        "safety and freedom from random mutations.",
+    }, "resources/story1.png", DocImageAlign::Right
+};
+
+DocPage storyPage2{
+    {
+        "",
+
+        "Although established as a haven for humanity, it is not",
+        "unwelcoming of mutates (though it's not particularly",
+        "welcoming, either), though they often struggle in a world",
+        "not built with them in mind. Most mutants are passer-bys,",
+        "travelling merchants and the like.",
+        "",
+        "Nothing lasts forever and the protective barrier always",
+        "fades with time. About once a generation, it's neccesary",
+        "for someone to go beyond the barrier and retrieve fresh",
+        "samples of the Ethereal Ore that powers the barrier. This",
+        "time, you've been selected. You're not the first of your",
+        "generation, but hopefully you will be the last. Given a",
+        "sword, a potion of regeneration, and some specially",
+        "designed leather armour that can adapt itself to",
+        "mutations, you set out.",
+        "",
+        "Fortunately, traces of Ethereal Ore have been found in a",
+        "mine not far outside the barrier. Unfortunately, it lies",
+        "beneath the remains of a wizard's tower, explaining why it",
+        "has not been claimed before. You'll need to make your way",
+        "through contamination until you can delve deep enough to",
+        "claim it.",
+    }, "resources/story2.png", DocImageAlign::Left
+};
+
+DocPage creditsPage1{
+    {
+        "","","","","","","","","","","","","",
+        "[font=italic]MorphRL: Delving the Mutagenic Dungeons[/font] was originally created for",
+        "[font=italic]Transformation game Jam 2023[/font] (https://itch.io/jam/tf23) by Gren Drake.",
+        "",
+        "MorphRL was developed using:",
+        "    BearLibTerminal    http://foo.wyrd.name/en:bearlibterminal",
+        "    libfov             https://github.com/google-code-export/libfov",
+        "    DejaVu Fonts       https://dejavu-fonts.github.io/",
+    }, "resources/logo.png", DocImageAlign::None
+};
+
+DocStory gameStory{ { storyPage1, storyPage2 } };
+DocStory gameCredits{ { creditsPage1 } };
+
+
+World* createGame() {
+    World *world = new World;
+
+    world->player = new Actor(getActorData(0), -1);
+    world->player->isPlayer = true;
+    world->player->reset();
+
+    world->map = new Dungeon(1, MAP_WIDTH, MAP_HEIGHT);
+    doMapgen(*world->map);
+
+    const Room &startRoom = world->map->getRoomByType(1);
+    Coord startPosition;
+    do {
+        startPosition = startRoom.getPointWithin();
+        if (!world->map->isValidPosition(startPosition)) {
+            startPosition.x = -1;
+            continue;
+        }
+        const MapTile *tile = world->map->at(startPosition);
+        const TileData &td = getTileData(tile->floor);
+        if (!td.isPassable || tile->actor) startPosition.x = -1;
+    } while (startPosition.x < 0);
+    std::cerr << "START " << startPosition << '\n';
+    world->map->addActor(world->player, startPosition);
+    world->map->doActorFOV(world->player);
+    return world;
+}
+
+int main() {
+    srand(time(nullptr));
+    std::cerr << "LOADING DATA\n";
+    if (!loadAllData()) return 1;
+
+    terminal_open();
+    terminal_set("window.title='MorphRL';");
+    terminal_set("input.filter = [keyboard, mouse];");
+    terminal_set("font: resources/DejaVuSansMono.ttf, size=24;");
+    terminal_set("italic font: resources/DejaVuSansMono-Oblique.ttf, size=24;");
+
+    std::cerr << "ENTERING main menu\n";
+    const std::string versionString = "Development Release 1";
+    const int versionX = 79 - versionString.size();
+    Image *logo = loadImage("resources/logo.png");
+    bool done = false;
+    int selection = 0;
+    color_t fgColor = color_from_argb(255, 196, 196, 196);
+    color_t fgColorDark = color_from_argb(255, 98, 98, 98);
+    color_t bgColor = color_from_argb(255, 0, 0, 0);
+    while (!done) {
+        terminal_color(fgColor);
+        terminal_bkcolor(bgColor);
+        terminal_clear();
+        terminal_print(25, 11, "[font=italic]Delving the Mutagenic Dungeon");
+        terminal_print(versionX, 24, ("[font=italic]" + versionString).c_str());
+        terminal_print(8, 16, "Start new game");
+        terminal_print(8, 17, "Story");
+        terminal_print(8, 18, "Credits");
+        terminal_print(8, 19, "Quit");
+        terminal_put(6, 16+selection, '*');
+        terminal_color(fgColorDark);
+        terminal_print(31, 12, "Pre-Alpha Release");
+        drawImage(0, 0, logo);
+        terminal_refresh();
+
+        int key = terminal_read();
+        if (key == TK_ESCAPE || key == TK_Q || key == TK_CLOSE) {
+            break;
+        }
+        if (key == TK_UP && selection > 0) --selection;
+        if (key == TK_DOWN && selection < 3) ++selection;
+        if (key == TK_SPACE || key == TK_ENTER) {
+            switch(selection) {
+                case 0: {
+                    // start new game
+                    World *world = createGame();
+                    gameloop(*world);
+                    delete world;
+                    done = true;
+                    break; }
+                case 1:
+                    showDocument(gameStory);
+                    break;
+                case 2:
+                    showDocument(gameCredits);
+                    break;
+                case 3:
+                    // quit
+                    done = true;
+                    break;
+            }
+        }
+    }
+
+
+    delete logo;
+    terminal_close();
+
+
+    return 0;
+}
+
+
+void showDocument(DocStory &story) {
+    // Image *art = loadImage(imageFilename);
+    if (story.pages.empty()) return; // can't show an empty document
+    unsigned currentPage = 0;
+
+    while (1) {
+        DocPage &page = story.pages[currentPage];
+        if (page.image == nullptr && !page.imageFilename.empty()) {
+            page.image = loadImage(page.imageFilename);
+        }
+
+        int leftMargin = 1;
+        if (page.align == DocImageAlign::Left) leftMargin = 21;
+
+        terminal_color(color_from_argb(255, 196, 196, 196));
+        terminal_bkcolor(color_from_argb(255, 0, 0, 0));
+        terminal_clear();
+
+        for (unsigned i = 0; i < page.text.size() && i < 25; ++i) {
+            terminal_print(leftMargin, i, page.text[i].c_str());
+        }
+        terminal_bkcolor(color_from_argb(255, 196, 196, 196));
+        terminal_color(color_from_argb(255, 0, 0, 0));
+        terminal_clear_area(0, 24, 80, 1);
+        if (story.pages.size() > 1) {
+            terminal_print(1, 24, "<- Change Page ->  ESCAPE to leave  ENTER/SPACE to continue");
+            const std::string pageNumberString = "Page " + std::to_string(currentPage + 1) + " of " + std::to_string(story.pages.size());
+            terminal_print(79 - pageNumberString.size(), 24, pageNumberString.c_str());
+        } else {
+            terminal_print(20, 24, "ESCAPE to leave  ENTER/SPACE to continue");
+        }
+
+        if (page.align == DocImageAlign::Right) drawImage(60, 0, page.image);
+        else                                    drawImage(0, 0, page.image);
+        terminal_refresh();
+
+        int key = terminal_read();
+        if (key == TK_LEFT && currentPage > 0) --currentPage;
+        if (key == TK_SPACE || key == TK_ENTER) {
+            if (currentPage < story.pages.size() - 1) ++currentPage;
+            else return;
+        }
+        if (key == TK_RIGHT && currentPage < story.pages.size() - 1) ++currentPage;
+        if (key == TK_ESCAPE) return;
+    }
+}
+
