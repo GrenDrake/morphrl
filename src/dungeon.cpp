@@ -133,7 +133,7 @@ int Item::getStatBonus(int statNumber) const {
 }
 
 MapTile::MapTile()
-: floor(0), actor(nullptr), item(nullptr), temperature(0), isSeen(false), everSeen(false)
+: floor(0), actor(nullptr), temperature(0), isSeen(false), everSeen(false)
 { }
 
 
@@ -258,7 +258,7 @@ Coord Dungeon::nearestOpenTile(const Coord &source, bool allowActor, bool allowI
     const MapTile *originTile = at(source);
     const TileData &originData = getTileData(originTile->floor);
     if ( (allowActor || !originTile->actor) &&
-         (allowItem || !originTile->item) &&
+         (allowItem || originTile->items.empty()) &&
          (originData.isPassable)) return source;
 
     Direction dir = Direction::North;
@@ -269,7 +269,7 @@ Coord Dungeon::nearestOpenTile(const Coord &source, bool allowActor, bool allowI
             const TileData &td = getTileData(tile->floor);
             if (!td.isPassable) isGood = false;
             if (!allowActor && tile->actor) isGood = false;
-            if (!allowItem && tile->item) isGood = false;
+            if (!allowItem && !tile->items.empty()) isGood = false;
             if (isGood) return source.shift(dir);
         }
         dir = rotate45(dir);
@@ -455,8 +455,8 @@ Actor* Dungeon::actorAt(const Coord &where) {
 bool Dungeon::addItem(Item *what, const Coord &where) {
     if (!what) return false;
     MapTile *tile = at(where);
-    if (!tile || tile->item) return false;
-    tile->item = what;
+    if (!tile) return false;
+    tile->items.push_back(what);
     what->position = where;
     return true;
 }
@@ -465,8 +465,13 @@ bool Dungeon::removeItem(Item *what) {
     if (!what) return false;
     MapTile *tile = at(what->position);
     if (!tile) return false;
-    if (tile->item != what) return false;
-    tile->item = nullptr;
+    for (auto iter = tile->items.begin(); iter != tile->items.end(); ) {
+        if (*iter == what) {
+            iter = tile->items.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
     what->position = Coord(-1, -1);
     return true;
 }
@@ -474,12 +479,14 @@ bool Dungeon::removeItem(Item *what) {
 const Item* Dungeon::itemAt(const Coord &where) const {
     const MapTile *tile = at(where);
     if (!tile) return nullptr;
-    return tile->item;
+    if (tile->items.empty()) return nullptr;
+    return tile->items.front();
 }
 Item* Dungeon::itemAt(const Coord &where) {
     MapTile *tile = at(where);
     if (!tile) return nullptr;
-    return tile->item;
+    if (tile->items.empty()) return nullptr;
+    return tile->items.front();
 }
 
 

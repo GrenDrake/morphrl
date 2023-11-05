@@ -58,13 +58,13 @@ void examineMapSpace(World &world, const Coord &where) {
             nextY += printedSize.height + 2;
         }
 
-        if (tile->item) {
-            terminal_color(highlight);
-            terminal_print(0, nextY, ucFirst(tile->item->getName(true)).c_str());
-            terminal_color(textColour);
-            dimensions_t printedSize = terminal_print_ext(0, nextY+1, textWidth, 5, TK_ALIGN_DEFAULT, tile->item->data.desc.c_str());
-            nextY += printedSize.height + 2;
-        }
+        // if (!tile->items.empty()) {
+            // terminal_color(highlight);
+            // terminal_print(0, nextY, ucFirst(tile->item->getName(true)).c_str());
+            // terminal_color(textColour);
+            // dimensions_t printedSize = terminal_print_ext(0, nextY+1, textWidth, 5, TK_ALIGN_DEFAULT, tile->item->data.desc.c_str());
+            // nextY += printedSize.height + 2;
+        // }
         terminal_refresh();
 
         int key = terminal_read();
@@ -80,14 +80,27 @@ void previewMapSpace(World &world, const Coord &where) {
         s << "You see: [color=yellow]" << td.name << "[/color]";
         if (tile->temperature < 0) s << " ([color=cyan]cold[/color] area)";
         if (tile->temperature > 0) s << " ([color=red]hot[/color] area)";
-        if (tile->actor || tile->item) s << " containing ";
+        if (tile->actor || !tile->items.empty()) s << " containing";
         if (tile->actor) {
-            s << "[color=yellow]" << tile->actor->getName() << "[/color] (";
+            s << " [color=yellow]" << tile->actor->getName() << "[/color] (";
             s << percentOf(tile->actor->health, tile->actor->getStat(STAT_HEALTH));
             s << "%)";
         }
-        if (tile->actor && tile->item) s << " and ";
-        if (tile->item) s << "[color=yellow]" << tile->item->getName() << "[/color]";
+        if (tile->actor && !tile->items.empty()) s << " and";
+        if (!tile->items.empty()) {
+            if (tile->items.size() > 4) {
+                s << " many items";
+            } else if (tile->items.size() == 1) {
+                    s << " [color=yellow]" << tile->items.front()->getName() << "[/color]";
+            } else {
+                for (unsigned i = 0; i < tile->items.size(); ++i) {
+                    if (i == tile->items.size() - 1) s << " and";
+                    else if (i > 0) s << ",";
+                    s << " [color=yellow]" << tile->items[i]->getName() << "[/color]";
+                }
+            }
+        }
+        s << '.';
         world.addMessage(s.str());
     }
 }

@@ -66,17 +66,17 @@ void tryPlayerTakeItem(World &world) {
 }
 
 void tryPlayerDropItem(World &world) {
-    Coord dropWhere = world.map->nearestOpenTile(world.player->position);
+    // Coord dropWhere = world.map->nearestOpenTile(world.player->position);
 
-    if (dropWhere.x == -1) {
-        world.addMessage("No room to drop item.");
-        return;
-    }
+    // if (dropWhere.x == -1) {
+        // world.addMessage("No room to drop item.");
+        // return;
+    // }
 
     Item *item = selectInventoryItem(world, "Drop what?");
     if (!item) return; // cancelled
     world.player->removeItem(item);
-    world.map->addItem(item, dropWhere);
+    world.map->addItem(item, world.player->position);
     world.addMessage("Dropped [color=yellow]" + item->getName(true) + "[/color].");
     world.tick();
 }

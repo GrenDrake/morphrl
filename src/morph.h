@@ -184,7 +184,7 @@ struct MapTile {
     MapTile();
     int floor;
     Actor *actor;
-    Item *item;
+    std::vector<Item*> items;
     int temperature;
     bool isSeen, everSeen;
     int distanceValue;
