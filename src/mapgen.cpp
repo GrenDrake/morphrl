@@ -33,7 +33,7 @@ const int ROOM_MAX_HEIGHT = 10;
 const int MAZE_DOOR_CHANCE = 20;
 const int MAX_ACTOR_COUNT = 40;
 const int MAX_ITEM_COUNT = 80;
-const int ADD_EXTRA_DOOR_COUNT = 15;
+const int ADD_EXTRA_DOOR_COUNT = 5;
 
 
 bool isOdd(int number) {
@@ -220,6 +220,39 @@ void trimDeadEnds(Dungeon &d) {
     }
 }
 
+Direction getDeadEndOpening(Dungeon &d, const Coord &where) {
+    int wallCount = 0;
+    Direction dir = Direction::North;
+    Direction opening = Direction::Unknown;
+    do {
+        Coord dest = where.shift(dir);
+        if (d.floorAt(dest) == TILE_WALL) ++wallCount;
+        else opening = dir;
+        dir = rotate90(dir);
+    } while (dir != Direction::North);
+    if (wallCount == 3) return opening;
+    return Direction::Unknown;
+}
+
+void removeDeadEnds(Dungeon &d) {
+    for (int y = 1; y < d.height(); y += 2) {
+        for (int x = 1; x < d.width(); x += 2) {
+            Coord here(x, y);
+            Direction opening;
+            int iterations = 50;
+            do {
+                --iterations;
+                opening = getDeadEndOpening(d, here);
+                if (opening != Direction::Unknown) {
+                    d.floorAt(here, TILE_WALL);
+                    d.floorAt(here.shift(opening), TILE_WALL);
+                }
+                here = here.shift(opening, 2);
+            } while (iterations > 0 && opening != Direction::Unknown);
+        }
+    }
+}
+
 void createLake(Dungeon &d) {
     int x = 1 + rand() % (d.width() - 2);
     int y = 1 + rand() % (d.height() - 2);
@@ -341,12 +374,13 @@ void doMapgen(Dungeon &d) {
     buildRooms(d);
     addStairs(d);
     buildMaze(d);
-    createTemperatureZone(d, -1);
-    createTemperatureZone(d, 1);
+    // createTemperatureZone(d, -1);
+    // createTemperatureZone(d, 1);
     setupRooms(d);
-    for (int i = 0; i < TRIM_DEADEND_ITERATIONS; ++i) {
-        trimDeadEnds(d);
-    }
+    removeDeadEnds(d);
+    // for (int i = 0; i < TRIM_DEADEND_ITERATIONS; ++i) {
+        // trimDeadEnds(d);
+    // }
     for (int i = 0; i < ADD_EXTRA_DOOR_COUNT; ++i) {
         addExtraDoors(d);
     }
