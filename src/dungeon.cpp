@@ -98,13 +98,15 @@ int Actor::getTalismanCount() const {
     return count;
 }
 
+static Item *fistsWeapon = nullptr;
 const Item* Actor::getCurrentWeapon() const {
     for (const Item *item : inventory) {
         if (item && item->data.type == ItemData::Weapon && item->isEquipped) {
             return item;
         }
     }
-    return nullptr;
+    if (!fistsWeapon) fistsWeapon = new Item(getItemData(SIN_FISTS));
+    return fistsWeapon;
 }
 
 

@@ -59,6 +59,8 @@ const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
 const int EFFECT_POISON     = 4; // poison status - strength = damage rate
 const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
 
+// special item numbers
+const int SIN_FISTS         = 10000;
 
 enum class Direction {
     Unknown, Here,
@@ -119,7 +121,7 @@ struct ItemData {
     std::string name, desc;
     Type type;
     int bulk;
-    int toHit, minDamage, maxDamage;
+    int minDamage, maxDamage;
     int consumeChance;
     int statMods[STAT_BASE_COUNT];
     std::vector<EffectData> effects;

@@ -278,7 +278,6 @@ std::vector<DataDef> itemPropData{
     { "colour",         3 },
     { "type",           1 },
     { "bulk",           1 },
-    { "to_hit",         1 },
     { "damage",         2 },
     { "effect",         4 },
     { "consumeChance",  1 },
@@ -295,7 +294,6 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
     resultData.r = 255; resultData.g = 255; resultData.b = 255;
     resultData.type = ItemData::Junk;
     resultData.bulk = 1;
-    resultData.toHit = 0;
     resultData.minDamage = 0;
     resultData.maxDamage = 0;
     resultData.consumeChance = 0;
@@ -326,8 +324,6 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
                 resultData.type = static_cast<ItemData::Type>(dataAsInt(rawData, prop.origin, prop.value[0]));
             } else if (prop.name == "bulk") {
                 resultData.bulk = dataAsInt(rawData, prop.origin, prop.value[0]);
-            } else if (prop.name == "to_hit") {
-                resultData.toHit = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "damage") {
                 resultData.minDamage = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.maxDamage = dataAsInt(rawData, prop.origin, prop.value[1]);
