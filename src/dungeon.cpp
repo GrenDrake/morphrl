@@ -5,6 +5,50 @@
 #include "morph.h"
 
 
+std::string EffectData::toString() const {
+    if (trigger == ET_BOOST) {
+        std::string text;
+        if (effectStrength >= 0) text += "[color=cyan]+";
+        else text += "[color=red]";
+        text += std::to_string(effectStrength) + "[/color] " + statName(effectId);
+        return text;
+    }
+
+    std::string text;
+    switch(trigger) {
+        case ET_GIVE_ABILITY: // grant special ability
+            text += "gives ability: ";
+            break;
+        case ET_ON_HIT:
+            text += "on hit: ";
+            break;
+        case ET_ON_USE:
+            text += "when used: ";
+            break;
+        case ET_ON_TICK:
+            text += "every turn: ";
+            break;
+        default:
+            text = "Unhandled trigger " + std::to_string(trigger);
+    }
+    switch(effectId) {
+        case EFFECT_HEALING:
+            text += "instantly heal for [color=cyan]" + std::to_string(effectStrength) + "%";
+            break;
+        default:
+            text = "Unhandled effectId " + std::to_string(trigger);
+    }
+    return text;
+}
+
+// const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
+// const int EFFECT_REGEN      = 1; // regen status - strength = regen rate
+// const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
+// const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
+// const int EFFECT_POISON     = 4; // poison status - strength = damage rate
+// const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
+
+
 
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),

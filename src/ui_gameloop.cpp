@@ -240,11 +240,7 @@ void gameloop(World &world) {
             terminal_print(61, yPos, text.c_str());
         }
 
-        // weapon and talisman count
-        const Item *currentWeapon = world.player->getCurrentWeapon();
-        if (currentWeapon) {
-            terminal_print(61, 13, currentWeapon->getName().c_str());
-        }
+        // talisman count
         terminal_printf(61, 14, "Talismans: %d", world.player->getTalismanCount());
         // (debug) position data
         terminal_print(61, 16, "Position:");

@@ -96,6 +96,8 @@ struct EffectData {
     int effectChance;
     int effectId;       // internal ID mapped to exact effect
     int effectStrength;
+    
+    std::string toString() const;
 };
 
 struct ActorData {

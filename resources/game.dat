@@ -133,6 +133,7 @@
 @item - 1
     glyph           /
     name            dagger
+    description     A_short_bladed_weapon._Agile,_but_less_damaging_than_a_sword.
     colour          127 127 127
     type            IT_WEAPON
     bulk            3
@@ -156,15 +157,17 @@
 
 @item - 4
     glyph           "
-    name            talisman_of_armour
+    name            talisman_of_evasion
     colour          63 63 127
     type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_EVASION 2
 
 @item - 5
     glyph           "
     name            talisman_of_health
     colour          63 127 63
     type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_HEALTH 5
 
 @item - 6
     glyph           %
