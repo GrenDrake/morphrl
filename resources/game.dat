@@ -32,6 +32,13 @@
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Dungeon level defs
+@dungeon - 44
+    name The_Upper_Levels
+    hasEntrance
+    noUpStairs
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Tile defs
 @tile TILE_NONE 0
     glyph           ?

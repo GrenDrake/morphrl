@@ -198,8 +198,8 @@ Coord Room::getPointWithin() const {
 
 
 
-Dungeon::Dungeon(int depth, int width, int height)
-: mDepth(depth), mWidth(width), mHeight(height)
+Dungeon::Dungeon(const DungeonData &data, int width, int height)
+: data(data), mDepth(data.ident), mWidth(width), mHeight(height)
 {
     mData = new MapTile[mWidth * mHeight];
 }

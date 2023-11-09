@@ -254,37 +254,40 @@ void createTemperatureZone(Dungeon &d, int forTemp) {
 void addStairs(Dungeon &d) {
     bool isGood = false;
 
-    for (int i = 0; !isGood && i < d.roomCount(); ++i) {
-        Room &room = d.getRoom(i);
-        if (room.type != RT_GENERIC) continue;
-        if (room.w < 4 || room.h < 4) continue;
-        room.type = RT_STAIR;
-        Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
-        d.floorAt(stairPos, TILE_STAIR_DOWN);
-        std::cerr << "DOWN " << stairPos << '\n';
-        isGood = true;
+    if (d.data.hasDownStairs) {
+        for (int i = 0; !isGood && i < d.roomCount(); ++i) {
+            Room &room = d.getRoom(i);
+            if (room.type != RT_GENERIC) continue;
+            if (room.w < 4 || room.h < 4) continue;
+            room.type = RT_STAIR;
+            Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
+            d.floorAt(stairPos, TILE_STAIR_DOWN);
+            std::cerr << "DOWN " << stairPos << '\n';
+            isGood = true;
+        }
+
+        if (!isGood) {
+            std::cerr << "Failed placing down stairs.\n";
+        }
     }
 
-    if (!isGood) {
-        std::cerr << "Failed placing down stairs.\n";
-    }
+    if (d.data.hasUpStairs) {
+        isGood = false;
+        for (int i = 0; !isGood && i < d.roomCount(); ++i) {
+            Room &room = d.getRoom(i);
+            if (room.type != RT_GENERIC) continue;
+            if (room.w < 4 || room.h < 4) continue;
+            room.type = RT_STAIR;
+            Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
+            d.floorAt(stairPos, TILE_STAIR_UP);
+            std::cerr << "UP " << stairPos << '\n';
+            isGood = true;
+        }
 
-    isGood = false;
-    for (int i = 0; !isGood && i < d.roomCount(); ++i) {
-        Room &room = d.getRoom(i);
-        if (room.type != RT_GENERIC) continue;
-        if (room.w < 4 || room.h < 4) continue;
-        room.type = RT_STAIR;
-        Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
-        d.floorAt(stairPos, TILE_STAIR_UP);
-        std::cerr << "UP " << stairPos << '\n';
-        isGood = true;
+        if (!isGood) {
+            std::cerr << "Failed placing up stairs.\n";
+        }
     }
-
-    if (!isGood) {
-        std::cerr << "Failed placing up stairs.\n";
-    }
-
 }
 
 void addEntranceHall(Dungeon &d) {
@@ -334,7 +337,7 @@ void addExtraDoors(Dungeon &d) {
 void doMapgen(Dungeon &d) {
     std::cerr << "DEPTH " << d.depth() << '\n';
     // if we're on the ground floor, create the entrance room
-    if (d.depth() == 1) addEntranceHall(d);
+    if (d.data.hasEntrance) addEntranceHall(d);
     buildRooms(d);
     addStairs(d);
     buildMaze(d);

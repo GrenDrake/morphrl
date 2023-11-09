@@ -109,7 +109,13 @@ World* createGame() {
     world->player->isPlayer = true;
     world->player->reset();
 
-    world->map = new Dungeon(1, MAP_WIDTH, MAP_HEIGHT);
+    const DungeonData &dungeonData = getDungeonEntranceData();
+    if (dungeonData.ident == BAD_VALUE) {
+        std::cerr << "Failed to find dungeon entrance\n";
+        delete world;
+        return nullptr;
+    }
+    world->map = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
     doMapgen(*world->map);
 
     const Room &startRoom = world->map->getRoomByType(1);
@@ -208,8 +214,12 @@ int main() {
                         delete world;
                     }
                     world = createGame();
-                    gameloop(*world);
-                    ++selection;
+                    if (!world) {
+                        ui_alertBox("Error", "Could not create game world.");
+                    } else {
+                        gameloop(*world);
+                        ++selection;
+                    }
                     break; }
                 case 1:
                     if (world) {

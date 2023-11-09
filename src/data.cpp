@@ -57,7 +57,6 @@ struct DataDef {
     unsigned partCount;
 };
 
-const unsigned BAD_VALUE = 4294967295;
 const DataDef BAD_DEF{ "INVALID", BAD_VALUE };
 ActorData BAD_ACTOR{BAD_VALUE, '?', 255, 0, 255, "invalid"};
 std::vector<ActorData> actorData;
@@ -65,6 +64,8 @@ ItemData BAD_ITEM{BAD_VALUE, '?', 255, 0, 255, "invalid", "", ItemData::Invalid}
 std::vector<ItemData> itemData;
 TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 std::vector<TileData> tileData;
+DungeonData BAD_DUNGEON{BAD_VALUE, "invalid"};
+std::vector<DungeonData> dungeonData;
 
 
 Origin::Origin()
@@ -124,6 +125,19 @@ const TileData& getTileData(unsigned ident) {
         if (data.ident == ident) return data;
     }
     return BAD_TILE;
+}
+
+const DungeonData& getDungeonData(unsigned ident) {
+    for (const DungeonData &data : dungeonData) {
+        if (data.ident == ident) return data;
+    }
+    return BAD_DUNGEON;
+}
+const DungeonData& getDungeonEntranceData() {
+    for (const DungeonData &data : dungeonData) {
+        if (data.hasEntrance) return data;
+    }
+    return BAD_DUNGEON;
 }
 
 
@@ -409,6 +423,50 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
 
     return true;
 }
+std::vector<DataDef> dungeonPropData{
+    { "name",           1 },
+    { "hasEntrance",    0 },
+    { "noUpStairs",     0 },
+    { "noDownStairs",   0 },
+};
+bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
+    if (!rawDungeon || rawDungeon->typeName != "@dungeon") {
+        rawData.addError(Origin(), "processDungeonData passed malformed data");
+        return false;
+    }
+
+    DungeonData resultData;
+    resultData.name = "unknown";
+    resultData.hasEntrance = false;
+    resultData.hasUpStairs = true;
+    resultData.hasDownStairs = true;
+    resultData.ident = rawDungeon->ident;
+    for (const DataProp &prop : rawDungeon->props) {
+        const DataDef &dataDef = getDataDef(dungeonPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown tile property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "hasEntrance") {
+                resultData.hasEntrance = true;
+            } else if (prop.name == "noUpStairs") {
+                resultData.hasUpStairs = false;
+            } else if (prop.name == "noDownStairs") {
+                resultData.hasDownStairs = false;
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    dungeonData.push_back(resultData);
+
+    return true;
+}
 
 
 bool loadAllData() {
@@ -432,6 +490,8 @@ bool loadAllData() {
             processActorData(rawData, data);
         } else if (data->typeName == "@item") {
             processItemData(rawData, data);
+        } else if (data->typeName == "@dungeon") {
+            processDungeonData(rawData, data);
         } else {
             rawData.addError(data->origin, "unknown object type " + data->typeName);
         }

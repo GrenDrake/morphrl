@@ -10,6 +10,7 @@ class Item;
 class World;
 
 
+const unsigned BAD_VALUE = 4294967295;
 const int MAP_WIDTH = 63;
 const int MAP_HEIGHT = 31;
 
@@ -96,7 +97,7 @@ struct EffectData {
     int effectChance;
     int effectId;       // internal ID mapped to exact effect
     int effectStrength;
-    
+
     std::string toString() const;
 };
 
@@ -137,6 +138,14 @@ struct TileData {
     int r, g, b;
     bool isUpStair;
     bool isDownStair;
+};
+
+struct DungeonData {
+    unsigned ident; // doubles as dungeon depth
+    std::string name;
+    bool hasEntrance;
+    bool hasUpStairs;
+    bool hasDownStairs;
 };
 
 
@@ -208,7 +217,7 @@ struct Room {
 
 class Dungeon {
 public:
-    Dungeon(int depth, int width, int height);
+    Dungeon(const DungeonData &data, int width, int height);
 
     int depth() const { return mDepth; };
     int width() const { return mWidth; };
@@ -261,6 +270,7 @@ public:
     void clearDeadActors();
     void tick(World &world);
 
+    const DungeonData &data;
 private:
     int mDepth;
     int mWidth, mHeight;
@@ -278,6 +288,7 @@ class World {
 public:
     World();
     ~World();
+
     Actor *player;
     Dungeon *map;
     unsigned currentTurn;
@@ -317,6 +328,8 @@ bool loadAllData();
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
 const TileData& getTileData(unsigned ident);
+const DungeonData& getDungeonEntranceData();
+const DungeonData& getDungeonData(unsigned ident);
 
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
