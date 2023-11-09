@@ -26,13 +26,14 @@ const int ROOM_ATTEMPTS = 10000;
 const int TRIM_DEADEND_ITERATIONS = 25;
 const int ROOM_FILL_CHANCE = 10;
 const int ROOM_SECOND_DOOR_CHANCE = 40;
-const int DEADEND_FILL_CHANCE = 30;
-const int DEADEND_DOOR_CHANCE = 40;
+const int DEADEND_FILL_CHANCE = 70;
+const int DEADEND_DOOR_CHANCE = 15;
 const int ROOM_MAX_WIDTH = 10;
 const int ROOM_MAX_HEIGHT = 10;
 const int MAZE_DOOR_CHANCE = 20;
 const int MAX_ACTOR_COUNT = 40;
 const int MAX_ITEM_COUNT = 80;
+const int ADD_EXTRA_DOOR_COUNT = 15;
 
 
 bool isOdd(int number) {
@@ -304,6 +305,32 @@ void addEntranceHall(Dungeon &d) {
     createRoom(d, room);
 }
 
+void addExtraDoors(Dungeon &d) {
+    Coord where;
+    bool isGood;
+    int iterations = 10;
+    do {
+        --iterations;
+        where.x = 2 + rand() % (d.width() - 2);
+        where.y = 2 + rand() % (d.height() - 2);
+        isGood = d.floorAt(where) == TILE_WALL;
+        if (!isGood) continue;
+        if (d.floorAt(where.shift(Direction::North)) == TILE_WALL) {
+            if (d.floorAt(where.shift(Direction::South)) != TILE_WALL ||
+                d.floorAt(where.shift(Direction::East))  != TILE_FLOOR ||
+                d.floorAt(where.shift(Direction::West))  != TILE_FLOOR)
+                isGood = false;
+        } else if (d.floorAt(where.shift(Direction::East)) == TILE_WALL) {
+            if (d.floorAt(where.shift(Direction::West))  != TILE_WALL ||
+                d.floorAt(where.shift(Direction::North)) == TILE_FLOOR ||
+                d.floorAt(where.shift(Direction::South)) == TILE_FLOOR)
+                isGood = false;
+        } else isGood = false;
+    } while (!isGood && iterations > 0);
+    if (!isGood) return;
+    d.floorAt(where, TILE_DOOR);
+}
+
 void doMapgen(Dungeon &d) {
     std::cerr << "DEPTH " << d.depth() << '\n';
     // if we're on the ground floor, create the entrance room
@@ -316,6 +343,9 @@ void doMapgen(Dungeon &d) {
     setupRooms(d);
     for (int i = 0; i < TRIM_DEADEND_ITERATIONS; ++i) {
         trimDeadEnds(d);
+    }
+    for (int i = 0; i < ADD_EXTRA_DOOR_COUNT; ++i) {
+        addExtraDoors(d);
     }
     // for (int i = 0; i < 50; ++i) {
         // createLake(d);
@@ -331,7 +361,7 @@ void doMapgen(Dungeon &d) {
             c = d.randomOfTile(TILE_FLOOR);
             isGood = d.actorAt(c) == nullptr;
             --iterations;
-        } while (!isGood);
+        } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
         Actor *actor = new Actor(getActorData(1), i);
@@ -347,7 +377,7 @@ void doMapgen(Dungeon &d) {
             c = d.randomOfTile(TILE_FLOOR);
             isGood = d.itemAt(c) == nullptr;
             --iterations;
-        } while (!isGood);
+        } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
         Item *item = new Item(getItemData(rand()%8));
