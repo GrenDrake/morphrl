@@ -141,8 +141,13 @@ Item* selectInventoryItem(World &world, const std::string &prompt) {
         if (key == TK_UP) {
             if (selection > 0) --selection;
         }
+        if (key == TK_HOME) selection = 0;
         if (key == TK_DOWN) {
             if (selection < maxSelection && selection < maxItemsListed) ++selection;
+        }
+        if (key == TK_END) {
+            if (maxSelection < maxItemsListed) selection = maxSelection;
+            else selection = maxItemsListed;
         }
         int code = keycodeToIndex(key);
         if (code >= 0) {
