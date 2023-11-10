@@ -319,6 +319,7 @@ Direction rotate45(Direction d);
 Direction unrotate45(Direction d);
 Direction rotate90(Direction d);
 
+std::string makeItemList(const std::vector<Item*> &itemList, unsigned maxList);
 std::string statName(int statNumber);
 
 std::ostream& operator<<(std::ostream &out, Direction d);

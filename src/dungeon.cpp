@@ -1,4 +1,5 @@
 #include <deque>
+#include <sstream>
 #include <iostream>
 #include <vector>
 
@@ -615,4 +616,27 @@ std::string statName(int statNumber) {
         case STAT_XP:           return "XP";
         default: return "unknown stat " + std::to_string(statNumber);
     }
+}
+
+std::string makeItemList(const std::vector<Item*> &itemList, unsigned maxList) {
+    if (itemList.empty()) return "nothing";
+    if (itemList.size() == 1) return itemList.front()->getName();
+    if (itemList.size() == 2) {
+        std::stringstream s;
+        s << itemList[0]->getName() << " and " << itemList[1]->getName();
+        return s.str();
+    }
+    if (itemList.size() > maxList) {
+        return "a large number of items";
+    }
+    std::stringstream s;
+    for (unsigned i = 0; i < itemList.size(); ++i) {
+        const Item *item = itemList[i];
+        if (!item) continue;
+        if (i > 0) s << ",";
+        if (i == itemList.size() - 1) s << " and";
+        if (i != 0) s << ' ';
+        s << item->getName();
+    }
+    return s.str();
 }

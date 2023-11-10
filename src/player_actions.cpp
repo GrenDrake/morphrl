@@ -49,8 +49,15 @@ void tryMeleeAttack(World &world, Direction dir) {
 void tryMovePlayer(World &world, Direction dir) {
     bool isOverBurdened = world.player->isOverBurdened();
     if (!isOverBurdened && world.map->tryActorStep(world.player, dir)) {
+        const MapTile *tile = world.map->at(world.player->position);
+        if (tile && !tile->items.empty()) {
+            std::stringstream s;
+            if (tile->items.size() == 1) s << "Item here: ";
+            else s << "Items here: ";
+            s << makeItemList(tile->items, 4) << '.';
+            world.addMessage(s.str());
+        }
         world.tick();
-        // Item *item = world.map->itemAt(world.player->position);
         return;
     }
 
