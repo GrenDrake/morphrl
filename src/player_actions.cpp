@@ -171,6 +171,7 @@ void tryPlayerUseItem(World &world) {
             return;
         case ItemData::Consumable: { // activate it
             activateItem(world, item, world.player);
+            world.tick();
             break; }
         default:
             world.addMessage("[color=yellow]" + ucFirst(item->getName(true)) +
