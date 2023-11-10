@@ -7,6 +7,94 @@
 
 
 
+void activateItem(World &world, Item *item, Actor *user) {
+    std::stringstream msg;
+    bool didEffect = false;
+    if (user == world.player)   msg << "Used ";
+    else                        msg << ucFirst(user->getName()) << " used ";
+    msg << "[color=yellow]" << item->getName() << "[/color]: ";
+
+    for (const EffectData &data : item->data.effects) {
+        if (data.trigger != ET_ON_USE) continue;
+        if (rand() % 100 >= data.effectChance) continue;
+        didEffect = true;
+        switch (data.effectId) {
+            case EFFECT_HEALING: {
+                int amount = data.effectStrength * user->getStat(STAT_HEALTH) / 100;
+                user->takeDamage(-amount);
+                msg << "Received " << amount << " healing. ";
+                break; }
+            default:
+                msg << "Unhandled effect " << data.effectId << ". ";
+        }
+    }
+
+    if (!didEffect) {
+        msg << "no effect. ";
+    }
+    int roll = rand() % 100;
+    if (item->data.consumeChance > roll) {
+        user->removeItem(item);
+        msg << "[color=yellow]" << ucFirst(item->getName(true)) << "[/color] was used up.";
+        delete item;
+    }
+    world.addMessage(msg.str());
+
+}
+
+
+void useItem(World &world, Item *item) {
+    if (!item) return;
+
+    std::stringstream msg;
+    switch(item->data.type) {
+        case ItemData::Weapon: // equip it
+            if (item->isEquipped) {
+                item->isEquipped = false;
+                msg << "Stopped wielding [color=yellow]" << item->getName(true) << "[/color].";
+            } else {
+                for (Item *itemIter : world.player->inventory) {
+                    if (itemIter && itemIter->data.type == ItemData::Weapon && itemIter->isEquipped) {
+                        itemIter->isEquipped = false;
+                        msg << "Stopped wielding [color=yellow]";
+                        msg << itemIter->getName(true) << "[/color]. ";
+                    }
+                }
+                item->isEquipped = true;
+                msg << "Now wielding [color=yellow]" << item->getName(true) << "[/color].";
+            }
+            world.addMessage(msg.str());
+            world.tick();
+            return;
+        case ItemData::Talisman: // equip it
+            if (item->isEquipped) {
+                item->isEquipped = false;
+                msg << "Stopped wearing [color=yellow]" << item->getName(true) << "[/color].";
+            } else {
+                int talismanCount = world.player->getTalismanCount();
+                if (talismanCount < 3) {
+                    item->isEquipped = true;
+                    msg << "Now wearing [color=yellow]" << item->getName(true) << "[/color].";
+                } else {
+                    msg << "You're already wearing the maximum number of talismans; remove one to wear [color=yellow]" << item->getName(true) << "[/color].";
+                    world.addMessage(msg.str());
+                    return;
+                }
+            }
+            world.addMessage(msg.str());
+            world.tick();
+            return;
+        case ItemData::Consumable: { // activate it
+            activateItem(world, item, world.player);
+            world.tick();
+            break; }
+        default:
+            world.addMessage("[color=yellow]" + ucFirst(item->getName(true)) +
+                             "[/color] is not something you can use.");
+    }
+}
+
+
 int keycodeToIndex(int keyCode) {
     switch(keyCode) {
         case TK_1:  return 0;
@@ -51,7 +139,7 @@ int keycodeToIndex(int keyCode) {
 }
 
 
-Item* selectInventoryItem(World &world, const std::string &prompt) {
+Item* doInventory(World &world) {
     if (world.player->inventory.empty()) {
         ui_alertBox("Alert", "You are not carrying anything.");
         return nullptr;
@@ -65,16 +153,28 @@ Item* selectInventoryItem(World &world, const std::string &prompt) {
     terminal_bkcolor(black);
     terminal_clear();
 
-    const int curBulk = world.player->getStat(STAT_BULK);
     const int maxBulk = world.player->getStat(STAT_BULK_MAX);
-    const std::string bulkString = "[font=italic]Carried Bulk: " + std::to_string(curBulk) +
-                                   " of " + std::to_string(maxBulk);
-    const int maxSelection = world.player->inventory.size() - 1;
     int selection = 0;
     while (1) {
+        const int curBulk = world.player->getStat(STAT_BULK);
+        const std::string bulkString = "[font=italic]Carried Bulk: " + std::to_string(curBulk) +
+                                       " of " + std::to_string(maxBulk);
+        const int maxSelection = world.player->inventory.size() - 1;
         terminal_color(textColour);
         terminal_bkcolor(black);
         terminal_clear();
+        // show log (we do this first so we can remove any extra bits that would
+        // overlap other UI elements)
+        unsigned yPos = 24;
+        for (auto iter = world.messages.rbegin(); iter != world.messages.rend(); ++iter) {
+            dimensions_t dims = terminal_measure_ext(39, 5, iter->text.c_str());
+            if (dims.height > 1) yPos -= dims.height - 1;
+            terminal_print_ext(41, yPos, 39, 5, TK_ALIGN_DEFAULT, iter->text.c_str());
+            --yPos;
+            if (yPos < 20) break;
+        }
+        terminal_clear_area(41, 0, 39, 20);
+
         terminal_print(3, 0, "[font=italic]ITEM");
         terminal_print(25, 0, "[font=italic]BULK");
         terminal_print(30, 0, "[font=italic]STATUS");
@@ -83,7 +183,7 @@ Item* selectInventoryItem(World &world, const std::string &prompt) {
 
         const Item *selectedItem = nullptr;
         int counter = 0;
-        int yPos = 2;
+        yPos = 2;
         for (const Item *item : world.player->inventory) {
             if (counter > maxItemsListed) break;
             if (counter == selection) {
@@ -132,10 +232,11 @@ Item* selectInventoryItem(World &world, const std::string &prompt) {
             my -= 2;
             if (my <= maxSelection) selection = my;
         }
-        if (key == TK_ESCAPE || key == TK_CLOSE) return nullptr;
+        if (key == TK_ESCAPE || key == TK_CLOSE || key == TK_I) return nullptr;
         if (key == TK_ENTER || key == TK_SPACE) {
             if (selection >= 0 && selection <= maxSelection) {
-                return world.player->inventory[selection];
+                Item *item = world.player->inventory[selection];
+                useItem(world, item);
             }
         }
         if (key == TK_UP) {
@@ -149,9 +250,21 @@ Item* selectInventoryItem(World &world, const std::string &prompt) {
             if (maxSelection < maxItemsListed) selection = maxSelection;
             else selection = maxItemsListed;
         }
-        int code = keycodeToIndex(key);
-        if (code >= 0) {
-            if (code <= maxSelection) selection = code;
+        if (key == TK_D) {
+            if (selection >= 0 && selection <= maxSelection) {
+                Item *item = world.player->inventory[selection];
+                world.player->removeItem(item);
+                world.map->addItem(item, world.player->position);
+                world.addMessage("Dropped [color=yellow]" + item->getName(true) + "[/color].");
+                world.tick();
+            }
         }
+
+        if (selection > maxSelection) selection = maxSelection;
+        if (selection > maxItemsListed) selection = maxItemsListed;
+        // int code = keycodeToIndex(key);
+        // if (code >= 0) {
+            // if (code <= maxSelection) selection = code;
+        // }
     }
 }

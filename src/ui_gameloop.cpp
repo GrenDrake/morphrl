@@ -10,8 +10,9 @@ void debug_saveMapToPNG(const Dungeon &d, bool showActors);
 void tryMeleeAttack(World &world, Direction dir);
 void tryMovePlayer(World &world, Direction dir);
 void tryPlayerTakeItem(World &world);
-void tryPlayerDropItem(World &world);
-void tryPlayerUseItem(World &world);
+// void tryPlayerDropItem(World &world);
+// void tryPlayerUseItem(World &world);
+Item* doInventory(World &world);
 void tryPlayerChangeFloor(World &world);
 
 
@@ -261,14 +262,14 @@ void gameloop(World &world) {
         if (key == TK_UP)       tryMovePlayer(world, Direction::North);
         if (key == TK_SPACE)    world.tick();
         if (key == TK_G)        tryPlayerTakeItem(world);
-        if (key == TK_D)        tryPlayerDropItem(world);
+        // if (key == TK_D)        tryPlayerDropItem(world);
         if (key == TK_COMMA)    tryPlayerChangeFloor(world);
         if (key == TK_PERIOD)   tryPlayerChangeFloor(world);
 
         if (key == TK_MOUSE_LEFT) handleMouseClick(world, offsetX, offsetY, 0);
         if (key == TK_MOUSE_RIGHT) handleMouseClick(world, offsetX, offsetY, 1);
 
-        if (key == TK_I)        tryPlayerUseItem(world);
+        if (key == TK_I)        doInventory(world);
 
 
         if (key == TK_F10)   debug_saveMapToPNG(*world.map, true);

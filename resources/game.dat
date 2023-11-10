@@ -143,7 +143,7 @@
     description     A_short_bladed_weapon._Agile,_but_less_damaging_than_a_sword.
     colour          127 127 127
     type            IT_WEAPON
-    bulk            3
+    bulk            1
     damage          3 7
     effect          ET_BOOST 100 STAT_TO_HIT 2
 
