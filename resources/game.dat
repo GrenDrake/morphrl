@@ -79,14 +79,14 @@
     colour          127 196 127
 
 @tile TILE_DOWN_STAIRS 6
-    glyph           <
+    glyph           >
     name            stairs_down
     colour          255 255 255
     isPassable
     isDownStair
 
 @tile TILE_UP_STAIRS 7
-    glyph           >
+    glyph           <
     name            stairs_up
     colour          255 255 255
     isPassable
