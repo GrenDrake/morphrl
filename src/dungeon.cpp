@@ -155,6 +155,30 @@ const Item* Actor::getCurrentWeapon() const {
 }
 
 
+AttackData Actor::meleeAttack(Actor *target) {
+    AttackData data;
+    data.weapon = getCurrentWeapon();
+    if (data.weapon == nullptr) {
+        data.errorMessage = "Weapon was nullptr";
+        return data;
+    }
+    data.roll = 1 + rand() % 20;
+    data.toHit = getStat(STAT_TO_HIT);
+    data.evasion = target->getStat(STAT_EVASION);
+    if (data.roll + data.toHit > data.evasion) {
+        int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
+        if (damageRange < 1) damageRange = 1;
+        data.damage = data.weapon->data.minDamage + rand() % damageRange;
+        target->takeDamage(data.damage);
+        if (target->isDead()) {
+            xp += 10;
+        }
+    }
+    return data;
+}
+
+
+
 Item::Item(const ItemData &data)
 : data(data), position(-1, -1), isEquipped(false)
 { }
@@ -580,7 +604,25 @@ void Dungeon::tick(World &world) {
         if (tile && tile->isSeen) {
             double dist = actor->position.distanceTo(world.player->position);
             if (dist < 2) {
-                world.addMessage("POW!");
+                AttackData attackData = actor->meleeAttack(world.player);
+                std::stringstream s;
+                s << "[color=yellow]" << ucFirst(actor->getName(true));
+                s << "[/color] attacks [color=yellow]you[/color] with their [color=yellow]";
+                if (attackData.weapon) s << attackData.weapon->data.name;
+                else s << "(nullptr weapon)";
+                s << "[/color]. (" << attackData.roll << '+' << attackData.toHit;
+                s << " vs " << attackData.evasion << ") ";
+                if (attackData.roll + attackData.toHit > attackData.evasion) {
+                    s << "you take [color=red]";
+                    s << attackData.damage << "[/color] damage";
+                    if (world.player->isDead()) {
+                        s << " and [color=red]die[/color]!";
+                    } else s << '.';
+                    world.addMessage(s.str());
+                } else {
+                    s << "[color=red]Miss[/color]!";
+                    world.addMessage(s.str());
+                }
             } else {
                 actor->playerLastSeenPosition = world.player->position;
                 Direction dirToPlayer = actor->position.directionTo(world.player->position);

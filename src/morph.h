@@ -149,9 +149,13 @@ struct DungeonData {
 };
 
 
-struct AttackResult {
-    bool didHit;
-    int roll, target, damage;
+struct AttackData {
+    int roll;
+    int toHit;
+    int evasion;
+    int damage;
+    const Item *weapon;
+    std::string errorMessage;
 };
 struct Actor {
     Actor(const ActorData &data, unsigned myIdent);
@@ -170,6 +174,7 @@ struct Actor {
     void removeItem(Item *item);
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
+    AttackData meleeAttack(Actor *target);
 
     const ActorData &data;
     unsigned ident;

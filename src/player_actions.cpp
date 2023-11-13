@@ -14,29 +14,19 @@ void tryMeleeAttack(World &world, Direction dir) {
         return;
     }
 
-    const Item *weapon = world.player->getCurrentWeapon();
-    if (weapon == nullptr) {
-        world.addMessage("Weapon was nullptr");
-        return;
-    }
-    int roll = 1 + rand() % 20;
-    int toHit = world.player->getStat(STAT_TO_HIT);
-    int evasion = actor->getStat(STAT_EVASION);
+    AttackData attackData = world.player->meleeAttack(actor);
     std::stringstream s;
     s << "[color=yellow]You[/color] attack [color=yellow]";
     s << actor->getName() << "[/color] with your [color=yellow]";
-    s << weapon->data.name << "[/color]. (" << roll << '+' << toHit;
-    s << " vs " << evasion << ") ";
-    if (roll + toHit > evasion) {
-        int damageRange = weapon->data.maxDamage - weapon->data.minDamage + 1;
-        if (damageRange < 1) damageRange = 1;
-        int damage = weapon->data.minDamage + rand() % damageRange;
-        actor->takeDamage(damage);
-        s << "" << ucFirst(actor->getName(true)) << " takes [color=red]";
-        s << damage << "[/color] damage";
+    if (attackData.weapon) s << attackData.weapon->data.name;
+    else s << "(nullptr weapon)";
+    s << "[/color]. (" << attackData.roll << '+' << attackData.toHit;
+    s << " vs " << attackData.evasion << ") ";
+    if (attackData.roll + attackData.toHit > attackData.evasion) {
+        s << ucFirst(actor->getName(true)) << " takes [color=red]";
+        s << attackData.damage << "[/color] damage";
         if (actor->isDead()) {
             s << " and [color=red]dies[/color]!";
-            world.player->xp += 10;
         } else s << '.';
         world.addMessage(s.str());
     } else {
