@@ -401,7 +401,7 @@ void doMapgen(Dungeon &d) {
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
-        Actor *actor = new Actor(getActorData(1), i);
+        Actor *actor = Actor::create(getActorData(1));
         actor->reset();
         d.addActor(actor, c);
     }

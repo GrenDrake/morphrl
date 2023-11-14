@@ -104,6 +104,7 @@
     base_agility    0
     base_dexterity  0
     base_toughness  0
+    item 100 2
 
 @actor - 1
     glyph           g

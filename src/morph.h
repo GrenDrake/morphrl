@@ -13,6 +13,7 @@ class World;
 const unsigned BAD_VALUE = 4294967295;
 const int MAP_WIDTH = 127;
 const int MAP_HEIGHT = 63;
+const int MAX_TALISMANS_WORN = 3;
 
 const int RT_GENERIC = 0;
 const int RT_ENTRANCE = 1;
@@ -101,6 +102,10 @@ struct EffectData {
     std::string toString() const;
 };
 
+struct SpawnLine {
+    int spawnChance;
+    int ident;
+};
 struct ActorData {
     unsigned ident;
     int glyph;
@@ -108,6 +113,7 @@ struct ActorData {
     std::string name, desc;
     std::string artFile;
     int baseStats[STAT_BASE_COUNT];
+    std::vector<SpawnLine> initialItems;
 };
 struct ItemData {
     enum Type {
@@ -159,7 +165,8 @@ struct AttackData {
     std::string errorMessage;
 };
 struct Actor {
-    Actor(const ActorData &data, unsigned myIdent);
+    static Actor* create(const ActorData &data);
+    ~Actor();
 
     bool isDead() const { return health <= 0; }
 
@@ -173,6 +180,7 @@ struct Actor {
     bool isOverBurdened() const;
     void addItem(Item *item);
     void removeItem(Item *item);
+    bool tryEquipItem(Item *item);
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
     AttackData meleeAttack(Actor *target);
@@ -186,6 +194,9 @@ struct Actor {
 
     int health, energy;
     std::vector<Item*> inventory;
+
+private:
+    Actor(const ActorData &data, unsigned myIdent);
 };
 
 struct Item {

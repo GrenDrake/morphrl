@@ -1,3 +1,4 @@
+#include <cstdint>
 #include <deque>
 #include <sstream>
 #include <iostream>
@@ -51,10 +52,33 @@ std::string EffectData::toString() const {
 
 
 
+Actor* Actor::create(const ActorData &data) {
+    if (data.ident == BAD_VALUE) return nullptr;
+    Actor *actor = new Actor(data, 0);
+    if (!actor) return nullptr;
+    for (const SpawnLine &line : data.initialItems) {
+        int roll = rand() % 100;
+        if (roll < line.spawnChance) {
+            Item *item = new Item(getItemData(line.ident));
+            if (item) {
+                actor->addItem(item);
+                actor->tryEquipItem(item);
+            }
+        }
+    }
+    return actor;
+}
+
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
   isPlayer(false), xp(0), playerLastSeenPosition(-1, -1)
 { }
+
+Actor::~Actor() {
+    for (Item *item : inventory) {
+        delete item;
+    }
+}
 
 std::string Actor::getName(bool definitive) const {
     if (isPlayer) return "you";
@@ -131,6 +155,29 @@ void Actor::removeItem(Item *item) {
         }
         ++iter;
     }
+}
+
+bool Actor::tryEquipItem(Item *item) {
+    if (!item) return false;
+    // ensure the actor possesses the item
+    bool foundItem = false;
+    const Item *oldWeapon = nullptr;
+    int talismanCount = 0;
+    for (const Item *oldItem : inventory) {
+        if (oldItem->data.type == ItemData::Talisman && oldItem->isEquipped) ++talismanCount;
+        if (oldItem->data.type == ItemData::Weapon && oldItem->isEquipped) oldWeapon = oldItem;
+        if (oldItem == item) foundItem = true;
+    }
+    if (!foundItem) return false;
+    if (item->data.type == ItemData::Talisman) {
+        if (talismanCount < MAX_TALISMANS_WORN) {
+            item->isEquipped = true;
+        } else return false;
+    } else if (item->data.type == ItemData::Weapon) {
+        if (!oldWeapon) item->isEquipped = true;
+        else return false;
+    }
+    return false;
 }
 
 int Actor::getTalismanCount() const {

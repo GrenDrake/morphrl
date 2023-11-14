@@ -105,7 +105,7 @@ DocStory gameCredits{ { creditsPage1 } };
 World* createGame() {
     World *world = new World;
 
-    world->player = new Actor(getActorData(0), -1);
+    world->player = Actor::create(getActorData(0));
     world->player->isPlayer = true;
     world->player->reset();
 

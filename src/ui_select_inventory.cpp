@@ -72,7 +72,7 @@ void useItem(World &world, Item *item) {
                 msg << "Stopped wearing [color=yellow]" << item->getName(true) << "[/color].";
             } else {
                 int talismanCount = world.player->getTalismanCount();
-                if (talismanCount < 3) {
+                if (talismanCount < MAX_TALISMANS_WORN) {
                     item->isEquipped = true;
                     msg << "Now wearing [color=yellow]" << item->getName(true) << "[/color].";
                 } else {

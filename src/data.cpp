@@ -228,6 +228,7 @@ std::vector<DataDef> actorPropData{
     { "artfile",        1 },
     { "description",    1 },
     { "colour",         3 },
+    { "item",           2 },
     { "base_strength",  1 },
     { "base_agility",   1 },
     { "base_dexterity", 1 },
@@ -266,6 +267,11 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 resultData.artFile = prop.value[0];
             } else if (prop.name == "description") {
                 resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "item") {
+                SpawnLine line;
+                line.spawnChance = dataAsInt(rawData, prop.origin, prop.value[0]);
+                line.ident = dataAsInt(rawData, prop.origin, prop.value[1]);
+                resultData.initialItems.push_back(line);
             } else if (prop.name == "colour") {
                 resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
