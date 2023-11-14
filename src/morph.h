@@ -11,8 +11,8 @@ class World;
 
 
 const unsigned BAD_VALUE = 4294967295;
-const int MAP_WIDTH = 127;
-const int MAP_HEIGHT = 63;
+const int MAP_WIDTH = 63;
+const int MAP_HEIGHT = 47;
 const int MAX_TALISMANS_WORN = 3;
 
 const int RT_GENERIC = 0;
