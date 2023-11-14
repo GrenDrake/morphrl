@@ -106,6 +106,7 @@ struct ActorData {
     int glyph;
     int r, g, b;
     std::string name, desc;
+    std::string artFile;
     int baseStats[STAT_BASE_COUNT];
 };
 struct ItemData {

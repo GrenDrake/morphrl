@@ -108,6 +108,7 @@
 @actor - 1
     glyph           g
     name            goblin
+    artfile         goblin.png
     colour          255 127 127
     base_strength   -2
     base_agility    -3

@@ -225,6 +225,7 @@ bool loadRawFromFile(const std::string &filename, RawData &rawData) {
 std::vector<DataDef> actorPropData{
     { "glyph",          1 },
     { "name",           1 },
+    { "artfile",        1 },
     { "description",    1 },
     { "colour",         3 },
     { "base_strength",  1 },
@@ -261,6 +262,8 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 } else resultData.glyph = prop.value[0][0];
             } else if (prop.name == "name") {
                 resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "artfile") {
+                resultData.artFile = prop.value[0];
             } else if (prop.name == "description") {
                 resultData.desc = convertUnderscores(prop.value[0]);
             } else if (prop.name == "colour") {
