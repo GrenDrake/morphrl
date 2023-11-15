@@ -79,6 +79,7 @@ void debug_saveMapToPNG(const Dungeon &d, bool showActors) {
             }
         }
     }
-    stbi_write_png("map.png", d.width(), d.height(), 3, mapdata, 0);
+    std::string outputFilename = "map_" + std::to_string(d.depth()) + ".png";
+    stbi_write_png(outputFilename.c_str(), d.width(), d.height(), 3, mapdata, 0);
     delete[] mapdata;
 }
