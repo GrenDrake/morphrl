@@ -26,8 +26,12 @@ void tryMeleeAttack(World &world, Direction dir) {
         s << ucFirst(actor->getName(true)) << " takes [color=red]";
         s << attackData.damage << "[/color] damage";
         if (actor->isDead()) {
-            s << " and [color=red]dies[/color]!";
-        } else s << '.';
+            s << " and [color=red]dies[/color]";
+        }
+        s << '!';
+        if (!attackData.drops.empty()) {
+            s << " They drop " << makeItemList(attackData.drops, 4) << '.';
+        }
         world.addMessage(s.str());
     } else {
         s << "[color=red]Miss[/color]!";

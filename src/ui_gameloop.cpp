@@ -61,6 +61,7 @@ void showActorInfo(World &world, const Actor *actor) {
     if (actorArt) delete actorArt;
 }
 
+
 const char *youveNeverSeenThatSpace = "You've never seen that space.";
 std::string previewMapSpace(World &world, const Coord &where) {
     if (!world.map->isValidPosition(where)) {
@@ -84,17 +85,8 @@ std::string previewMapSpace(World &world, const Coord &where) {
             }
             if (tile->actor && !tile->items.empty()) s << " and";
             if (!tile->items.empty()) {
-                if (tile->items.size() > 4) {
-                    s << " many items";
-                } else if (tile->items.size() == 1) {
-                        s << " [color=yellow]" << tile->items.front()->getName() << "[/color]";
-                } else {
-                    for (unsigned i = 0; i < tile->items.size(); ++i) {
-                        if (i == tile->items.size() - 1) s << " and";
-                        else if (i > 0) s << ",";
-                        s << " [color=yellow]" << tile->items[i]->getName() << "[/color]";
-                    }
-                }
+                s << ' ';
+                s << makeItemList(tile->items, 4);
             }
             s << '.';
         } else {

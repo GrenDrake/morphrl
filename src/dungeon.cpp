@@ -51,7 +51,6 @@ std::string EffectData::toString() const {
 // const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
 
 
-
 Actor* Actor::create(const ActorData &data) {
     if (data.ident == BAD_VALUE) return nullptr;
     Actor *actor = new Actor(data, 0);
@@ -71,7 +70,8 @@ Actor* Actor::create(const ActorData &data) {
 
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
-  isPlayer(false), xp(0), playerLastSeenPosition(-1, -1)
+  isPlayer(false), xp(0), playerLastSeenPosition(-1, -1),
+  onMap(nullptr)
 { }
 
 Actor::~Actor() {
@@ -157,6 +157,19 @@ void Actor::removeItem(Item *item) {
     }
 }
 
+void Actor::dropAllItems() {
+    // ensure the actor is actually on a map
+    if (!onMap || !onMap->isValidPosition(position)) return;
+    if (onMap->actorAt(position) != this) return;
+
+    // drop stuff
+    for (Item *item : inventory) {
+        item->isEquipped = false;
+        onMap->addItem(item, position);
+    }
+    inventory.clear();
+}
+
 bool Actor::tryEquipItem(Item *item) {
     if (!item) return false;
     // ensure the actor possesses the item
@@ -218,6 +231,8 @@ AttackData Actor::meleeAttack(Actor *target) {
         data.damage = data.weapon->data.minDamage + rand() % damageRange;
         target->takeDamage(data.damage);
         if (target->isDead()) {
+            for (Item *item : target->inventory) data.drops.push_back(item);
+            target->dropAllItems();
             xp += 10;
         }
     }
@@ -518,6 +533,7 @@ bool Dungeon::addActor(Actor *who, const Coord &where) {
     if (!tile || tile->actor) return false;
     tile->actor = who;
     who->position = where;
+    who->onMap = this;
     mActors.push_back(who);
     return true;
 }
@@ -565,6 +581,7 @@ bool Dungeon::removeActor(Actor *who) {
         ++iter;
     }
     who->position = Coord(-1, -1);
+    who->onMap = nullptr;
     return true;
 }
 

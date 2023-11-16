@@ -6,6 +6,7 @@
 #include <vector>
 
 
+class Dungeon;
 class Item;
 class World;
 
@@ -166,6 +167,7 @@ struct AttackData {
     int evasion;
     int damage;
     const Item *weapon;
+    std::vector<Item*> drops;
     std::string errorMessage;
 };
 struct Actor {
@@ -184,6 +186,7 @@ struct Actor {
     bool isOverBurdened() const;
     void addItem(Item *item);
     void removeItem(Item *item);
+    void dropAllItems();
     bool tryEquipItem(Item *item);
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
@@ -198,6 +201,7 @@ struct Actor {
 
     int health, energy;
     std::vector<Item*> inventory;
+    Dungeon *onMap;
 
 private:
     Actor(const ActorData &data, unsigned myIdent);
