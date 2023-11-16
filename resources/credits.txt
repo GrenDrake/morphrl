@@ -1,0 +1,23 @@
+
+
+
+
+
+
+
+
+
+
+
+                         [font=italic]Delving the Mutagenic Dungeons
+                                 by Gren Drake
+
+                             originally created for
+            [font=italic]Transformation game Jam 2023[/font] (https://itch.io/jam/tf23)
+
+MorphRL was developed using:
+    BearLibTerminal    http://foo.wyrd.name/en:bearlibterminal
+    libfov             https://github.com/google-code-export/libfov
+    DejaVu Fonts       https://dejavu-fonts.github.io/
+    stb                https://github.com/nothings/stb
+@image resources/logo.png 0 0

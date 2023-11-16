@@ -317,6 +317,18 @@ public:
     void tick();
 };
 
+
+struct DocumentImage {
+    std::string filename;
+    int x, y, w, h;
+    Image *image;
+};
+
+struct Document {
+    std::vector<std::string> lines;
+    std::vector<DocumentImage> images;
+};
+
 int percentOf(int percent, int ofValue);
 std::string ucFirst(std::string text);
 std::vector<std::string> explode(const std::string &text, char onChar);
@@ -326,6 +338,10 @@ std::string& trim(std::string &text);
 std::string intToString(long long number);
 // int strToInt(const std::string &text);
 bool strToInt(const std::string &text, int &result);
+
+void showDocument(const std::string &filename);
+void showDocument(Document *document);
+Document* loadDocument(const std::string &filename);
 
 Image* loadImage(const std::string &filename);
 void drawImage(int originX, int originY, Image *image);
