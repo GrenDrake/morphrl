@@ -105,6 +105,19 @@ std::string previewMapSpace(World &world, const Coord &where) {
     return youveNeverSeenThatSpace;
 }
 
+Direction keyToDirection(int key) {
+    if (key == TK_SPACE || key == TK_KP_5)  return Direction::Here;
+    if (key == TK_RIGHT || key == TK_KP_6)  return Direction::East;
+    if (key == TK_LEFT || key == TK_KP_4)   return Direction::West;
+    if (key == TK_DOWN || key == TK_KP_2)   return Direction::South;
+    if (key == TK_UP || key == TK_KP_8)     return Direction::North;
+    if (key == TK_KP_7)                     return Direction::Northwest;
+    if (key == TK_KP_9)                     return Direction::Northeast;
+    if (key == TK_KP_1)                     return Direction::Southwest;
+    if (key == TK_KP_3)                     return Direction::Southeast;
+    return Direction::Unknown;
+}
+
 enum class UIMode {
     Normal, ExamineTile, ChooseDirection
 };
@@ -272,15 +285,12 @@ void gameloop(World &world) {
         if (key == TK_CLOSE)    break;
         if (uiMode == UIMode::Normal) {
             if (key == TK_ESCAPE)   break;
-            if (key == TK_RIGHT || key == TK_KP_6)  tryMovePlayer(world, Direction::East);
-            if (key == TK_LEFT || key == TK_KP_4)   tryMovePlayer(world, Direction::West);
-            if (key == TK_DOWN || key == TK_KP_2)   tryMovePlayer(world, Direction::South);
-            if (key == TK_UP || key == TK_KP_8)     tryMovePlayer(world, Direction::North);
-            if (key == TK_KP_7)                     tryMovePlayer(world, Direction::Northwest);
-            if (key == TK_KP_9)                     tryMovePlayer(world, Direction::Northeast);
-            if (key == TK_KP_1)                     tryMovePlayer(world, Direction::Southwest);
-            if (key == TK_KP_3)                     tryMovePlayer(world, Direction::Southeast);
-            if (key == TK_SPACE || key == TK_KP_5)  world.tick();
+            Direction theDir = keyToDirection(key);
+            if (theDir == Direction::Here) {
+                world.tick();
+            } else if (theDir != Direction::Unknown) {
+                tryMovePlayer(world, theDir);
+            }
 
             if (key == TK_G)        tryPlayerTakeItem(world);
             if (key == TK_COMMA)    tryPlayerChangeFloor(world);
@@ -340,35 +350,15 @@ void gameloop(World &world) {
                 const Actor *actor = world.map->actorAt(cursorPos);
                 if (actor) showActorInfo(world, actor);
             }
-            if (key == TK_RIGHT || key == TK_KP_6)  cursorPos = cursorPos.shift(Direction::East);
-            if (key == TK_LEFT || key == TK_KP_4)   cursorPos = cursorPos.shift(Direction::West);
-            if (key == TK_DOWN || key == TK_KP_2)   cursorPos = cursorPos.shift(Direction::South);
-            if (key == TK_UP || key == TK_KP_8)     cursorPos = cursorPos.shift(Direction::North);
-            if (key == TK_KP_7)                     cursorPos = cursorPos.shift(Direction::Northwest);
-            if (key == TK_KP_9)                     cursorPos = cursorPos.shift(Direction::Northeast);
-            if (key == TK_KP_1)                     cursorPos = cursorPos.shift(Direction::Southwest);
-            if (key == TK_KP_3)                     cursorPos = cursorPos.shift(Direction::Southeast);
+            Direction theDir = keyToDirection(key);
+            if (theDir != Direction::Unknown) {
+                cursorPos = cursorPos.shift(theDir);
+            }
         } else if (uiMode == UIMode::ChooseDirection) {
-            // if (key == TK_MOUSE_LEFT) {
-                // int mx = terminal_state(TK_MOUSE_X);
-                // int my = terminal_state(TK_MOUSE_Y);
-                // if (mx < 60 && my < 20) {
-                    // cursorPos.x = mx + offsetX;
-                    // cursorPos.y = my + offsetY;
-                // }
-            // }
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
             }
-            Direction theDir = Direction::Unknown;
-            if (key == TK_RIGHT || key == TK_KP_6)  theDir = Direction::East;
-            if (key == TK_LEFT || key == TK_KP_4)   theDir = Direction::West;
-            if (key == TK_DOWN || key == TK_KP_2)   theDir = Direction::South;
-            if (key == TK_UP || key == TK_KP_8)     theDir = Direction::North;
-            if (key == TK_KP_7)                     theDir = Direction::Northwest;
-            if (key == TK_KP_9)                     theDir = Direction::Northeast;
-            if (key == TK_KP_1)                     theDir = Direction::Southwest;
-            if (key == TK_KP_3)                     theDir = Direction::Southeast;
+            Direction theDir = keyToDirection(key);
             if (theDir != Direction::Unknown) {
                 uiMode = UIMode::Normal;
                 switch(uiModeAction) {
