@@ -18,31 +18,7 @@ World* createGame() {
     world->player = Actor::create(getActorData(0));
     world->player->isPlayer = true;
     world->player->reset();
-
-    const DungeonData &dungeonData = getDungeonEntranceData();
-    if (dungeonData.ident == BAD_VALUE) {
-        std::cerr << "Failed to find dungeon entrance\n";
-        delete world;
-        return nullptr;
-    }
-    world->map = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
-    doMapgen(*world->map);
-
-    const Room &startRoom = world->map->getRoomByType(1);
-    Coord startPosition;
-    do {
-        startPosition = startRoom.getPointWithin();
-        if (!world->map->isValidPosition(startPosition)) {
-            startPosition.x = -1;
-            continue;
-        }
-        const MapTile *tile = world->map->at(startPosition);
-        const TileData &td = getTileData(tile->floor);
-        if (!td.isPassable || tile->actor) startPosition.x = -1;
-    } while (startPosition.x < 0);
-    std::cerr << "START " << startPosition << '\n';
-    world->map->addActor(world->player, startPosition);
-    world->map->doActorFOV(world->player);
+    world->movePlayerToDepth(getDungeonEntranceIdent(), DE_ENTRANCE);
     return world;
 }
 

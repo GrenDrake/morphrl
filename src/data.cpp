@@ -133,11 +133,11 @@ const DungeonData& getDungeonData(unsigned ident) {
     }
     return BAD_DUNGEON;
 }
-const DungeonData& getDungeonEntranceData() {
+unsigned getDungeonEntranceIdent() {
     for (const DungeonData &data : dungeonData) {
-        if (data.hasEntrance) return data;
+        if (data.hasEntrance) return data.ident;
     }
-    return BAD_DUNGEON;
+    return BAD_VALUE;
 }
 
 

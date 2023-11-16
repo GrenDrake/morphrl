@@ -295,7 +295,7 @@ void addStairs(Dungeon &d) {
             room.type = RT_STAIR;
             Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
             d.floorAt(stairPos, TILE_STAIR_DOWN);
-            std::cerr << "DOWN " << stairPos << '\n';
+            std::cerr << "    downstair @ " << stairPos << '\n';
             isGood = true;
         }
 
@@ -313,7 +313,7 @@ void addStairs(Dungeon &d) {
             room.type = RT_STAIR;
             Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
             d.floorAt(stairPos, TILE_STAIR_UP);
-            std::cerr << "UP " << stairPos << '\n';
+            std::cerr << "    upstair @ " << stairPos << '\n';
             isGood = true;
         }
 
@@ -368,7 +368,7 @@ void addExtraDoors(Dungeon &d) {
 }
 
 void doMapgen(Dungeon &d) {
-    std::cerr << "DEPTH " << d.depth() << '\n';
+    std::cerr << "MAPGEN for " << d.depth() << '\n';
     // if we're on the ground floor, create the entrance room
     if (d.data.hasEntrance) addEntranceHall(d);
     buildRooms(d);

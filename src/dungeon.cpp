@@ -428,6 +428,16 @@ Coord Dungeon::randomOfTile(int theTile) const {
     return Coord(-1, -1);
 }
 
+Coord Dungeon::firstOfTile(int theTile) const {
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            Coord here(x, y);
+            if (floorAt(here) == theTile) return here;
+        }
+    }
+    return Coord(-1, -1);
+}
+
 
 bool Dungeon::isValidPosition(const Coord &where) const {
     if (where.x < 0 || where.y < 0) return false;

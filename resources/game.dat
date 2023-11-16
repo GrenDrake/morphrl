@@ -37,6 +37,8 @@
     name The_Upper_Levels
     hasEntrance
     noUpStairs
+@dungeon - 45
+    name The_Halls_Of_Change
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Tile defs

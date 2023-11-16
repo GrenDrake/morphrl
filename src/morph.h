@@ -15,6 +15,10 @@ const int MAP_WIDTH = 63;
 const int MAP_HEIGHT = 47;
 const int MAX_TALISMANS_WORN = 3;
 
+const int DE_ENTRANCE = 0;
+const int DE_UPSTAIRS = 1;
+const int DE_DOWNSTAIRS = 2;
+
 const int RT_GENERIC = 0;
 const int RT_ENTRANCE = 1;
 const int RT_STAIR = 1;
@@ -250,6 +254,7 @@ public:
     Coord nearestOpenTile(const Coord &source, bool allowActor=true, bool allowItem=false) const;
     Coord randomOpenTile(bool allowActor=false, bool allowItem=true) const;
     Coord randomOfTile(int theTile) const;
+    Coord firstOfTile(int theTile) const;
 
     bool isValidPosition(const Coord &where) const;
     unsigned toPosition(const Coord &where) const;
@@ -310,8 +315,11 @@ public:
     Dungeon *map;
     unsigned currentTurn;
     std::vector<LogMessage> messages;
+    std::vector<Dungeon*> levels;
     bool disableFOV;
 
+    Dungeon* getDungeon(int depth);
+    void movePlayerToDepth(int newDepth, int enterFrom);
     void addMessage(const std::string &text);
 
     void tick();
@@ -363,7 +371,7 @@ bool loadAllData();
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
 const TileData& getTileData(unsigned ident);
-const DungeonData& getDungeonEntranceData();
+unsigned getDungeonEntranceIdent();
 const DungeonData& getDungeonData(unsigned ident);
 
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
