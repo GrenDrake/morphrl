@@ -106,8 +106,9 @@ std::string previewMapSpace(World &world, const Coord &where) {
 }
 
 enum class UIMode {
-    Normal, ChooseTile
+    Normal, ExamineTile, ChooseDirection
 };
+const int UI_DEBUG_TUNNEL = 10000;
 void gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
@@ -120,6 +121,8 @@ void gameloop(World &world) {
     const color_t coldZone = color_from_argb(255, 0, 64, 64);
     const color_t coldZoneDark = color_from_argb(255, 0, 32, 32);
 
+    std::string uiModeString;
+    int uiModeAction = 0;
     UIMode uiMode = UIMode::Normal;
     Coord cursorPos;
     while (1) {
@@ -140,10 +143,13 @@ void gameloop(World &world) {
                 --yPos;
                 if (yPos < 20) break;
             }
-        } else if (uiMode == UIMode::ChooseTile) {
+        } else if (uiMode == UIMode::ExamineTile) {
             const std::string desc = previewMapSpace(world, cursorPos);
             terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
             terminal_print(0, 24, "X to finish    ENTER or SPACE to examine creature");
+        } else if (uiMode == UIMode::ChooseDirection) {
+            terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
+            terminal_print(0, 24, "Choose direction or Z to cancel");
         } else {
             std::cerr << "Unsupported UIMode " << static_cast<int>(uiMode) << " in display\n";
         }
@@ -162,7 +168,7 @@ void gameloop(World &world) {
         for (int y = 0; y < 19; ++y) {
             for (int x = 0; x < 60; ++x) {
                 Coord here(Coord(offsetX + x, offsetY + y));
-                if (uiMode == UIMode::ChooseTile && here == cursorPos) {
+                if (uiMode == UIMode::ExamineTile && here == cursorPos) {
                     terminal_bkcolor(cursorColour);
                     terminal_put(x, y, ' ');
                 }
@@ -173,7 +179,7 @@ void gameloop(World &world) {
                 bool isVisible = world.disableFOV || tile->isSeen;
                 Actor *actor = world.map->actorAt(here);
                 Item *item = world.map->itemAt(here);
-                if (uiMode == UIMode::ChooseTile && here == cursorPos) {
+                if (uiMode == UIMode::ExamineTile && here == cursorPos) {
                     ;
                 } else if (td.isOpaque || tile->temperature == 0) {
                     terminal_bkcolor(black);
@@ -291,13 +297,11 @@ void gameloop(World &world) {
 
             if (key == TK_I)        doInventory(world);
             if (key == TK_X) {
-                uiMode = UIMode::ChooseTile;
+                uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;
             }
 
 
-            if (key == TK_F10)   debug_saveMapToPNG(*world.map, true);
-            if (key == TK_F11)   debug_saveMapToPNG(*world.map, false);
             if (key == TK_F1)    world.addMessage("This is a really long message for testing purposes and so I can see how well word wrap works from messages and so one and so forth and such is what this message is for.");
             if (key == TK_F2)    world.player->takeDamage(1 + rand() % 10);
             if (key == TK_F3)    world.player->spendEnergy(1 + rand() % 10);
@@ -311,9 +315,15 @@ void gameloop(World &world) {
                     world.player->addItem(item);
                 }
             }
-            if (key == TK_F8)   world.map->calcDistances(world.player->position);
+            if (key == TK_F8) {
+                uiMode = UIMode::ChooseDirection;
+                uiModeString = "DEBUG make tunnel";
+                uiModeAction = UI_DEBUG_TUNNEL;
+            }
             if (key == TK_F9)   ui_alertBox("Testing", "This is a really long message for testing purposes and so I can see how well word wrap works from messages and so one and so forth and such is what this message is for.");
-        } else if (uiMode == UIMode::ChooseTile) {
+            if (key == TK_F10)  debug_saveMapToPNG(*world.map, true);
+            if (key == TK_F11)  debug_saveMapToPNG(*world.map, false);
+        } else if (uiMode == UIMode::ExamineTile) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
                 int my = terminal_state(TK_MOUSE_Y);
@@ -330,10 +340,47 @@ void gameloop(World &world) {
                 const Actor *actor = world.map->actorAt(cursorPos);
                 if (actor) showActorInfo(world, actor);
             }
-            if (key == TK_RIGHT)    cursorPos = cursorPos.shift(Direction::East);
-            if (key == TK_LEFT)     cursorPos = cursorPos.shift(Direction::West);
-            if (key == TK_DOWN)     cursorPos = cursorPos.shift(Direction::South);
-            if (key == TK_UP)       cursorPos = cursorPos.shift(Direction::North);
+            if (key == TK_RIGHT || key == TK_KP_6)  cursorPos = cursorPos.shift(Direction::East);
+            if (key == TK_LEFT || key == TK_KP_4)   cursorPos = cursorPos.shift(Direction::West);
+            if (key == TK_DOWN || key == TK_KP_2)   cursorPos = cursorPos.shift(Direction::South);
+            if (key == TK_UP || key == TK_KP_8)     cursorPos = cursorPos.shift(Direction::North);
+            if (key == TK_KP_7)                     cursorPos = cursorPos.shift(Direction::Northwest);
+            if (key == TK_KP_9)                     cursorPos = cursorPos.shift(Direction::Northeast);
+            if (key == TK_KP_1)                     cursorPos = cursorPos.shift(Direction::Southwest);
+            if (key == TK_KP_3)                     cursorPos = cursorPos.shift(Direction::Southeast);
+        } else if (uiMode == UIMode::ChooseDirection) {
+            // if (key == TK_MOUSE_LEFT) {
+                // int mx = terminal_state(TK_MOUSE_X);
+                // int my = terminal_state(TK_MOUSE_Y);
+                // if (mx < 60 && my < 20) {
+                    // cursorPos.x = mx + offsetX;
+                    // cursorPos.y = my + offsetY;
+                // }
+            // }
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            Direction theDir = Direction::Unknown;
+            if (key == TK_RIGHT || key == TK_KP_6)  theDir = Direction::East;
+            if (key == TK_LEFT || key == TK_KP_4)   theDir = Direction::West;
+            if (key == TK_DOWN || key == TK_KP_2)   theDir = Direction::South;
+            if (key == TK_UP || key == TK_KP_8)     theDir = Direction::North;
+            if (key == TK_KP_7)                     theDir = Direction::Northwest;
+            if (key == TK_KP_9)                     theDir = Direction::Northeast;
+            if (key == TK_KP_1)                     theDir = Direction::Southwest;
+            if (key == TK_KP_3)                     theDir = Direction::Southeast;
+            if (theDir != Direction::Unknown) {
+                uiMode = UIMode::Normal;
+                switch(uiModeAction) {
+                    case UI_DEBUG_TUNNEL: {
+                        Coord where = world.player->position.shift(theDir);
+                        world.map->floorAt(where, TILE_FLOOR);
+                        world.addMessage("Carved tunnel.");
+                        break; }
+                    default:
+                        std::cerr << "Unknown UI action " << uiModeAction << '\n';
+                }
+            }
         } else {
             std::cerr << "unhandled UIMode " << static_cast<int>(uiMode) << " in input \n";
         }
