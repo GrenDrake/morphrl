@@ -325,6 +325,7 @@ struct DocumentImage {
 };
 
 struct Document {
+    ~Document();
     std::vector<std::string> lines;
     std::vector<DocumentImage> images;
 };

@@ -7,6 +7,12 @@
 #include "morph.h"
 
 
+Document::~Document() {
+    for (DocumentImage &image : images) {
+        if (image.image) delete image.image;
+    }
+}
+
 void showDocument(const std::string &filename) {
     Document *document = loadDocument(filename);
     if (document) {
