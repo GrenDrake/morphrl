@@ -265,13 +265,17 @@ void gameloop(World &world) {
         if (key == TK_CLOSE)    break;
         if (uiMode == UIMode::Normal) {
             if (key == TK_ESCAPE)   break;
-            if (key == TK_RIGHT)    tryMovePlayer(world, Direction::East);
-            if (key == TK_LEFT)     tryMovePlayer(world, Direction::West);
-            if (key == TK_DOWN)     tryMovePlayer(world, Direction::South);
-            if (key == TK_UP)       tryMovePlayer(world, Direction::North);
-            if (key == TK_SPACE)    world.tick();
+            if (key == TK_RIGHT || key == TK_KP_6)  tryMovePlayer(world, Direction::East);
+            if (key == TK_LEFT || key == TK_KP_4)   tryMovePlayer(world, Direction::West);
+            if (key == TK_DOWN || key == TK_KP_2)   tryMovePlayer(world, Direction::South);
+            if (key == TK_UP || key == TK_KP_8)     tryMovePlayer(world, Direction::North);
+            if (key == TK_KP_7)                     tryMovePlayer(world, Direction::Northwest);
+            if (key == TK_KP_9)                     tryMovePlayer(world, Direction::Northeast);
+            if (key == TK_KP_1)                     tryMovePlayer(world, Direction::Southwest);
+            if (key == TK_KP_3)                     tryMovePlayer(world, Direction::Southeast);
+            if (key == TK_SPACE || key == TK_KP_5)  world.tick();
+
             if (key == TK_G)        tryPlayerTakeItem(world);
-            // if (key == TK_D)        tryPlayerDropItem(world);
             if (key == TK_COMMA)    tryPlayerChangeFloor(world);
             if (key == TK_PERIOD)   tryPlayerChangeFloor(world);
 
