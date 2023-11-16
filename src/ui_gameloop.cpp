@@ -238,8 +238,12 @@ void gameloop(World &world) {
         // player name & ID
         terminal_color(textColour);
         terminal_print(61, 0, "Player the Player");
-        terminal_print(72, 2, std::to_string(world.player->health).c_str());
-        terminal_print(72, 3, std::to_string(world.player->energy).c_str());
+        std::string healthLine = std::to_string(world.player->health) + "/"
+                               + std::to_string(world.player->getStat(STAT_HEALTH));
+        std::string energyLine = std::to_string(world.player->energy) + "/"
+                               + std::to_string(world.player->getStat(STAT_ENERGY));
+        terminal_print(72, 2, healthLine.c_str());
+        terminal_print(72, 3, energyLine.c_str());
 
         // stats
         for (int i = 0; i < STAT_EXTRA_COUNT; ++i) {
@@ -249,8 +253,6 @@ void gameloop(World &world) {
             terminal_print(61, yPos, text.c_str());
         }
 
-        // talisman count
-        terminal_printf(61, 14, "Talismans: %d", world.player->getTalismanCount());
         // (debug) position data
         terminal_print(61, 16, "Position:");
         terminal_print(63, 17, (std::to_string(world.player->position.x) +
