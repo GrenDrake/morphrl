@@ -267,12 +267,6 @@ void gameloop(World &world) {
                 cursorPos = world.player->position;
             }
 
-            if (key == TK_F2) {
-                for (int i = 0; i < 200; ++i) {
-                    Item *item = new Item(getItemData(1));
-                    world.player->addItem(item);
-                }
-            }
             if (key == TK_F1) {
                 world.player->takeDamage(-99999);
                 world.player->spendEnergy(-99999);
