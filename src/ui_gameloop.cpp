@@ -307,28 +307,37 @@ void gameloop(World &world) {
                 cursorPos = world.player->position;
             }
 
-
-            if (key == TK_F1)    world.addMessage("This is a really long message for testing purposes and so I can see how well word wrap works from messages and so one and so forth and such is what this message is for.");
-            if (key == TK_F2)    world.player->takeDamage(1 + rand() % 10);
-            if (key == TK_F3)    world.player->spendEnergy(1 + rand() % 10);
-            if (key == TK_F4)    world.player->takeDamage(-(1 + rand() % 10));
-            if (key == TK_F5)    world.player->spendEnergy(-(1 + rand() % 10));
-            if (key == TK_F6)    world.disableFOV = !world.disableFOV;
-            if (key == TK_F7) {
-                // for (int i = 0; i < 30 && !world.player->isOverBurdened(); ++i) {
-                for (int i = 0; i < 30 ; ++i) {
-                    Item *item = new Item(getItemData(rand()%6));
-                    world.player->addItem(item);
-                }
-            }
-            if (key == TK_F8) {
+            if (key == TK_F1) {
+                world.player->takeDamage(-99999);
+                world.player->spendEnergy(-99999);
+                world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
+            } else if (key == TK_F6) {
+                world.disableFOV = !world.disableFOV;
+                world.addMessage("[color=cyan]DEBUG[/color] toggled FOV");
+            } else if (key == TK_F7) {
+                Direction d = Direction::North;
+                int count = 0;
+                do {
+                    Actor *actor = world.map->actorAt(world.player->position.shift(d));
+                    if (actor) {
+                        ++count;
+                        actor->takeDamage(99999);
+                    }
+                    d = rotate45(d);
+                } while (d != Direction::North);
+                world.addMessage("[color=cyan]DEBUG[/color] Killed " + std::to_string(count) + " actors");
+                world.tick();
+            } else if (key == TK_F8) {
                 uiMode = UIMode::ChooseDirection;
-                uiModeString = "DEBUG make tunnel";
+                uiModeString = "[color=cyan]DEBUG[/color] make tunnel";
                 uiModeAction = UI_DEBUG_TUNNEL;
+            } else if (key == TK_F10) {
+                debug_saveMapToPNG(*world.map, true);
+                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (including actors) to file");
+            } else if (key == TK_F11) {
+                debug_saveMapToPNG(*world.map, false);
+                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (layout only) to file");
             }
-            if (key == TK_F9)   ui_alertBox("Testing", "This is a really long message for testing purposes and so I can see how well word wrap works from messages and so one and so forth and such is what this message is for.");
-            if (key == TK_F10)  debug_saveMapToPNG(*world.map, true);
-            if (key == TK_F11)  debug_saveMapToPNG(*world.map, false);
         } else if (uiMode == UIMode::ExamineTile) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
