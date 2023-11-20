@@ -106,7 +106,12 @@
     base_agility    0
     base_dexterity  0
     base_toughness  0
-    item            100 ITM_LESSER_HEALING
+    item            0 100 ITM_LESSER_HEALING
+    item            1 50 ITM_SWORD
+    item            1 99 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+    item            2 99 ITM_TALIS_ENERGY
 
 @actor - 1
     glyph           g
@@ -117,11 +122,11 @@
     base_agility    -3
     base_dexterity  -2
     base_toughness  -4
-    item            25 ITM_LESSER_HEALING
-    item            25 ITM_SWORD
-    item            25 ITM_DAGGER
-    item            25 ITM_TALIS_EVASION
-    item            25 ITM_TALIS_HEALTH
+    item            0 25 ITM_LESSER_HEALING
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
@@ -184,6 +189,13 @@
     colour          63 127 63
     type            IT_TALISMAN
     effect          ET_BOOST 100 STAT_HEALTH 5
+
+@item ITM_TALIS_ENERGY 8
+    glyph           "
+    name            talisman_of_energy
+    colour          63 63 127
+    type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_ENERGY 5
 
 @item - 6
     glyph           %

@@ -51,20 +51,51 @@ std::string EffectData::toString() const {
 // const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
 
 
+void addUniqueToVector(std::vector<int> &v, int item) {
+    for (const int &iter : v) {
+        if (iter == item) return;
+    }
+    v.push_back(item);
+}
+
 Actor* Actor::create(const ActorData &data) {
     if (data.ident == BAD_VALUE) return nullptr;
     Actor *actor = new Actor(data, 0);
     if (!actor) return nullptr;
+
+    std::vector<int> spawnGroups;
+
     for (const SpawnLine &line : data.initialItems) {
-        int roll = rand() % 100;
-        if (roll < line.spawnChance) {
-            Item *item = new Item(getItemData(line.ident));
-            if (item) {
-                actor->addItem(item);
-                actor->tryEquipItem(item);
+        if (line.spawnGroup == 0) {
+            int roll = rand() % 100;
+            if (roll < line.spawnChance) {
+                Item *item = new Item(getItemData(line.ident));
+                if (item) {
+                    actor->addItem(item);
+                    actor->tryEquipItem(item);
+                }
             }
+        } else {
+            addUniqueToVector(spawnGroups, line.spawnGroup);
         }
     }
+
+    for (int groupId : spawnGroups) {
+        int roll = rand() % 100;
+        for (const SpawnLine &line : data.initialItems) {
+            if (line.spawnGroup != groupId) continue;
+            if (roll < line.spawnChance) {
+                const ItemData &itemData = getItemData(line.ident);
+                Item *item = new Item(itemData);
+                if (item) {
+                    actor->addItem(item);
+                    actor->tryEquipItem(item);
+                }
+                break;
+            } else roll -= line.spawnChance;
+        }
+    }
+
     return actor;
 }
 

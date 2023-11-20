@@ -108,6 +108,7 @@ struct EffectData {
 };
 
 struct SpawnLine {
+    int spawnGroup;
     int spawnChance;
     int ident;
 };
