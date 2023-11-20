@@ -266,7 +266,7 @@ void gameloop(World &world) {
 
         // (debug) position data
         terminal_printf(61, 14, "Depth: %d", world.map->depth());
-        terminal_print(61, 15, world.map->data.name.c_str());
+        terminal_print(61, 15, ucFirst(world.map->data.name).c_str());
         terminal_printf(61, 17, "Position: %d, %d", world.player->position.x, world.player->position.y);
         terminal_print(61, 18, ("Turn: " + std::to_string(world.currentTurn)).c_str());
 

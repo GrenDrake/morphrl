@@ -19,6 +19,7 @@ World* createGame() {
     world->player->isPlayer = true;
     world->player->reset();
     world->movePlayerToDepth(getDungeonEntranceIdent(), DE_ENTRANCE);
+    world->addMessage("Welcome to MorphRL!");
     return world;
 }
 

@@ -78,10 +78,10 @@ void tryPlayerChangeFloor(World &world) {
     const TileData &td = getTileData(world.map->floorAt(world.player->position));
     if (td.isUpStair) {
         world.movePlayerToDepth(world.map->depth() - 1, DE_UPSTAIRS);
-        world.addMessage("You ascend towards the surface.");
+        world.addMessage("Ascending to " + world.map->data.name + ".");
     } else if (td.isDownStair) {
         world.movePlayerToDepth(world.map->depth() + 1, DE_DOWNSTAIRS);
-        world.addMessage("You descend deeper into the depths.");
+        world.addMessage("Descending to " + world.map->data.name + ".");
     } else {
         world.addMessage("No stairs here!");
     }
