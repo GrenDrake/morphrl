@@ -154,7 +154,11 @@ void gameloop(World &world) {
         } else if (uiMode == UIMode::ExamineTile) {
             const std::string desc = previewMapSpace(world, cursorPos);
             terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
-            terminal_print(0, 24, "X to finish    ENTER or SPACE to examine creature");
+            if (world.map->isSeen(cursorPos) && world.map->actorAt(cursorPos)) {
+                terminal_print(0, 24, "X to finish    SPACE to examine creature");
+            } else {
+                terminal_print(0, 24, "X to finish");
+            }
         } else if (uiMode == UIMode::ChooseDirection) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose direction or Z to cancel");
@@ -352,8 +356,8 @@ void gameloop(World &world) {
             }
             if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
                 uiMode = UIMode::Normal;
-                const Actor *actor = world.map->actorAt(cursorPos);
-                if (actor) showActorInfo(world, actor);
+                const MapTile *tile = world.map->at(cursorPos);
+                if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
             }
             Direction theDir = keyToDirection(key);
             if (theDir != Direction::Unknown) {

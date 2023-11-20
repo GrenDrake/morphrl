@@ -552,21 +552,6 @@ bool loadAllData() {
         }
     }
 
-    // for (const DataTemp *data : rawData.data) {
-        // std::cerr << "-> '" << data->typeName << "' (" << data->ident << ") '" << data->idName << "'\n";
-        // for (const DataProp &prop : data->props) {
-            // std::cerr << "    '" << prop.name << "' =";
-            // for (const std::string &text : prop.value) {
-                // std::cerr << " '" << text << '\'';
-            // }
-            // std::cerr << '\n';
-        // }
-    // }
-
-    // for (const DefineValue &def : rawData.defines) {
-        // std::cerr << def.origin.toString() << "  " << def.name << " = " << def.value << '\n';
-    // }
-
     if (rawData.hasErrors()) {
         for (const ErrorMessage &msg : rawData.errors) {
             std::cerr << msg.origin.toString() << "  " << msg.message << '\n';

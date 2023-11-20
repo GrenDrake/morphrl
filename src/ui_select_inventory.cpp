@@ -94,51 +94,6 @@ void useItem(World &world, Item *item) {
     }
 }
 
-
-int keycodeToIndex(int keyCode) {
-    switch(keyCode) {
-        case TK_1:  return 0;
-        case TK_2:  return 1;
-        case TK_3:  return 2;
-        case TK_4:  return 3;
-        case TK_5:  return 4;
-        case TK_6:  return 5;
-        case TK_7:  return 6;
-        case TK_8:  return 7;
-        case TK_9:  return 8;
-        case TK_0:  return 9;
-
-        case TK_A:  return 0;
-        case TK_B:  return 1;
-        case TK_C:  return 2;
-        case TK_D:  return 3;
-        case TK_E:  return 4;
-        case TK_F:  return 5;
-        case TK_G:  return 6;
-        case TK_H:  return 7;
-        case TK_I:  return 8;
-        case TK_J:  return 9;
-        case TK_K:  return 10;
-        case TK_L:  return 11;
-        case TK_M:  return 12;
-        case TK_N:  return 13;
-        case TK_O:  return 14;
-        case TK_P:  return 15;
-        case TK_Q:  return 16;
-        case TK_R:  return 17;
-        case TK_S:  return 18;
-        case TK_T:  return 19;
-        case TK_U:  return 20;
-        case TK_V:  return 21;
-        case TK_W:  return 22;
-        case TK_X:  return 23;
-        case TK_Y:  return 24;
-        case TK_Z:  return 25;
-        default:    return -1;
-    }
-}
-
-
 Item* doInventory(World &world) {
     if (world.player->inventory.empty()) {
         ui_alertBox("Alert", "You are not carrying anything.");
@@ -262,9 +217,5 @@ Item* doInventory(World &world) {
 
         if (selection > maxSelection) selection = maxSelection;
         if (selection > maxItemsListed) selection = maxItemsListed;
-        // int code = keycodeToIndex(key);
-        // if (code >= 0) {
-            // if (code <= maxSelection) selection = code;
-        // }
     }
 }

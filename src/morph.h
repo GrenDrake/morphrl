@@ -112,6 +112,7 @@ struct SpawnLine {
     int spawnChance;
     int ident;
 };
+
 struct ActorData {
     unsigned ident;
     int glyph;
@@ -121,12 +122,12 @@ struct ActorData {
     int baseStats[STAT_BASE_COUNT];
     std::vector<SpawnLine> initialItems;
 };
+
 struct ItemData {
     enum Type {
         Invalid,
         Junk,
-        //              arg1        arg2        arg3
-        Weapon,      // attackBonus minDamage   maxDamage
+        Weapon,
         Talisman,
         Consumable
     };
@@ -139,9 +140,9 @@ struct ItemData {
     int bulk;
     int minDamage, maxDamage;
     int consumeChance;
-    int statMods[STAT_BASE_COUNT];
     std::vector<EffectData> effects;
 };
+
 struct TileData {
     unsigned ident;
     int glyph;
@@ -354,7 +355,6 @@ std::vector<std::string> explodeOnWhitespace(std::string text);
 const std::string& trim(const std::string &text);
 std::string& trim(std::string &text);
 std::string intToString(long long number);
-// int strToInt(const std::string &text);
 bool strToInt(const std::string &text, int &result);
 
 void showDocument(const std::string &filename);
