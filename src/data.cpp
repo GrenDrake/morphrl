@@ -290,9 +290,15 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
             }
         }
     }
-    actorData.push_back(resultData);
 
-    return true;
+    const ActorData &oldActorData = getActorData(resultData.ident);
+    if (oldActorData.ident == resultData.ident) {
+        rawData.addError(rawActor->origin, "actor ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        actorData.push_back(resultData);
+        return true;
+    }
 }
 
 std::vector<DataDef> itemPropData{
@@ -365,9 +371,14 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
             }
         }
     }
-    itemData.push_back(resultData);
-
-    return true;
+    const ItemData &oldItemData = getItemData(resultData.ident);
+    if (oldItemData.ident == resultData.ident) {
+        rawData.addError(rawItem->origin, "item ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        itemData.push_back(resultData);
+        return true;
+    }
 }
 
 std::vector<DataDef> tilePropData{
@@ -429,9 +440,15 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
             }
         }
     }
-    tileData.push_back(resultData);
 
-    return true;
+    const TileData &oldTileData = getTileData(resultData.ident);
+    if (oldTileData.ident == resultData.ident) {
+        rawData.addError(rawTile->origin, "tile ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        tileData.push_back(resultData);
+        return true;
+    }
 }
 std::vector<DataDef> dungeonPropData{
     { "name",           1 },
@@ -473,9 +490,15 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
             }
         }
     }
-    dungeonData.push_back(resultData);
 
-    return true;
+    const DungeonData &oldDungeonData = getDungeonData(resultData.ident);
+    if (oldDungeonData.ident == resultData.ident) {
+        rawData.addError(rawDungeon->origin, "dungeon ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        dungeonData.push_back(resultData);
+        return true;
+    }
 }
 
 
