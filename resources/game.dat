@@ -37,6 +37,20 @@
     name the_Upper_Levels
     hasEntrance
     noUpStairs
+    actorCount      40
+    actor           0 45 ACTOR_GOBLIN
+    actor           0 45 ACTOR_KOBOLD
+    actor           0 10 ACTOR_SKELETON
+    itemCount       80
+    item            0 10 ITM_DAGGER
+    item            0 10 ITM_SWORD
+    item            0 17 ITM_POTION_LESSER_HEALING
+    item            0 10 ITM_POTION_LESSER_MUTATION
+    item            0 10 ITM_TALIS_ENERGY
+    item            0 10 ITM_TALIS_ENERGY
+    item            0 10 ITM_TALIS_EVASION
+    item            0 13 ITM_WAND_HEALING
+
 @dungeon - 45
     name the_Halls_Of_Change
 
@@ -97,7 +111,7 @@
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Actor defs
-@actor - 0
+@actor ACTOR_PLAYER 0
     glyph           @
     name            player
     description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
@@ -106,14 +120,14 @@
     base_agility    0
     base_dexterity  0
     base_toughness  0
-    item            0 100 ITM_LESSER_HEALING
+    item            0 100 ITM_POTION_LESSER_HEALING
     item            1 50 ITM_SWORD
     item            1 99 ITM_DAGGER
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
     item            2 99 ITM_TALIS_ENERGY
 
-@actor - 1
+@actor ACTOR_GOBLIN 1
     glyph           g
     name            goblin
     artfile         goblin.png
@@ -122,11 +136,84 @@
     base_agility    -3
     base_dexterity  -2
     base_toughness  -4
-    item            0 25 ITM_LESSER_HEALING
+    item            0 25 ITM_POTION_LESSER_HEALING
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_KOBOLD 2
+    glyph           k
+    name            kobold
+    artfile         kobold.png
+    colour          255 127 127
+    base_strength   -3
+    base_agility    -1
+    base_dexterity  -2
+    base_toughness  -3
+    item            0 25 ITM_POTION_LESSER_HEALING
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_HOBGOBLIN 3
+    glyph           h
+    name            hobgoblin
+    artfile         orc.png
+    colour          255 127 127
+    base_strength   -1
+    base_agility    -1
+    base_dexterity  -2
+    base_toughness  -1
+    item            0 100 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_SWORD
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_ORC 4
+    glyph           o
+    name            orc
+    artfile         orc.png
+    colour          255 127 127
+    base_strength   -1
+    base_agility    -1
+    base_dexterity  -2
+    base_toughness  0
+    item            0 25 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_SWORD
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_TROLL 5
+    glyph           t
+    name            troll
+    artfile         troll.png
+    colour          255 127 127
+    base_strength   1
+    base_agility    -2
+    base_dexterity  -2
+    base_toughness  1
+
+@actor ACTOR_SKELETON 6
+    glyph           s
+    name            skeleton
+    artfile         skeleton.png
+    colour          255 127 127
+    base_strength   0
+    base_agility    0
+    base_dexterity  -2
+    base_toughness  0
+
+@actor ACTOR_ZOMBIE 7
+    glyph           z
+    name            zombie
+    artfile         zombie.png
+    colour          255 127 127
+    base_strength   0
+    base_agility    -4
+    base_dexterity  -2
+    base_toughness  2
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
@@ -161,7 +248,7 @@
     damage          3 7
     effect          ET_BOOST 100 STAT_TO_HIT 2
 
-@item ITM_LESSER_HEALING 2
+@item ITM_POTION_LESSER_HEALING 2
     glyph           !
     name            potion_of_healing
     colour          255 0 0
@@ -169,7 +256,7 @@
     consumeChance   100
     effect          ET_ON_USE 100 EFFECT_HEALING 20
 
-@item - 3
+@item ITM_POTION_LESSER_MUTATION 3
     glyph           !
     name            potion_of_mutation
     colour          127 127 255
@@ -203,7 +290,7 @@
     colour          127 127 127
     type            IT_JUNK
 
-@item - 7
+@item ITM_WAND_HEALING 7
     glyph           \
     name            wand_of_healing
     colour          255 127 127

@@ -455,6 +455,10 @@ std::vector<DataDef> dungeonPropData{
     { "hasEntrance",    0 },
     { "noUpStairs",     0 },
     { "noDownStairs",   0 },
+    { "actorCount",     1 },
+    { "actor",          3 },
+    { "itemCount",      1 },
+    { "item",           3 },
 };
 bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
     if (!rawDungeon || rawDungeon->typeName != "@dungeon") {
@@ -468,6 +472,8 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
     resultData.hasUpStairs = true;
     resultData.hasDownStairs = true;
     resultData.ident = rawDungeon->ident;
+    resultData.actorCount = 0;
+    resultData.itemCount = 0;
     for (const DataProp &prop : rawDungeon->props) {
         const DataDef &dataDef = getDataDef(dungeonPropData, prop.name);
         if (dataDef.partCount == BAD_VALUE) {
@@ -485,6 +491,22 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
                 resultData.hasUpStairs = false;
             } else if (prop.name == "noDownStairs") {
                 resultData.hasDownStairs = false;
+            } else if (prop.name == "actorCount") {
+                resultData.actorCount = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "actor") {
+                SpawnLine spawnLine;
+                spawnLine.spawnGroup  = dataAsInt(rawData, prop.origin, prop.value[0]);
+                spawnLine.spawnChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                spawnLine.ident       = dataAsInt(rawData, prop.origin, prop.value[2]);
+                resultData.actorSpawns.push_back(spawnLine);
+            } else if (prop.name == "itemCount") {
+                resultData.itemCount = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "item") {
+                SpawnLine spawnLine;
+                spawnLine.spawnGroup  = dataAsInt(rawData, prop.origin, prop.value[0]);
+                spawnLine.spawnChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                spawnLine.ident       = dataAsInt(rawData, prop.origin, prop.value[2]);
+                resultData.itemSpawns.push_back(spawnLine);
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
             }

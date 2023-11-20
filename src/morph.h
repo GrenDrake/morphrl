@@ -159,6 +159,10 @@ struct DungeonData {
     bool hasEntrance;
     bool hasUpStairs;
     bool hasDownStairs;
+    unsigned actorCount;
+    unsigned itemCount;
+    std::vector<SpawnLine> actorSpawns;
+    std::vector<SpawnLine> itemSpawns;
 };
 
 

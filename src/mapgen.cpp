@@ -31,8 +31,6 @@ const int DEADEND_DOOR_CHANCE = 15;
 const int ROOM_MAX_WIDTH = 10;
 const int ROOM_MAX_HEIGHT = 10;
 const int MAZE_DOOR_CHANCE = 20;
-const int MAX_ACTOR_COUNT = 40;
-const int MAX_ITEM_COUNT = 80;
 const int ADD_EXTRA_DOOR_COUNT = 5;
 
 
@@ -367,6 +365,61 @@ void addExtraDoors(Dungeon &d) {
     d.floorAt(where, TILE_DOOR);
 }
 
+void spawnActors(Dungeon &d) {
+    for (unsigned i = 0; i < d.data.actorCount; ++i) {
+        bool isGood = false;
+        int iterations = 20;
+        Coord c;
+        do {
+            if (iterations <= 0) break;
+            c = d.randomOfTile(TILE_FLOOR);
+            isGood = d.actorAt(c) == nullptr;
+            --iterations;
+        } while (!isGood && iterations > 0);
+        if (!isGood) continue;
+
+        int roll = rand() % 100;
+        for (const SpawnLine &line : d.data.actorSpawns) {
+            if (roll < line.spawnChance) {
+                Actor *actor = Actor::create(getActorData(line.ident));
+                if (actor) {
+                    actor->reset();
+                    d.addActor(actor, c);
+                }
+                break;
+            }
+            roll -= line.spawnChance;
+        }
+    }
+}
+
+void spawnItems(Dungeon &d) {
+    for (unsigned i = 0; i < d.data.itemCount; ++i) {
+        bool isGood = false;
+        int iterations = 20;
+        Coord c;
+        do {
+            if (iterations <= 0) break;
+            c = d.randomOfTile(TILE_FLOOR);
+            isGood = d.itemAt(c) == nullptr;
+            --iterations;
+        } while (!isGood && iterations > 0);
+        if (!isGood) continue;
+
+        int roll = rand() % 100;
+        for (const SpawnLine &line : d.data.itemSpawns) {
+            if (roll < line.spawnChance) {
+                Item *item = new Item(getItemData(line.ident));
+                if (item) {
+                    d.addItem(item, c);
+                }
+                break;
+            }
+            roll -= line.spawnChance;
+        }
+    }
+}
+
 void doMapgen(Dungeon &d) {
     std::cerr << "MAPGEN for " << d.depth() << '\n';
     // if we're on the ground floor, create the entrance room
@@ -387,38 +440,6 @@ void doMapgen(Dungeon &d) {
     // for (int i = 0; i < 50; ++i) {
         // createLake(d);
     // }
-
-
-    for (int i = 0; i < MAX_ACTOR_COUNT; ++i) {
-        bool isGood = false;
-        int iterations = 20;
-        Coord c;
-        do {
-            if (iterations <= 0) break;
-            c = d.randomOfTile(TILE_FLOOR);
-            isGood = d.actorAt(c) == nullptr;
-            --iterations;
-        } while (!isGood && iterations > 0);
-        if (!isGood) continue;
-
-        Actor *actor = Actor::create(getActorData(1));
-        actor->reset();
-        d.addActor(actor, c);
-    }
-    for (int i = 0; i < MAX_ITEM_COUNT; ++i) {
-        bool isGood = false;
-        int iterations = 20;
-        Coord c;
-        do {
-            if (iterations <= 0) break;
-            c = d.randomOfTile(TILE_FLOOR);
-            isGood = d.itemAt(c) == nullptr;
-            --iterations;
-        } while (!isGood && iterations > 0);
-        if (!isGood) continue;
-
-        Item *item = new Item(getItemData(rand()%8));
-        d.addItem(item, c);
-    }
-
+    spawnActors(d);
+    spawnItems(d);
 }
