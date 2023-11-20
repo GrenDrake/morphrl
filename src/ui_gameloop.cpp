@@ -8,7 +8,7 @@
 void debug_saveMapToPNG(const Dungeon &d, bool showActors);
 
 void showActorInfo(World &world, const Actor *actor);
-Item* doInventory(World &world);
+void doInventory(World &world, bool showFloor);
 void doMessageLog(World &world);
 
 void tryMeleeAttack(World &world, Direction dir);
@@ -109,14 +109,15 @@ void gameloop(World &world) {
         } else if (uiMode == UIMode::ExamineTile) {
             const std::string desc = previewMapSpace(world, cursorPos);
             terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
-            if (world.map->isSeen(cursorPos) && world.map->actorAt(cursorPos)) {
-                terminal_print(0, 24, "X to finish    SPACE to examine creature");
+            const Actor *actorAtPos = world.map->actorAt(cursorPos);
+            if (world.map->isSeen(cursorPos) && actorAtPos) {
+                terminal_print(0, 24, ("[color=yellow]X[/color] to finish    [color=yellow]SPACE[/color] to examine [color=yellow]" + actorAtPos->getName(true)).c_str());
             } else {
-                terminal_print(0, 24, "X to finish");
+                terminal_print(0, 24, "[color=yellow]X[/color] to finish");
             }
         } else if (uiMode == UIMode::ChooseDirection) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
-            terminal_print(0, 24, "Choose direction or Z to cancel");
+            terminal_print(0, 24, "Choose direction or [color=yellow]Z[/color] to cancel");
         } else {
             std::cerr << "Unsupported UIMode " << static_cast<int>(uiMode) << " in display\n";
         }
@@ -260,12 +261,18 @@ void gameloop(World &world) {
                     }
             }
 
-            if (key == TK_I)        doInventory(world);
+            if (key == TK_I)        doInventory(world, false);
             if (key == TK_X) {
                 uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;
             }
 
+            if (key == TK_F2) {
+                for (int i = 0; i < 200; ++i) {
+                    Item *item = new Item(getItemData(1));
+                    world.player->addItem(item);
+                }
+            }
             if (key == TK_F1) {
                 world.player->takeDamage(-99999);
                 world.player->spendEnergy(-99999);

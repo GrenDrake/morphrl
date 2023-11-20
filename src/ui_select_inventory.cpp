@@ -94,27 +94,35 @@ void useItem(World &world, Item *item) {
     }
 }
 
-Item* doInventory(World &world) {
-    if (world.player->inventory.empty()) {
-        ui_alertBox("Alert", "You are not carrying anything.");
-        return nullptr;
-    }
-
+void doInventory(World &world, bool showFloor) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t textColour = color_from_argb(255, 192, 192, 192);
-    const int maxItemsListed = 20;
+    const int maxItemsListed = 17;
 
     terminal_color(textColour);
     terminal_bkcolor(black);
     terminal_clear();
 
+    MapTile *floorTile = world.map->at(world.player->position);
+    if (!floorTile) {
+        std::cerr << "ERROR: player standing on non-existant floor tile\n";
+        return;
+    }
     const int maxBulk = world.player->getStat(STAT_BULK_MAX);
     int selection = 0;
     while (1) {
+        std::vector<Item*> &currentInventory = showFloor ? floorTile->items : world.player->inventory;
         const int curBulk = world.player->getStat(STAT_BULK);
         const std::string bulkString = "[font=italic]Carried Bulk: " + std::to_string(curBulk) +
                                        " of " + std::to_string(maxBulk);
-        const int maxSelection = world.player->inventory.size() - 1;
+        const std::string healthString = "[color=red]Health[/color]: " + std::to_string(world.player->health) +
+                                         "/" + std::to_string(world.player->getStat(STAT_HEALTH)) +
+                                         "    [color=blue]Energy[/color]: " + std::to_string(world.player->energy) +
+                                         "/" + std::to_string(world.player->getStat(STAT_ENERGY));
+        const char *helpFloor = "[color=yellow]SPACE[/color] pick up";
+        const char *helpInventory = "[color=yellow]SPACE[/color] use/equip        [color=yellow]D[/color] drop";
+        const int maxSelection = currentInventory.size() < maxItemsListed
+                                    ? currentInventory.size() - 1 : maxItemsListed;
         terminal_color(textColour);
         terminal_bkcolor(black);
         terminal_clear();
@@ -126,20 +134,36 @@ Item* doInventory(World &world) {
             if (dims.height > 1) yPos -= dims.height - 1;
             terminal_print_ext(41, yPos, 39, 5, TK_ALIGN_DEFAULT, iter->text.c_str());
             --yPos;
-            if (yPos < 20) break;
+            if (yPos < 17) break;
         }
-        terminal_clear_area(41, 0, 39, 20);
+        terminal_clear_area(41, 0, 39, 17);
 
-        terminal_print(3, 0, "[font=italic]ITEM");
+        // draw the UI frame
+        for (int y = 0; y < 25; ++y) {
+            terminal_put(40, y, 0x2502);
+        }
+        for (int x = 0; x < 40; ++x) {
+            terminal_put(x, 20, 0x2500);
+            terminal_put(41+x, 16, 0x2500);
+        }
+        terminal_put(40, 16, 0x251C);
+        terminal_put(40, 20, 0x2524);
+
+        if (showFloor)  terminal_print(0, 0, "[font=italic]ITEMS ON [color=yellow]FLOOR");
+        else            terminal_print(0, 0, "[font=italic][color=yellow]CARRIED[/color] ITEMS");
         terminal_print(25, 0, "[font=italic]BULK");
         terminal_print(30, 0, "[font=italic]STATUS");
         terminal_print(45, 0, "[font=italic]DESCRIPTION");
-        terminal_print(0, 24, bulkString.c_str());
+        terminal_print(0, 21, "[color=yellow]UP/DOWN[/color] select item    [color=yellow]TAB[/color] change view");
+        terminal_print(0, 22, showFloor ? helpFloor : helpInventory);
+        terminal_print(0, 23, bulkString.c_str());
+        terminal_print(0, 24, healthString.c_str());
 
         const Item *selectedItem = nullptr;
         int counter = 0;
         yPos = 2;
-        for (const Item *item : world.player->inventory) {
+
+        for (const Item *item : currentInventory) {
             if (counter > maxItemsListed) break;
             if (counter == selection) {
                 terminal_bkcolor(textColour);
@@ -150,9 +174,7 @@ Item* doInventory(World &world) {
                 terminal_color(textColour);
                 terminal_bkcolor(black);
             }
-            terminal_put(0, yPos, 'a' + counter);
-            terminal_put(1, yPos, ')');
-            terminal_print(3, yPos, ucFirst(item->getName()).c_str());
+            terminal_print(0, yPos, ucFirst(item->getName()).c_str());
             terminal_print(25, yPos, std::to_string(item->data.bulk).c_str());
             if (item->isEquipped) {
                 terminal_print(30, yPos, "(equipped)");
@@ -187,27 +209,32 @@ Item* doInventory(World &world) {
             my -= 2;
             if (my <= maxSelection) selection = my;
         }
-        if (key == TK_ESCAPE || key == TK_CLOSE || key == TK_I) return nullptr;
-        if (key == TK_ENTER || key == TK_SPACE) {
+        if (key == TK_TAB) {
+            showFloor = !showFloor;
+            selection = 0;
+        }
+        if (key == TK_ESCAPE || key == TK_CLOSE || key == TK_I) return;
+        if ((key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER || (key == TK_G && showFloor)) && !currentInventory.empty()) {
             if (selection >= 0 && selection <= maxSelection) {
-                Item *item = world.player->inventory[selection];
-                useItem(world, item);
+                if (showFloor) {
+                    Item *item = currentInventory[selection];
+                    world.map->removeItem(item);
+                    world.player->addItem(item);
+                    world.addMessage("Took [color=yellow]" + item->getName(true) + "[/color].");
+                    world.tick();
+                } else {
+                    Item *item = currentInventory[selection];
+                    useItem(world, item);
+                }
             }
         }
-        if (key == TK_UP) {
-            if (selection > 0) --selection;
-        }
+        if ((key == TK_UP || key == TK_KP_8) && selection > 0) --selection;
         if (key == TK_HOME) selection = 0;
-        if (key == TK_DOWN) {
-            if (selection < maxSelection && selection < maxItemsListed) ++selection;
-        }
-        if (key == TK_END) {
-            if (maxSelection < maxItemsListed) selection = maxSelection;
-            else selection = maxItemsListed;
-        }
-        if (key == TK_D) {
+        if ((key == TK_DOWN || key == TK_KP_2) && selection < maxSelection) ++selection;
+        if (key == TK_END) selection = maxSelection;
+        if (key == TK_D && !showFloor) {
             if (selection >= 0 && selection <= maxSelection) {
-                Item *item = world.player->inventory[selection];
+                Item *item = currentInventory[selection];
                 world.player->removeItem(item);
                 world.map->addItem(item, world.player->position);
                 world.addMessage("Dropped [color=yellow]" + item->getName(true) + "[/color].");
@@ -215,7 +242,9 @@ Item* doInventory(World &world) {
             }
         }
 
+        // verify the current selection is in the valid range
+        // this can become invalid if items are dropped or used up
         if (selection > maxSelection) selection = maxSelection;
-        if (selection > maxItemsListed) selection = maxItemsListed;
+        if (selection < 0) selection = 0;
     }
 }

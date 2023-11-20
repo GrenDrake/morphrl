@@ -4,7 +4,7 @@
 #include "morph.h"
 
 
-Item* selectInventoryItem(World &world, const std::string &prompt);
+void doInventory(World &world, bool showFloor);
 
 
 void tryMeleeAttack(World &world, Direction dir) {
@@ -63,14 +63,22 @@ void tryMovePlayer(World &world, Direction dir) {
 }
 
 void tryPlayerTakeItem(World &world) {
-    Item *item = world.map->itemAt(world.player->position);
-    if (!item) {
+    MapTile *tile = world.map->at(world.player->position);
+    if (!tile) {
+        std::cerr << "Tried to take item while player outside map.\n";
+        return;
+    }
+
+    if (tile->items.empty()) {
         world.addMessage("Nothing to take!");
-    } else {
+    } else if (tile->items.size() == 1) {
+        Item *item = tile->items[0];
         world.map->removeItem(item);
         world.player->addItem(item);
         world.tick();
         world.addMessage("Took [color=yellow]" + item->getName(true) + "[/color].");
+    } else {
+        doInventory(world, true);
     }
 }
 
