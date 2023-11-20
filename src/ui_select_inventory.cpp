@@ -163,7 +163,9 @@ void doInventory(World &world, bool showFloor) {
         int counter = 0;
         yPos = 2;
 
-        for (const Item *item : currentInventory) {
+        if (currentInventory.empty()) {
+            terminal_print(0, yPos, "[font=italic]Nothing . . .");
+        } else for (const Item *item : currentInventory) {
             if (counter > maxItemsListed) break;
             if (counter == selection) {
                 terminal_bkcolor(textColour);
