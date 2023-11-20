@@ -7,10 +7,12 @@
 
 void debug_saveMapToPNG(const Dungeon &d, bool showActors);
 
+Item* doInventory(World &world);
+void doMessageLog(World &world);
+
 void tryMeleeAttack(World &world, Direction dir);
 void tryMovePlayer(World &world, Direction dir);
 void tryPlayerTakeItem(World &world);
-Item* doInventory(World &world);
 void tryPlayerChangeFloor(World &world);
 
 
@@ -142,9 +144,10 @@ void gameloop(World &world) {
         unsigned yPos = 24;
         if (uiMode == UIMode::Normal) {
             for (auto iter = world.messages.rbegin(); iter != world.messages.rend(); ++iter) {
-                dimensions_t dims = terminal_measure_ext(80, 5, iter->text.c_str());
+                dimensions_t dims = terminal_measure_ext(77, 5, iter->text.c_str());
                 if (dims.height > 1) yPos -= dims.height - 1;
-                terminal_print_ext(0, yPos, 80, 5, TK_ALIGN_DEFAULT, iter->text.c_str());
+                terminal_put(0, yPos, '*');
+                terminal_print_ext(2, yPos, 77, 5, TK_ALIGN_DEFAULT, iter->text.c_str());
                 --yPos;
                 if (yPos < 20) break;
             }
@@ -284,6 +287,7 @@ void gameloop(World &world) {
                 tryMovePlayer(world, theDir);
             }
 
+            if (key == TK_L)        doMessageLog(world);
             if (key == TK_G)        tryPlayerTakeItem(world);
             if (key == TK_COMMA)    tryPlayerChangeFloor(world);
             if (key == TK_PERIOD)   tryPlayerChangeFloor(world);
