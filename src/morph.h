@@ -12,6 +12,7 @@ class World;
 
 
 const unsigned BAD_VALUE = 4294967295;
+
 const int MAP_WIDTH = 63;
 const int MAP_HEIGHT = 47;
 const int MAX_TALISMANS_WORN = 3;
@@ -42,6 +43,7 @@ const int ET_ON_HIT = 2;        // triggers a special effect every time the acto
 const int ET_ON_USE = 3;        // triggers a special effect when the item is used from the inventory (item may be destroyed)
 const int ET_ON_TICK = 4;       // triggers a special effect at the end of the actor's turn, every turn
 
+const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
 const int STAT_STRENGTH     = 0;
 const int STAT_AGILITY      = 1;
@@ -65,6 +67,7 @@ const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
 const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
 const int EFFECT_POISON     = 4; // poison status - strength = damage rate
 const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
+const int EFFECT_APPLY_STATUS = 6;
 
 // special item numbers
 const int SIN_FISTS         = 10000;
@@ -105,6 +108,19 @@ struct EffectData {
     int effectStrength;
 
     std::string toString() const;
+};
+
+struct StatusData {
+    unsigned ident;
+    std::string name;
+    std::string desc;
+    unsigned minDuration;        // the status effect should last at least this long
+    unsigned maxDuration;        // the status effect should never last longer than
+                            // this (use a high value (4294967295) to allow
+                            // "permenant" effects
+    int resistDC;           // the DC required to resist the effect
+    bool resistEveryTurn;   // should the actor retry the resistance until cured?
+    std::vector<EffectData> effects;
 };
 
 struct SpawnLine {
@@ -176,6 +192,14 @@ struct AttackData {
     std::vector<Item*> drops;
     std::string errorMessage;
 };
+
+struct StatusItem {
+    StatusItem(const StatusData &data);
+
+    const StatusData &data;
+    unsigned duration;      // the number of times this status effect has triggered
+};
+
 struct Actor {
     static Actor* create(const ActorData &data);
     ~Actor();
@@ -198,6 +222,8 @@ struct Actor {
     const Item* getCurrentWeapon() const;
     AttackData meleeAttack(Actor *target);
 
+    void applyStatus(StatusItem *statusItem);
+
     const ActorData &data;
     unsigned ident;
     Coord position;
@@ -207,6 +233,7 @@ struct Actor {
 
     int health, energy;
     std::vector<Item*> inventory;
+    std::vector<StatusItem*> statusEffects;
     Dungeon *onMap;
 
 private:
@@ -379,10 +406,12 @@ std::ostream& operator<<(std::ostream &out, const Coord &where);
 bool loadAllData();
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
+const StatusData& getStatusData(unsigned ident);
 const TileData& getTileData(unsigned ident);
 unsigned getDungeonEntranceIdent();
 const DungeonData& getDungeonData(unsigned ident);
 
+std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target);
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
 

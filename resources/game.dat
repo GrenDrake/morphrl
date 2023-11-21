@@ -29,6 +29,7 @@
 @define EFFECT_PURIFY   3
 @define EFFECT_POISON   4
 @define EFFECT_BOOST    5
+@define EFFECT_APPLY_STATUS 6
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
@@ -44,7 +45,8 @@
     itemCount       80
     item            0 10 ITM_DAGGER
     item            0 10 ITM_SWORD
-    item            0 17 ITM_POTION_LESSER_HEALING
+    item            0 10 ITM_POTION_LESSER_HEALING
+    item            0  7 ITM_POTION_LESSER_REGEN
     item            0 10 ITM_POTION_LESSER_MUTATION
     item            0 10 ITM_TALIS_ENERGY
     item            0 10 ITM_TALIS_ENERGY
@@ -53,6 +55,18 @@
 
 @dungeon - 45
     name the_Halls_Of_Change
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Status effect defs
+@status STATUS_LESSER_REGEN 0
+    name            regeneration
+    description     Causes_the_subject_to_slowly_recover_health_over_time.
+    minDuration     4
+    maxDuration     3
+    resistDC        9999
+    effect          ET_ON_USE 100 EFFECT_HEALING 15
+
+
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Tile defs
@@ -255,6 +269,14 @@
     type            IT_CONSUMABLE
     consumeChance   100
     effect          ET_ON_USE 100 EFFECT_HEALING 20
+
+@item ITM_POTION_LESSER_REGEN 9
+    glyph           !
+    name            potion_of_regeneration
+    colour          255 0 0
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_LESSER_REGEN
 
 @item ITM_POTION_LESSER_MUTATION 3
     glyph           !

@@ -58,12 +58,19 @@ struct DataDef {
 };
 
 const DataDef BAD_DEF{ "INVALID", BAD_VALUE };
+
 ActorData BAD_ACTOR{BAD_VALUE, '?', 255, 0, 255, "invalid"};
 std::vector<ActorData> actorData;
+
 ItemData BAD_ITEM{BAD_VALUE, '?', 255, 0, 255, "invalid", "", ItemData::Invalid};
 std::vector<ItemData> itemData;
+
+StatusData BAD_STATUS{BAD_VALUE, "invalid"};
+std::vector<StatusData> statusData;
+
 TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 std::vector<TileData> tileData;
+
 DungeonData BAD_DUNGEON{BAD_VALUE, "invalid"};
 std::vector<DungeonData> dungeonData;
 
@@ -118,6 +125,13 @@ const ItemData& getItemData(unsigned ident) {
         if (data.ident == ident) return data;
     }
     return BAD_ITEM;
+}
+
+const StatusData& getStatusData(unsigned ident) {
+    for (const StatusData &data : statusData) {
+        if (data.ident == ident) return data;
+    }
+    return BAD_STATUS;
 }
 
 const TileData& getTileData(unsigned ident) {
@@ -301,6 +315,72 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
     }
 }
 
+std::vector<DataDef> statusPropData{
+    { "name",           1 },
+    { "description",    1 },
+    { "minDuration",    1 },
+    { "maxDuration",    1 },
+    { "resistDC",       1 },
+    { "resistEveryTurn",0 },
+    { "effect",         4 },
+};
+bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
+    if (!rawStatus || rawStatus->typeName != "@status") {
+        rawData.addError(Origin(), "processStatusData passed malformed data");
+        return false;
+    }
+
+    StatusData resultData;
+    resultData.name = "unknown";
+    resultData.minDuration = 0;
+    resultData.maxDuration = 4294967295;
+    resultData.resistDC = 10;
+    resultData.resistEveryTurn = false;
+
+    resultData.ident = rawStatus->ident;
+    for (const DataProp &prop : rawStatus->props) {
+        const DataDef &dataDef = getDataDef(statusPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown item property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "minDuration") {
+                resultData.minDuration = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "maxDuration") {
+                resultData.maxDuration = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "resistDC") {
+                resultData.resistDC = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "resistEveryTurn") {
+                resultData.resistEveryTurn = true;
+            } else if (prop.name == "effect") {
+                EffectData effectData;
+                effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);
+                effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
+                effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                resultData.effects.push_back(effectData);
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    const ItemData &oldItemData = getItemData(resultData.ident);
+    if (oldItemData.ident == resultData.ident) {
+        rawData.addError(rawStatus->origin, "item ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        statusData.push_back(resultData);
+        return true;
+    }
+}
+
 std::vector<DataDef> itemPropData{
     { "glyph",          1 },
     { "name",           1 },
@@ -450,6 +530,7 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
         return true;
     }
 }
+
 std::vector<DataDef> dungeonPropData{
     { "name",           1 },
     { "hasEntrance",    0 },
@@ -545,6 +626,8 @@ bool loadAllData() {
             processActorData(rawData, data);
         } else if (data->typeName == "@item") {
             processItemData(rawData, data);
+        } else if (data->typeName == "@status") {
+            processStatusData(rawData, data);
         } else if (data->typeName == "@dungeon") {
             processDungeonData(rawData, data);
         } else {
@@ -562,6 +645,8 @@ bool loadAllData() {
     std::cerr << "LOADED " << tileData.size() << " tiles\n";
     std::cerr << "LOADED " << itemData.size() << " items\n";
     std::cerr << "LOADED " << actorData.size() << " actors\n";
+    std::cerr << "LOADED " << statusData.size() << " status effects\n";
+    std::cerr << "LOADED " << dungeonData.size() << " dungeon levels\n";
     return true;
 }
 

@@ -99,6 +99,10 @@ Actor* Actor::create(const ActorData &data) {
     return actor;
 }
 
+StatusItem::StatusItem(const StatusData &data)
+: data(data), duration(0)
+{ }
+
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
   isPlayer(false), xp(0), playerLastSeenPosition(-1, -1),
@@ -270,6 +274,9 @@ AttackData Actor::meleeAttack(Actor *target) {
     return data;
 }
 
+void Actor::applyStatus(StatusItem *statusItem) {
+    statusEffects.push_back(statusItem);
+}
 
 
 Item::Item(const ItemData &data)
@@ -700,10 +707,39 @@ void Dungeon::clearDeadActors() {
     }
 }
 
+
 void Dungeon::tick(World &world) {
     for (Actor *actor : mActors) {
-        if (actor->isPlayer) continue; // skip player
         if (actor->health <= 0) continue; // skip dead actors
+
+        std::stringstream msg;
+        auto statusIter = actor->statusEffects.begin();
+        while (statusIter != actor->statusEffects.end()) {
+            StatusItem *status = *statusIter;
+            ++status->duration;
+
+            for (const EffectData &effect : status->data.effects) {
+                std::string resultString = triggerEffect(world, effect, actor, nullptr);
+                if (!resultString.empty()) {
+                    msg << resultString;
+                }
+            }
+
+            // check for effect expiry
+            if (status->duration >= status->data.maxDuration) {
+                statusIter = actor->statusEffects.erase(statusIter);
+                if (actor->isPlayer) {
+                    if (actor->isPlayer) msg << "Your " << status->data.name << " fades. ";
+                }
+            } else ++statusIter;
+        }
+        if (actor->isPlayer) {
+            const std::string &text = msg.str();
+            if (!text.empty()) world.addMessage(text);
+        }
+
+        if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
+        if (actor->isPlayer) continue; // skip player
 
         const MapTile *tile = at(actor->position);
         if (tile && tile->isSeen) {

@@ -6,6 +6,34 @@
 #include "morph.h"
 
 
+std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target) {
+    if (!user) {
+        std::cerr << "Tried to trigger effect with no user.\n";
+    }
+    if (rand() % 100 >= effect.effectChance) return "";
+
+    switch (effect.effectId) {
+        case EFFECT_HEALING: {
+            int amount = effect.effectStrength * user->getStat(STAT_HEALTH) / 100;
+            user->takeDamage(-amount);
+            return "Received " + std::to_string(amount) + " healing. ";
+            break; }
+        case EFFECT_APPLY_STATUS: {
+            const StatusData &statusData = getStatusData(effect.effectStrength);
+            if (statusData.ident == BAD_VALUE) {
+                std::cerr << "tried to apply invalid status " << effect.effectStrength << '\n';
+            } else {
+                StatusItem *statusItem = new StatusItem(statusData);
+                user->applyStatus(statusItem);
+                return "You are now effected by [color=yellow]" + statusData.name + "[/color]. ";
+            }
+            break; }
+        default:
+            return "Unhandled effect " + std::to_string(effect.effectId) + ". ";
+    }
+    return "";
+}
+
 
 void activateItem(World &world, Item *item, Actor *user) {
     std::stringstream msg;
@@ -16,16 +44,10 @@ void activateItem(World &world, Item *item, Actor *user) {
 
     for (const EffectData &data : item->data.effects) {
         if (data.trigger != ET_ON_USE) continue;
-        if (rand() % 100 >= data.effectChance) continue;
-        didEffect = true;
-        switch (data.effectId) {
-            case EFFECT_HEALING: {
-                int amount = data.effectStrength * user->getStat(STAT_HEALTH) / 100;
-                user->takeDamage(-amount);
-                msg << "Received " << amount << " healing. ";
-                break; }
-            default:
-                msg << "Unhandled effect " << data.effectId << ". ";
+        std::string result = triggerEffect(world, data, user, nullptr);
+        if (!result.empty()) {
+            msg << result;
+            didEffect = true;
         }
     }
 
@@ -35,7 +57,9 @@ void activateItem(World &world, Item *item, Actor *user) {
     int roll = rand() % 100;
     if (item->data.consumeChance > roll) {
         user->removeItem(item);
-        msg << "[color=yellow]" << ucFirst(item->getName(true)) << "[/color] was used up.";
+        if (item->data.consumeChance < 100) {
+            msg << "[color=yellow]" << ucFirst(item->getName(true)) << "[/color] was used up.";
+        }
         delete item;
     }
     world.addMessage(msg.str());
