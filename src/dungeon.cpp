@@ -67,7 +67,7 @@ Actor* Actor::create(const ActorData &data) {
 
     for (const SpawnLine &line : data.initialItems) {
         if (line.spawnGroup == 0) {
-            int roll = rand() % 100;
+            int roll = globalRNG.upto(100);
             if (roll < line.spawnChance) {
                 Item *item = new Item(getItemData(line.ident));
                 if (item) {
@@ -81,7 +81,7 @@ Actor* Actor::create(const ActorData &data) {
     }
 
     for (int groupId : spawnGroups) {
-        int roll = rand() % 100;
+        int roll = globalRNG.upto(100);
         for (const SpawnLine &line : data.initialItems) {
             if (line.spawnGroup != groupId) continue;
             if (roll < line.spawnChance) {
@@ -257,13 +257,13 @@ AttackData Actor::meleeAttack(Actor *target) {
         data.errorMessage = "Weapon was nullptr";
         return data;
     }
-    data.roll = 1 + rand() % 20;
+    data.roll = 1 + globalRNG.upto(20);
     data.toHit = getStat(STAT_TO_HIT);
     data.evasion = target->getStat(STAT_EVASION);
     if (data.roll + data.toHit > data.evasion) {
         int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
         if (damageRange < 1) damageRange = 1;
-        data.damage = data.weapon->data.minDamage + rand() % damageRange;
+        data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange);
         target->takeDamage(data.damage);
         if (target->isDead()) {
             for (Item *item : target->inventory) data.drops.push_back(item);
@@ -314,8 +314,8 @@ int Room::area() const {
 
 
 Coord Room::getPointWithin() const {
-    int dx = rand() % (w / 2);
-    int dy = rand() % (h / 2);
+    int dx = globalRNG.upto(w / 2);
+    int dy = globalRNG.upto(h / 2);
     dx *= 2;
     dy *= 2;
     return Coord(1 + x + dx, 1 + y + dy);
@@ -455,8 +455,8 @@ Coord Dungeon::randomOpenTile(bool allowActor, bool allowItem) const {
     do {
         --iterations;
         isValid = false;
-        x = 1 + (rand() % (mWidth - 2));
-        y = 1 + (rand() % (mHeight - 2));
+        x = 1 + (globalRNG.upto(mWidth - 2));
+        y = 1 + (globalRNG.upto(mHeight - 2));
         const MapTile *tile = at(Coord(x, y));
         if (!tile) continue;
         if (tile->actor) continue;
@@ -472,8 +472,8 @@ Coord Dungeon::randomOfTile(int theTile) const {
     int x, y, iterations = 10000;
     bool isValid;
     do {
-        x = 1 + (rand() % (mWidth - 2));
-        y = 1 + (rand() % (mHeight - 2));
+        x = 1 + (globalRNG.upto(mWidth - 2));
+        y = 1 + (globalRNG.upto(mHeight - 2));
         const MapTile *tile = at(Coord(x, y));
         isValid = tile && tile->floor == theTile;
     } while (iterations > 0 && !isValid);
@@ -774,7 +774,7 @@ void Dungeon::tick(World &world) {
                 Direction dirToPlayer = actor->position.directionTo(actor->playerLastSeenPosition);
                 bool result = tryActorStepApprox(actor, dirToPlayer);
                 if (!result || actor->position == actor->playerLastSeenPosition) actor->playerLastSeenPosition.x = -1;
-            } else if (rand() % 2) {
+            } else if (globalRNG.upto(2)) {
                 Direction dir = randomDirection();
                 tryActorStepApprox(actor, dir);
             }

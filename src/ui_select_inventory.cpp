@@ -10,7 +10,7 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
     if (!user) {
         std::cerr << "Tried to trigger effect with no user.\n";
     }
-    if (rand() % 100 >= effect.effectChance) return "";
+    if (globalRNG.upto(100) >= effect.effectChance) return "";
 
     switch (effect.effectId) {
         case EFFECT_HEALING: {
@@ -54,7 +54,7 @@ void activateItem(World &world, Item *item, Actor *user) {
     if (!didEffect) {
         msg << "no effect. ";
     }
-    int roll = rand() % 100;
+    int roll = globalRNG.upto(100);
     if (item->data.consumeChance > roll) {
         user->removeItem(item);
         if (item->data.consumeChance < 100) {

@@ -79,7 +79,7 @@ void buildMaze(Dungeon &d) {
             tile->floor = TILE_FLOOR;
             tile = d.at(here.shift(wd));
             if (tile) {
-                if (rand() % 1000 < MAZE_DOOR_CHANCE) {
+                if (globalRNG.upto(1000) < MAZE_DOOR_CHANCE) {
                     tile->floor = TILE_DOOR;
                 } else {
                     tile->floor = TILE_FLOOR;
@@ -111,13 +111,13 @@ void buildRooms(Dungeon &d) {
     int yRange = ROOM_MAX_HEIGHT - 2;
 
     for (int i = 0; i < ROOM_ATTEMPTS; ++i) {
-        int x = 1 + rand() % (d.width() - 2);
+        int x = 1 + globalRNG.upto(d.width() - 2);
         x = x / 2 * 2;
-        int y = 1 + rand() % (d.height() - 2);
+        int y = 1 + globalRNG.upto(d.height() - 2);
         y = y / 2 * 2;
-        int w = 3 + rand() % xRange;
+        int w = 3 + globalRNG.upto(xRange);
         w = w / 2 * 2 + 1;
-        int h = 3 + rand() % yRange;
+        int h = 3 + globalRNG.upto(yRange);
         h = h / 2 * 2 + 1;
 
         if (d.areaIsTile(x, y, w, h, 0)) {
@@ -159,13 +159,13 @@ void setupRooms(Dungeon &d) {
     for (int i = 0; i < d.roomCount(); ++i) {
         Room &room = d.getRoom(i);
         if (room.w < 1) continue; // invalid room
-        if (room.type == RT_GENERIC && (room.area() <= 3 || (rand() % 100) < ROOM_FILL_CHANCE)) {
+        if (room.type == RT_GENERIC && (room.area() <= 3 || (globalRNG.upto(100)) < ROOM_FILL_CHANCE)) {
             // filled in room
             d.fillRect(room.x, room.y, room.w, room.h, 1);
             room.isFilled = true;
         } else {
             addDoorToRoom(d, room);
-            if (room.type == RT_ENTRANCE || rand() % 100 < ROOM_SECOND_DOOR_CHANCE) {
+            if (room.type == RT_ENTRANCE || globalRNG.upto(100) < ROOM_SECOND_DOOR_CHANCE) {
                 addDoorToRoom(d, room);
             }
         }
@@ -195,7 +195,7 @@ void trimDeadEnds(Dungeon &d) {
                 dir = rotate90(dir);
             } while (dir != Direction::North);
             if (wallCount == 3) {
-                int roll = rand() % 100;
+                int roll = globalRNG.upto(100);
                 if (roll < DEADEND_FILL_CHANCE) {
                     // fill in dead end
                     d.floorAt(here, TILE_WALL);
@@ -252,10 +252,10 @@ void removeDeadEnds(Dungeon &d) {
 }
 
 void createLake(Dungeon &d) {
-    int x = 1 + rand() % (d.width() - 2);
-    int y = 1 + rand() % (d.height() - 2);
+    int x = 1 + globalRNG.upto(d.width() - 2);
+    int y = 1 + globalRNG.upto(d.height() - 2);
     Coord root(x, y);
-    int r = 3 + rand() % 4;
+    int r = 3 + globalRNG.upto(4);
     for (int wy = y - r; wy <= y + r; ++wy) {
         for (int wx = x - r; wx <= x + r; ++wx) {
             Coord here(wx, wy);
@@ -267,10 +267,10 @@ void createLake(Dungeon &d) {
 };
 
 void createTemperatureZone(Dungeon &d, int forTemp) {
-    int x = 1 + rand() % (d.width() - 2);
-    int y = 1 + rand() % (d.height() - 2);
+    int x = 1 + globalRNG.upto(d.width() - 2);
+    int y = 1 + globalRNG.upto(d.height() - 2);
     Coord root(x, y);
-    int r = 3 + rand() % 10;
+    int r = 3 + globalRNG.upto(10);
     for (int wy = y - r; wy <= y + r; ++wy) {
         for (int wx = x - r; wx <= x + r; ++wx) {
             Coord here(wx, wy);
@@ -345,8 +345,8 @@ void addExtraDoors(Dungeon &d) {
     int iterations = 10;
     do {
         --iterations;
-        where.x = 2 + rand() % (d.width() - 2);
-        where.y = 2 + rand() % (d.height() - 2);
+        where.x = 2 + globalRNG.upto(d.width() - 2);
+        where.y = 2 + globalRNG.upto(d.height() - 2);
         isGood = d.floorAt(where) == TILE_WALL;
         if (!isGood) continue;
         if (d.floorAt(where.shift(Direction::North)) == TILE_WALL) {
@@ -378,7 +378,7 @@ void spawnActors(Dungeon &d) {
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
-        int roll = rand() % 100;
+        int roll = globalRNG.upto(100);
         for (const SpawnLine &line : d.data.actorSpawns) {
             if (roll < line.spawnChance) {
                 Actor *actor = Actor::create(getActorData(line.ident));
@@ -406,7 +406,7 @@ void spawnItems(Dungeon &d) {
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
-        int roll = rand() % 100;
+        int roll = globalRNG.upto(100);
         for (const SpawnLine &line : d.data.itemSpawns) {
             if (roll < line.spawnChance) {
                 Item *item = new Item(getItemData(line.ident));

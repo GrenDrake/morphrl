@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 
+#include "random.h"
 
 class Dungeon;
 class Item;
@@ -416,5 +417,7 @@ void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
 
 void ui_alertBox(const std::string &title, const std::string &message);
+
+extern RNG globalRNG;
 
 #endif // MORPH_H

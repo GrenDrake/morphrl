@@ -11,6 +11,7 @@
 
 void gameloop(World &world);
 
+RNG globalRNG;
 
 World* createGame() {
     World *world = new World;

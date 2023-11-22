@@ -4,13 +4,13 @@
 #include "morph.h"
 
 Direction randomDirection() {
-    int i = rand() % 8;
+    int i = globalRNG.upto(8);
     return static_cast<Direction>(i + 2);
 }
 
 
 Direction randomCardinalDirection() {
-    switch(rand() % 4) {
+    switch(globalRNG.upto(4)) {
         case 0: return Direction::North;
         case 1: return Direction::East;
         case 2: return Direction::South;
