@@ -23,7 +23,10 @@ Dungeon* World::getDungeon(int depth) {
     }
     Dungeon *newMap = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
     if (!newMap) return nullptr;
+    auto oldSeed = globalRNG.getState();
+    globalRNG.seed(gameSeed + dungeonData.ident);
     doMapgen(*newMap);
+    globalRNG.seed(oldSeed);
     levels.push_back(newMap);
     return newMap;
 }

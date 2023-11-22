@@ -355,6 +355,7 @@ public:
     std::vector<LogMessage> messages;
     std::vector<Dungeon*> levels;
     bool disableFOV;
+    uint64_t gameSeed;
 
     Dungeon* getDungeon(int depth);
     void movePlayerToDepth(int newDepth, int enterFrom);

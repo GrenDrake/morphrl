@@ -19,6 +19,10 @@ void RNG::seed(uint64_t theSeed) {
     } else mState = theSeed;
 }
 
+uint64_t RNG::getState() const {
+    return mState;
+}
+
 uint64_t RNG::next64() {
     mState ^= mState >> 12;
     mState ^= mState << 25;

@@ -9,6 +9,7 @@ public:
     RNG(uint64_t theSeed);
 
     void seed(uint64_t theSeed);
+    uint64_t getState() const;
     uint64_t next64();
     uint64_t next32();
 
