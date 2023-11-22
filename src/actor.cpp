@@ -1,3 +1,4 @@
+#include <iostream>
 #include <vector>
 
 #include "morph.h"
@@ -126,9 +127,23 @@ void Actor::reset() {
 
 int Actor::getStat(int statNumber) const {
     int itemBonus = 0;
-    for (const Item *item : inventory) {
-        if (!item->isEquipped) continue; // items only provide static bonuses when equipped
-        itemBonus += item->getStatBonus(statNumber);
+
+    // current bulk and XP can never be boosted
+    if (statNumber != STAT_BULK && statNumber != STAT_XP) {
+        for (const Item *item : inventory) {
+            if (!item->isEquipped) continue; // items only provide static bonuses when equipped
+            itemBonus += item->getStatBonus(statNumber);
+        }
+        for (const StatusItem *status : statusEffects) {
+            if (!status) continue;
+            for (const EffectData &data : status->data.effects) {
+                if (data.trigger != ET_BOOST) continue;
+                if (data.effectId == statNumber) {
+                    itemBonus += data.effectStrength;
+                }
+            }
+            
+        }
     }
 
     switch(statNumber) {

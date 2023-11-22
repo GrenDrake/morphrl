@@ -63,15 +63,13 @@ const int STAT_ALL_COUNT    = 11;
 
 
 const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
-const int EFFECT_REGEN      = 1; // regen status - strength = regen rate
+const int EFFECT_DAMAGE     = 1; // take damage - strength = amount
 const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
 const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
-const int EFFECT_POISON     = 4; // poison status - strength = damage rate
-const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
 const int EFFECT_APPLY_STATUS = 6;
 
 // special item numbers
-const int SIN_FISTS         = 10000;
+const int SIN_FISTS         = -2;
 
 enum class Direction {
     Unknown, Here,
@@ -107,6 +105,7 @@ struct EffectData {
     int effectChance;
     int effectId;       // internal ID mapped to exact effect
     int effectStrength;
+    int effectParam;
 
     std::string toString() const;
 };

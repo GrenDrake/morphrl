@@ -322,7 +322,7 @@ std::vector<DataDef> statusPropData{
     { "maxDuration",    1 },
     { "resistDC",       1 },
     { "resistEveryTurn",0 },
-    { "effect",         4 },
+    { "effect",         5 },
 };
 bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
     if (!rawStatus || rawStatus->typeName != "@status") {
@@ -365,15 +365,16 @@ bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
                 effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
                 effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
                 effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                effectData.effectParam = dataAsInt(rawData, prop.origin, prop.value[4]);
                 resultData.effects.push_back(effectData);
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
             }
         }
     }
-    const ItemData &oldItemData = getItemData(resultData.ident);
-    if (oldItemData.ident == resultData.ident) {
-        rawData.addError(rawStatus->origin, "item ident " + std::to_string(resultData.ident) + " already used");
+    const StatusData &oldStatusData = getStatusData(resultData.ident);
+    if (oldStatusData.ident == resultData.ident) {
+        rawData.addError(rawStatus->origin, "status ident " + std::to_string(resultData.ident) + " already used");
         return false;
     } else {
         statusData.push_back(resultData);
@@ -389,7 +390,7 @@ std::vector<DataDef> itemPropData{
     { "type",           1 },
     { "bulk",           1 },
     { "damage",         2 },
-    { "effect",         4 },
+    { "effect",         5 },
     { "consumeChance",  1 },
 };
 bool processItemData(RawData &rawData, const DataTemp *rawItem) {
@@ -445,6 +446,7 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
                 effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
                 effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
                 effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                effectData.effectParam = dataAsInt(rawData, prop.origin, prop.value[4]);
                 resultData.effects.push_back(effectData);
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
@@ -616,37 +618,44 @@ bool loadAllData() {
         return false;
     }
 
+    int maxItem = 0, maxTile = 0, maxActor = 0, maxStatus = 0, maxDungeon = 0;
     for (const DataTemp *data : rawData.data) {
         if (!data) continue;
         if (data->typeName == "@define") {
             // we don't need to do anything for this case
         } else if (data->typeName == "@tile") {
+            if (maxTile < data->ident) maxTile = data->ident;
             processTileData(rawData, data);
         } else if (data->typeName == "@actor") {
+            if (maxActor < data->ident) maxActor = data->ident;
             processActorData(rawData, data);
         } else if (data->typeName == "@item") {
+            if (maxItem < data->ident) maxItem = data->ident;
             processItemData(rawData, data);
         } else if (data->typeName == "@status") {
+            if (maxStatus < data->ident) maxStatus = data->ident;
             processStatusData(rawData, data);
         } else if (data->typeName == "@dungeon") {
+            if (maxDungeon < data->ident) maxDungeon = data->ident;
             processDungeonData(rawData, data);
         } else {
             rawData.addError(data->origin, "unknown object type " + data->typeName);
         }
     }
 
+    std::cerr << "LOADED " << tileData.size() << " tiles (next ident: " << maxTile+1 << ")\n";
+    std::cerr << "LOADED " << itemData.size() << " items (next ident: " << maxItem+1 << ")\n";
+    std::cerr << "LOADED " << actorData.size() << " actors (next ident: " << maxActor+1 << ")\n";
+    std::cerr << "LOADED " << statusData.size() << " status effects (next ident: " << maxStatus+1 << ")\n";
+    std::cerr << "LOADED " << dungeonData.size() << " dungeon levels (next ident: " << maxDungeon+1 << ")\n";
+
     if (rawData.hasErrors()) {
         for (const ErrorMessage &msg : rawData.errors) {
             std::cerr << msg.origin.toString() << "  " << msg.message << '\n';
         }
         return false;
+    } else {
+        return true;
     }
-
-    std::cerr << "LOADED " << tileData.size() << " tiles\n";
-    std::cerr << "LOADED " << itemData.size() << " items\n";
-    std::cerr << "LOADED " << actorData.size() << " actors\n";
-    std::cerr << "LOADED " << statusData.size() << " status effects\n";
-    std::cerr << "LOADED " << dungeonData.size() << " dungeon levels\n";
-    return true;
 }
 
