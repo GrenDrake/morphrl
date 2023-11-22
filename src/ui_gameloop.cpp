@@ -68,7 +68,7 @@ Direction keyToDirection(int key) {
 }
 
 enum class UIMode {
-    Normal, ExamineTile, ChooseDirection
+    Normal, ExamineTile, ChooseDirection, PlayerDead
 };
 const int UI_DEBUG_TUNNEL = 10000;
 void gameloop(World &world) {
@@ -87,7 +87,16 @@ void gameloop(World &world) {
     int uiModeAction = 0;
     UIMode uiMode = UIMode::Normal;
     Coord cursorPos;
+    bool shownDeathMessage = false;
     while (1) {
+        if (uiMode == UIMode::Normal && world.player->isDead()) {
+            uiMode = UIMode::PlayerDead;
+            if (!shownDeathMessage) {
+                shownDeathMessage = true;
+                world.addMessage("You have [color=red]died[/color]! Press [color=yellow]ESCAPE[/color] to return to the menu.");
+            }
+        }
+
         int offsetX = world.player->position.x - 30;
         int offsetY = world.player->position.y - 10;
         terminal_color(textColour);
@@ -97,7 +106,7 @@ void gameloop(World &world) {
         // show log (we do this first so we can remove any extra bits that would
         // overlap other UI elements)
         unsigned yPos = 24;
-        if (uiMode == UIMode::Normal) {
+        if (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead) {
             for (auto iter = world.messages.rbegin(); iter != world.messages.rend(); ++iter) {
                 dimensions_t dims = terminal_measure_ext(77, 5, iter->text.c_str());
                 if (dims.height > 1) yPos -= dims.height - 1;
@@ -235,10 +244,24 @@ void gameloop(World &world) {
 
         terminal_refresh();
 
-
         int key = terminal_read();
         if (key == TK_CLOSE)    break;
-        if (uiMode == UIMode::Normal) {
+        if (uiMode == UIMode::PlayerDead) {
+            if (key == TK_ESCAPE)   break;
+            if (key == TK_L)        doMessageLog(world);
+            if (key == TK_I)        doInventory(world, false);
+            if (key == TK_X) {
+                uiMode = UIMode::ExamineTile;
+                cursorPos = world.player->position;
+            }
+            if (key == TK_F1) {
+                world.player->takeDamage(-99999);
+                world.player->spendEnergy(-99999);
+                uiMode = UIMode::Normal;
+                shownDeathMessage = false;
+                world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
+            }
+        } else if (uiMode == UIMode::Normal) {
             if (key == TK_ESCAPE)   break;
             Direction theDir = keyToDirection(key);
             if (theDir == Direction::Here) {

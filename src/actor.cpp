@@ -142,7 +142,7 @@ int Actor::getStat(int statNumber) const {
                     itemBonus += data.effectStrength;
                 }
             }
-            
+
         }
     }
 
@@ -278,7 +278,7 @@ AttackData Actor::meleeAttack(Actor *target) {
         if (damageRange < 1) damageRange = 1;
         data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange);
         target->takeDamage(data.damage);
-        if (target->isDead()) {
+        if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
             xp += 10;

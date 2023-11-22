@@ -14,16 +14,13 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
     if (globalRNG.upto(100) >= effect.effectChance) return "";
 
     switch (effect.effectId) {
-        case EFFECT_BOOST:
-            // no per-tick effect
-            return "";
         case EFFECT_HEALING: {
             int amount = effect.effectStrength * user->getStat(STAT_HEALTH) / 100;
             user->takeDamage(-amount);
             return "Received " + std::to_string(amount) + " healing. "; }
         case EFFECT_DAMAGE: {
             user->takeDamage(effect.effectStrength);
-            std::string message = ucFirst(user->getName(true)) + " took " 
+            std::string message = ucFirst(user->getName(true)) + " took "
                     + std::to_string(effect.effectStrength) + " damage. ";
             if (user->isDead()) {
                 if (user->isPlayer) {
@@ -57,6 +54,7 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
 void activateItem(World &world, Item *item, Actor *user) {
     std::stringstream msg;
     bool didEffect = false;
+    if (user->isDead()) return;
     if (user == world.player)   msg << "Used ";
     else                        msg << ucFirst(user->getName()) << " used ";
     msg << "[color=yellow]" << item->getName() << "[/color]: ";
@@ -88,6 +86,7 @@ void activateItem(World &world, Item *item, Actor *user) {
 
 void useItem(World &world, Item *item) {
     if (!item) return;
+    if (world.player->isDead()) return;
 
     std::stringstream msg;
     switch(item->data.type) {
@@ -198,7 +197,8 @@ void doInventory(World &world, bool showFloor) {
         terminal_print(30, 0, "[font=italic]STATUS");
         terminal_print(45, 0, "[font=italic]DESCRIPTION");
         terminal_print(0, 21, "[color=yellow]UP/DOWN[/color] select item    [color=yellow]TAB[/color] change view");
-        terminal_print(0, 22, showFloor ? helpFloor : helpInventory);
+        if (world.player->isDead()) terminal_print(0, 22, "You are [color=red]DEAD[/color].");
+        else terminal_print(0, 22, showFloor ? helpFloor : helpInventory);
         terminal_print(0, 23, bulkString.c_str());
         terminal_print(0, 24, healthString.c_str());
 
@@ -259,7 +259,7 @@ void doInventory(World &world, bool showFloor) {
             selection = 0;
         }
         if (key == TK_ESCAPE || key == TK_CLOSE || key == TK_I) return;
-        if ((key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER || (key == TK_G && showFloor)) && !currentInventory.empty()) {
+        if ((key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER || (key == TK_G && showFloor)) && !currentInventory.empty() && !world.player->isDead()) {
             if (selection >= 0 && selection <= maxSelection) {
                 if (showFloor) {
                     Item *item = currentInventory[selection];
@@ -277,7 +277,7 @@ void doInventory(World &world, bool showFloor) {
         if (key == TK_HOME) selection = 0;
         if ((key == TK_DOWN || key == TK_KP_2) && selection < maxSelection) ++selection;
         if (key == TK_END) selection = maxSelection;
-        if (key == TK_D && !showFloor) {
+        if (key == TK_D && !showFloor && !world.player->isDead()) {
             if (selection >= 0 && selection <= maxSelection) {
                 Item *item = currentInventory[selection];
                 world.player->removeItem(item);

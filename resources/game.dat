@@ -24,11 +24,9 @@
 
 # effect effects
 @define EFFECT_HEALING  0
-@define EFFECT_REGEN    1
+@define EFFECT_DAMAGE   1
 @define EFFECT_MUTATE   2
 @define EFFECT_PURIFY   3
-@define EFFECT_POISON   4
-@define EFFECT_BOOST    5
 @define EFFECT_APPLY_STATUS 6
 
 
@@ -56,6 +54,13 @@
 @dungeon - 45
     name the_Halls_Of_Change
 
+@dungeon - 46
+    name the_Dark_Depths
+
+@dungeon - 47
+    name the_Forgotten_Mines
+    noDownStairs
+
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Status effect defs
 @status STATUS_LESSER_REGEN 0
@@ -64,7 +69,24 @@
     minDuration     4
     maxDuration     3
     resistDC        9999
-    effect          ET_ON_USE 100 EFFECT_HEALING 15
+    effect          ET_ON_TICK 100 EFFECT_HEALING 15 0
+
+@status STATUS_RAGE 1
+    name            rage
+    description     Gives_the_subject_enhanced_strength,_but_reduces_their_agility.
+    minDuration     8
+    maxDuration     16
+    resistDC        9999
+    effect          ET_BOOST 100 STAT_STRENGTH 2 0
+    effect          ET_BOOST 100 STAT_AGILITY -1 0
+
+@status STATUS_POISON 2
+    name            poison
+    description     Causes_the_subject_to_slowly_take_damage.
+    minDuration     1
+    maxDuration     4
+    resistDC        9999
+    effect          ET_ON_TICK 100 EFFECT_DAMAGE 6 0
 
 
 
@@ -135,6 +157,12 @@
     base_dexterity  0
     base_toughness  0
     item            0 100 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_POTION_RAGE
+    item            0 100 ITM_POTION_POISON
+    item            0 100 ITM_POTION_RAGE
+    item            0 100 ITM_POTION_POISON
+    item            0 100 ITM_POTION_RAGE
+    item            0 100 ITM_POTION_POISON
     item            1 50 ITM_SWORD
     item            1 99 ITM_DAGGER
     item            2 33 ITM_TALIS_EVASION
@@ -232,7 +260,7 @@
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Special item defs
-@item - 10000
+@item - -2
     glyph           /
     name            fists
     colour          127 127 127
@@ -250,7 +278,7 @@
     type            IT_WEAPON
     bulk            2
     damage          7 13
-    effect          ET_BOOST 100 STAT_TO_HIT -1
+    effect          ET_BOOST 100 STAT_TO_HIT -1 0
 
 @item ITM_DAGGER 1
     glyph           /
@@ -260,7 +288,7 @@
     type            IT_WEAPON
     bulk            1
     damage          3 7
-    effect          ET_BOOST 100 STAT_TO_HIT 2
+    effect          ET_BOOST 100 STAT_TO_HIT 2 0
 
 @item ITM_POTION_LESSER_HEALING 2
     glyph           !
@@ -268,7 +296,23 @@
     colour          255 0 0
     type            IT_CONSUMABLE
     consumeChance   100
-    effect          ET_ON_USE 100 EFFECT_HEALING 20
+    effect          ET_ON_USE 100 EFFECT_HEALING 20 0
+
+@item ITM_POTION_RAGE 10
+    glyph           !
+    name            potion_of_rage
+    colour          255 127 127
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_RAGE 0
+
+@item ITM_POTION_POISON 11
+    glyph           !
+    name            potion_of_poison
+    colour          255 127 127
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_POISON 0
 
 @item ITM_POTION_LESSER_REGEN 9
     glyph           !
@@ -276,7 +320,7 @@
     colour          255 0 0
     type            IT_CONSUMABLE
     consumeChance   100
-    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_LESSER_REGEN
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_LESSER_REGEN 0
 
 @item ITM_POTION_LESSER_MUTATION 3
     glyph           !
@@ -290,21 +334,21 @@
     name            talisman_of_evasion
     colour          63 63 127
     type            IT_TALISMAN
-    effect          ET_BOOST 100 STAT_EVASION 2
+    effect          ET_BOOST 100 STAT_EVASION 2 0
 
 @item ITM_TALIS_HEALTH 5
     glyph           "
     name            talisman_of_health
     colour          63 127 63
     type            IT_TALISMAN
-    effect          ET_BOOST 100 STAT_HEALTH 5
+    effect          ET_BOOST 100 STAT_HEALTH 5 0
 
 @item ITM_TALIS_ENERGY 8
     glyph           "
     name            talisman_of_energy
     colour          63 63 127
     type            IT_TALISMAN
-    effect          ET_BOOST 100 STAT_ENERGY 5
+    effect          ET_BOOST 100 STAT_ENERGY 5 0
 
 @item - 6
     glyph           %
@@ -318,4 +362,4 @@
     colour          255 127 127
     consumeChance   25
     type            IT_CONSUMABLE
-    effect          ET_ON_USE 100 EFFECT_HEALING 20
+    effect          ET_ON_USE 100 EFFECT_HEALING 20 0
