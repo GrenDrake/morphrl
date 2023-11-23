@@ -123,6 +123,15 @@ struct StatusData {
     std::vector<EffectData> effects;
 };
 
+struct MutationData {
+    unsigned ident;
+    std::string name;
+    std::string desc;
+    unsigned slot;          // what part of the body is mutated? (arms, tail, 
+                            // etc.) or 0 for "minor" muations that do not require a slot
+    std::vector<EffectData> effects;
+};
+
 struct SpawnLine {
     int spawnGroup;
     int spawnChance;
@@ -137,6 +146,7 @@ struct ActorData {
     std::string artFile;
     int baseStats[STAT_BASE_COUNT];
     std::vector<SpawnLine> initialItems;
+    std::vector<SpawnLine> initialMutations;
 };
 
 struct ItemData {
@@ -200,6 +210,12 @@ struct StatusItem {
     unsigned duration;      // the number of times this status effect has triggered
 };
 
+struct MutationItem {
+    MutationItem(const MutationData &data);
+
+    const MutationData &data;
+};
+
 struct Actor {
     static Actor* create(const ActorData &data);
     ~Actor();
@@ -235,6 +251,7 @@ struct Actor {
     int health, energy;
     std::vector<Item*> inventory;
     std::vector<StatusItem*> statusEffects;
+    std::vector<MutationItem*> mutations;
     Dungeon *onMap;
 
 private:
@@ -410,6 +427,7 @@ std::ostream& operator<<(std::ostream &out, const Coord &where);
 bool loadAllData();
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
+const MutationData& getMutationData(unsigned ident);
 const StatusData& getStatusData(unsigned ident);
 const TileData& getTileData(unsigned ident);
 unsigned getDungeonEntranceIdent();

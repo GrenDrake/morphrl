@@ -68,6 +68,9 @@ std::vector<ItemData> itemData;
 StatusData BAD_STATUS{BAD_VALUE, "invalid"};
 std::vector<StatusData> statusData;
 
+MutationData BAD_MUTATION{BAD_VALUE, "invalid"};
+std::vector<MutationData> mutationData;
+
 TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 std::vector<TileData> tileData;
 
@@ -125,6 +128,13 @@ const ItemData& getItemData(unsigned ident) {
         if (data.ident == ident) return data;
     }
     return BAD_ITEM;
+}
+
+const MutationData& getMutationData(unsigned ident) {
+    for (const MutationData &data : mutationData) {
+        if (data.ident == ident) return data;
+    }
+    return BAD_MUTATION;
 }
 
 const StatusData& getStatusData(unsigned ident) {
@@ -243,6 +253,7 @@ std::vector<DataDef> actorPropData{
     { "description",    1 },
     { "colour",         3 },
     { "item",           3 },
+    { "mutation",       3 },
     { "base_strength",  1 },
     { "base_agility",   1 },
     { "base_speed",     1 },
@@ -287,6 +298,12 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 line.spawnChance = dataAsInt(rawData, prop.origin, prop.value[1]);
                 line.ident = dataAsInt(rawData, prop.origin, prop.value[2]);
                 resultData.initialItems.push_back(line);
+            } else if (prop.name == "mutation") {
+                SpawnLine line;
+                line.spawnGroup = dataAsInt(rawData, prop.origin, prop.value[0]);
+                line.spawnChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                line.ident = dataAsInt(rawData, prop.origin, prop.value[2]);
+                resultData.initialMutations.push_back(line);
             } else if (prop.name == "colour") {
                 resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
@@ -378,6 +395,57 @@ bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
         return false;
     } else {
         statusData.push_back(resultData);
+        return true;
+    }
+}
+
+std::vector<DataDef> mutationPropData{
+    { "name",           1 },
+    { "description",    1 },
+    { "effect",         5 },
+};
+bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
+    if (!rawMutation || rawMutation->typeName != "@mutation") {
+        rawData.addError(Origin(), "processStatusData passed malformed data");
+        return false;
+    }
+
+    MutationData resultData;
+    resultData.name = "unknown";
+
+    resultData.ident = rawMutation->ident;
+    for (const DataProp &prop : rawMutation->props) {
+        const DataDef &dataDef = getDataDef(mutationPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown item property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "effect") {
+                EffectData effectData;
+                effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);
+                effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
+                effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                effectData.effectParam = dataAsInt(rawData, prop.origin, prop.value[4]);
+                resultData.effects.push_back(effectData);
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    const MutationData &oldMutationData = getMutationData(resultData.ident);
+    if (oldMutationData.ident == resultData.ident) {
+        rawData.addError(rawMutation->origin, "mutation ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        mutationData.push_back(resultData);
         return true;
     }
 }
@@ -618,7 +686,7 @@ bool loadAllData() {
         return false;
     }
 
-    int maxItem = 0, maxTile = 0, maxActor = 0, maxStatus = 0, maxDungeon = 0;
+    int maxItem = 0, maxTile = 0, maxActor = 0, maxStatus = 0, maxDungeon = 0, maxMutation = 0;
     for (const DataTemp *data : rawData.data) {
         if (!data) continue;
         if (data->typeName == "@define") {
@@ -635,6 +703,9 @@ bool loadAllData() {
         } else if (data->typeName == "@status") {
             if (maxStatus < data->ident) maxStatus = data->ident;
             processStatusData(rawData, data);
+        } else if (data->typeName == "@mutation") {
+            if (maxMutation < data->ident) maxMutation = data->ident;
+            processMutationData(rawData, data);
         } else if (data->typeName == "@dungeon") {
             if (maxDungeon < data->ident) maxDungeon = data->ident;
             processDungeonData(rawData, data);
@@ -647,6 +718,7 @@ bool loadAllData() {
     std::cerr << "LOADED " << itemData.size() << " items (next ident: " << maxItem+1 << ")\n";
     std::cerr << "LOADED " << actorData.size() << " actors (next ident: " << maxActor+1 << ")\n";
     std::cerr << "LOADED " << statusData.size() << " status effects (next ident: " << maxStatus+1 << ")\n";
+    std::cerr << "LOADED " << mutationData.size() << " mutations (next ident: " << maxMutation+1 << ")\n";
     std::cerr << "LOADED " << dungeonData.size() << " dungeon levels (next ident: " << maxDungeon+1 << ")\n";
 
     if (rawData.hasErrors()) {

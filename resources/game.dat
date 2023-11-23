@@ -145,6 +145,15 @@
     isUpStair
 
 
+@mutation MUT_BATWINGS 1
+    name bat-like_wings
+    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+
+@mutation MUT_BIRDWINGS 2
+    name feathery_wings
+    effect          ET_BOOST 100 STAT_EVASION 2 0
+
+
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Actor defs
 @actor ACTOR_PLAYER 0
@@ -157,17 +166,13 @@
     base_speed      0
     base_toughness  0
     item            0 100 ITM_POTION_LESSER_HEALING
-    item            0 100 ITM_POTION_RAGE
-    item            0 100 ITM_POTION_POISON
-    item            0 100 ITM_POTION_RAGE
-    item            0 100 ITM_POTION_POISON
-    item            0 100 ITM_POTION_RAGE
-    item            0 100 ITM_POTION_POISON
     item            1 50 ITM_SWORD
     item            1 99 ITM_DAGGER
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
     item            2 99 ITM_TALIS_ENERGY
+    mutation        1 50 MUT_BATWINGS
+    mutation        1 99 MUT_BIRDWINGS
 
 @actor ACTOR_GOBLIN 1
     glyph           g

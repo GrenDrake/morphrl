@@ -47,6 +47,16 @@ void showActorInfo(World &world, const Actor *actor) {
             }
         }
 
+        if (!actor->mutations.empty()) {
+            ++nextY;
+            terminal_print(0, nextY, "Mutations:");
+            ++nextY;
+            for (const MutationItem *mutation : actor->mutations) {
+                terminal_print(4, nextY, ucFirst(mutation->data.name).c_str());
+                ++nextY;
+            }
+        }
+
         terminal_print_ext(0, 24, textWidth, 1, TK_ALIGN_CENTER, "Press a key to return");
         terminal_print_ext(0, nextY + 1, textWidth, 20, TK_ALIGN_DEFAULT, actor->data.desc.c_str());
         if (actorArt) drawImage(textWidth + 1, 0, actorArt);

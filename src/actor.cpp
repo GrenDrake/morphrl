@@ -60,23 +60,20 @@ StatusItem::StatusItem(const StatusData &data)
 : data(data), duration(0)
 { }
 
+MutationItem::MutationItem(const MutationData &data)
+: data(data)
+{ }
 
-Actor* Actor::create(const ActorData &data) {
-    if (data.ident == BAD_VALUE) return nullptr;
-    Actor *actor = new Actor(data, 0);
-    if (!actor) return nullptr;
 
+std::vector<unsigned> getIdentsForSpawn(const std::vector<SpawnLine> &spawnLines, bool processGroup0) {
+    std::vector<unsigned> toSpawn;
     std::vector<int> spawnGroups;
 
-    for (const SpawnLine &line : data.initialItems) {
+    for (const SpawnLine &line : spawnLines) {
         if (line.spawnGroup == 0) {
             int roll = globalRNG.upto(100);
             if (roll < line.spawnChance) {
-                Item *item = new Item(getItemData(line.ident));
-                if (item) {
-                    actor->addItem(item);
-                    actor->tryEquipItem(item);
-                }
+                toSpawn.push_back(line.ident);
             }
         } else {
             addUniqueToVector(spawnGroups, line.spawnGroup);
@@ -85,18 +82,37 @@ Actor* Actor::create(const ActorData &data) {
 
     for (int groupId : spawnGroups) {
         int roll = globalRNG.upto(100);
-        for (const SpawnLine &line : data.initialItems) {
+        for (const SpawnLine &line : spawnLines) {
             if (line.spawnGroup != groupId) continue;
             if (roll < line.spawnChance) {
-                const ItemData &itemData = getItemData(line.ident);
-                Item *item = new Item(itemData);
-                if (item) {
-                    actor->addItem(item);
-                    actor->tryEquipItem(item);
-                }
+                toSpawn.push_back(line.ident);
                 break;
             } else roll -= line.spawnChance;
         }
+    }
+
+    return toSpawn;
+}
+
+
+Actor* Actor::create(const ActorData &data) {
+    if (data.ident == BAD_VALUE) return nullptr;
+    Actor *actor = new Actor(data, 0);
+    if (!actor) return nullptr;
+
+    std::vector<unsigned> toSpawn = getIdentsForSpawn(data.initialItems, true);
+    for (unsigned ident : toSpawn) {
+        Item *item = new Item(getItemData(ident));
+        if (item) {
+            actor->addItem(item);
+            actor->tryEquipItem(item);
+        }
+    }
+
+    std::vector<unsigned> mutations = getIdentsForSpawn(data.initialMutations, true);
+    for (unsigned ident : mutations) {
+        MutationItem *mutation = new MutationItem(getMutationData(ident));
+        actor->mutations.push_back(mutation);
     }
 
     return actor;
@@ -142,7 +158,15 @@ int Actor::getStat(int statNumber) const {
                     itemBonus += data.effectStrength;
                 }
             }
-
+        }
+        for (const MutationItem *mutation : mutations) {
+            if (!mutation) continue;
+            for (const EffectData &data : mutation->data.effects) {
+                if (data.trigger != ET_BOOST) continue;
+                if (data.effectId == statNumber) {
+                    itemBonus += data.effectStrength;
+                }
+            }
         }
     }
 
