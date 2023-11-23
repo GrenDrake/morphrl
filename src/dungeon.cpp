@@ -336,6 +336,11 @@ Actor* Dungeon::actorAt(const Coord &where) {
     return tile->actor;
 }
 
+void Dungeon::resetSpeedCounter() {
+    for (Actor *actor : mActors) {
+        actor->speedCounter = 0;
+    }
+}
 
 bool Dungeon::addItem(Item *what, const Coord &where) {
     if (!what) return false;
@@ -409,10 +414,26 @@ void Dungeon::clearDeadActors() {
     }
 }
 
+Actor* Dungeon::getNextActor() {
+    Actor *next = nullptr;
+    for (Actor *actor : mActors) {
+        if (actor == nullptr) continue;
+        else if (actor->health <= 0) continue; // skip dead actors
+        else if (next == nullptr) next = actor;
+        else {
+            if (actor->speedCounter < next->speedCounter) next = actor;
+        }
+    }
+    return next;
+}
 
 void Dungeon::tick(World &world) {
-    for (Actor *actor : mActors) {
-        if (actor->health <= 0) continue; // skip dead actors
+    while (1) {
+        if (world.player->isDead()) {
+            clearDeadActors();
+            return;
+        }
+        Actor *actor = getNextActor();
 
         std::stringstream msg;
         auto statusIter = actor->statusEffects.begin();
@@ -442,8 +463,12 @@ void Dungeon::tick(World &world) {
         }
 
         if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
-        if (actor->isPlayer) continue; // skip player
+        if (actor->isPlayer) {
+            clearDeadActors();
+            return; // skip player
+        }
 
+        actor->advanceSpeedCounter();
         const MapTile *tile = at(actor->position);
         if (tile && tile->isSeen) {
             double dist = actor->position.distanceTo(world.player->position);
@@ -483,8 +508,6 @@ void Dungeon::tick(World &world) {
             }
         }
     }
-
-    clearDeadActors();
 }
 
 std::string makeItemList(const std::vector<Item*> &itemList, unsigned maxList) {

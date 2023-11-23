@@ -245,7 +245,7 @@ std::vector<DataDef> actorPropData{
     { "item",           3 },
     { "base_strength",  1 },
     { "base_agility",   1 },
-    { "base_dexterity", 1 },
+    { "base_speed",     1 },
     { "base_toughness", 1 },
 };
 bool processActorData(RawData &rawData, const DataTemp *rawActor) {
@@ -295,8 +295,8 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 resultData.baseStats[STAT_STRENGTH] = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "base_agility") {
                 resultData.baseStats[STAT_AGILITY] = dataAsInt(rawData, prop.origin, prop.value[0]);
-            } else if (prop.name == "base_dexterity") {
-                resultData.baseStats[STAT_DEXTERITY] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "base_speed") {
+                resultData.baseStats[STAT_SPEED] = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "base_toughness") {
                 resultData.baseStats[STAT_TOUGHNESS] = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else {

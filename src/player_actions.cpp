@@ -37,6 +37,7 @@ void tryMeleeAttack(World &world, Direction dir) {
         s << "[color=red]Miss[/color]!";
         world.addMessage(s.str());
     }
+    world.player->advanceSpeedCounter();
     world.tick();
 }
 
@@ -51,6 +52,7 @@ void tryMovePlayer(World &world, Direction dir) {
             s << makeItemList(tile->items, 4) << '.';
             world.addMessage(s.str());
         }
+        world.player->advanceSpeedCounter();
         world.tick();
         return;
     }
@@ -75,8 +77,9 @@ void tryPlayerTakeItem(World &world) {
         Item *item = tile->items[0];
         world.map->removeItem(item);
         world.player->addItem(item);
-        world.tick();
+        world.player->advanceSpeedCounter();
         world.addMessage("Took [color=yellow]" + item->getName(true) + "[/color].");
+        world.tick();
     } else {
         doInventory(world, true);
     }

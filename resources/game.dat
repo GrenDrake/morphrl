@@ -154,7 +154,7 @@
     colour          127 255 127
     base_strength   0
     base_agility    0
-    base_dexterity  0
+    base_speed      0
     base_toughness  0
     item            0 100 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_POTION_RAGE
@@ -176,7 +176,7 @@
     colour          255 127 127
     base_strength   -2
     base_agility    -3
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  -4
     item            0 25 ITM_POTION_LESSER_HEALING
     item            1 33 ITM_SWORD
@@ -191,7 +191,7 @@
     colour          255 127 127
     base_strength   -3
     base_agility    -1
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  -3
     item            0 25 ITM_POTION_LESSER_HEALING
     item            1 33 ITM_SWORD
@@ -206,7 +206,7 @@
     colour          255 127 127
     base_strength   -1
     base_agility    -1
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  -1
     item            0 100 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_SWORD
@@ -220,7 +220,7 @@
     colour          255 127 127
     base_strength   -1
     base_agility    -1
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  0
     item            0 25 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_SWORD
@@ -234,7 +234,7 @@
     colour          255 127 127
     base_strength   1
     base_agility    -2
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  1
 
 @actor ACTOR_SKELETON 6
@@ -244,7 +244,7 @@
     colour          255 127 127
     base_strength   0
     base_agility    0
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  0
 
 @actor ACTOR_ZOMBIE 7
@@ -254,7 +254,7 @@
     colour          255 127 127
     base_strength   0
     base_agility    -4
-    base_dexterity  -2
+    base_speed      -2
     base_toughness  2
 
 

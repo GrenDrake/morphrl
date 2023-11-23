@@ -105,7 +105,7 @@ Actor* Actor::create(const ActorData &data) {
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
   isPlayer(false), xp(0), playerLastSeenPosition(-1, -1),
-  onMap(nullptr)
+  speedCounter(0), onMap(nullptr)
 { }
 
 Actor::~Actor() {
@@ -148,7 +148,7 @@ int Actor::getStat(int statNumber) const {
 
     switch(statNumber) {
         case STAT_STRENGTH:
-        case STAT_DEXTERITY:
+        case STAT_SPEED:
         case STAT_AGILITY:
         case STAT_TOUGHNESS:
             return itemBonus + data.baseStats[statNumber];
@@ -287,6 +287,10 @@ AttackData Actor::meleeAttack(Actor *target) {
     return data;
 }
 
+void Actor::advanceSpeedCounter() {
+    speedCounter += getStat(STAT_SPEED) * -2 + 10;
+}
+
 void Actor::applyStatus(StatusItem *statusItem) {
     statusEffects.push_back(statusItem);
 }
@@ -295,7 +299,7 @@ void Actor::applyStatus(StatusItem *statusItem) {
 std::string statName(int statNumber) {
     switch(statNumber) {
         case STAT_STRENGTH:     return "strength";
-        case STAT_DEXTERITY:    return "dexterity";
+        case STAT_SPEED:        return "speed";
         case STAT_AGILITY:      return "agility";
         case STAT_TOUGHNESS:    return "toughness";
         case STAT_HEALTH:       return "max health";

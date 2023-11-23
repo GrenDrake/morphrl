@@ -77,6 +77,7 @@ void World::movePlayerToDepth(int newDepth, int enterFrom) {
     }
     std::cerr << "ENTER AT " << startPosition << '\n';
     map->addActor(player, startPosition);
+    map->resetSpeedCounter();
     map->doActorFOV(player);
 }
 

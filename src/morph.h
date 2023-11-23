@@ -48,7 +48,7 @@ const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
 const int STAT_STRENGTH     = 0;
 const int STAT_AGILITY      = 1;
-const int STAT_DEXTERITY    = 2;
+const int STAT_SPEED        = 2;
 const int STAT_TOUGHNESS    = 3;
 const int STAT_BASE_COUNT   = 4;
 const int STAT_TO_HIT       = 4;
@@ -221,7 +221,7 @@ struct Actor {
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
     AttackData meleeAttack(Actor *target);
-
+    void advanceSpeedCounter();
     void applyStatus(StatusItem *statusItem);
 
     const ActorData &data;
@@ -230,6 +230,7 @@ struct Actor {
     bool isPlayer;
     int xp;
     Coord playerLastSeenPosition;
+    unsigned speedCounter;
 
     int health, energy;
     std::vector<Item*> inventory;
@@ -314,6 +315,7 @@ public:
     bool removeActor(Actor *who);
     const Actor* actorAt(const Coord &where) const;
     Actor* actorAt(const Coord &where);
+    void resetSpeedCounter();
 
     bool addItem(Item *what, const Coord &where);
     bool removeItem(Item *what);
@@ -327,6 +329,7 @@ public:
     Room& getRoom(int index);
 
     void clearDeadActors();
+    Actor* getNextActor();
     void tick(World &world);
 
     const DungeonData &data;

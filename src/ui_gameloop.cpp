@@ -240,7 +240,7 @@ void gameloop(World &world) {
         terminal_printf(61, 14, "Depth: %d", world.map->depth());
         terminal_print(61, 15, ucFirst(world.map->data.name).c_str());
         terminal_printf(61, 17, "Position: %d, %d", world.player->position.x, world.player->position.y);
-        terminal_print(61, 18, ("Turn: " + std::to_string(world.currentTurn)).c_str());
+        terminal_print(61, 18, ("Turn: " + std::to_string(world.currentTurn) + " / " + std::to_string(world.player->speedCounter)).c_str());
 
         terminal_refresh();
 
@@ -265,6 +265,7 @@ void gameloop(World &world) {
             if (key == TK_ESCAPE)   break;
             Direction theDir = keyToDirection(key);
             if (theDir == Direction::Here) {
+                world.player->advanceSpeedCounter();
                 world.tick();
             } else if (theDir != Direction::Unknown) {
                 tryMovePlayer(world, theDir);
