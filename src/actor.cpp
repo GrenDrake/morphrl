@@ -300,7 +300,7 @@ AttackData Actor::meleeAttack(Actor *target) {
     if (data.roll + data.toHit > data.evasion) {
         int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
         if (damageRange < 1) damageRange = 1;
-        data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange);
+        data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
         target->takeDamage(data.damage);
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
