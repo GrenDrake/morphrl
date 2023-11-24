@@ -1,0 +1,109 @@
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Actor defs
+
+@actor ACTOR_PLAYER 0
+    glyph           @
+    name            player
+    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    colour          127 255 127
+    base_strength   0
+    base_agility    0
+    base_speed      0
+    base_toughness  0
+    item            0 100 ITM_POTION_LESSER_HEALING
+    item            1 50 ITM_SWORD
+    item            1 99 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+    item            2 99 ITM_TALIS_ENERGY
+    mutation        1 50 MUT_BATWINGS
+    mutation        1 99 MUT_BIRDWINGS
+
+@actor ACTOR_GOBLIN 1
+    glyph           g
+    name            goblin
+    artfile         goblin.png
+    colour          255 127 127
+    base_strength   -2
+    base_agility    -3
+    base_speed      -2
+    base_toughness  -4
+    item            0 25 ITM_POTION_LESSER_HEALING
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_KOBOLD 2
+    glyph           k
+    name            kobold
+    artfile         kobold.png
+    colour          255 127 127
+    base_strength   -3
+    base_agility    -1
+    base_speed      -2
+    base_toughness  -3
+    item            0 25 ITM_POTION_LESSER_HEALING
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_HOBGOBLIN 3
+    glyph           h
+    name            hobgoblin
+    artfile         orc.png
+    colour          255 127 127
+    base_strength   -1
+    base_agility    -1
+    base_speed      -2
+    base_toughness  -1
+    item            0 100 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_SWORD
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_ORC 4
+    glyph           o
+    name            orc
+    artfile         orc.png
+    colour          255 127 127
+    base_strength   -1
+    base_agility    -1
+    base_speed      -2
+    base_toughness  0
+    item            0 25 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_SWORD
+    item            2 33 ITM_TALIS_EVASION
+    item            2 33 ITM_TALIS_HEALTH
+
+@actor ACTOR_TROLL 5
+    glyph           t
+    name            troll
+    artfile         troll.png
+    colour          255 127 127
+    base_strength   1
+    base_agility    -2
+    base_speed      -2
+    base_toughness  1
+
+@actor ACTOR_SKELETON 6
+    glyph           s
+    name            skeleton
+    artfile         skeleton.png
+    colour          255 127 127
+    base_strength   0
+    base_agility    0
+    base_speed      -2
+    base_toughness  0
+
+@actor ACTOR_ZOMBIE 7
+    glyph           z
+    name            zombie
+    artfile         zombie.png
+    colour          255 127 127
+    base_strength   0
+    base_agility    -4
+    base_speed      -2
+    base_toughness  2
+

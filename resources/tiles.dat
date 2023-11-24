@@ -1,0 +1,53 @@
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Tile defs
+@tile TILE_NONE 0
+    glyph           ?
+    name            unassigned
+    colour          255 0 255
+    isOpaque
+
+@tile TILE_WALL 1
+    glyph           #
+    name            wall
+    colour          127 127 127
+    isOpaque
+
+@tile TILE_FLOOR 2
+    glyph           .
+    name            floor
+    description     An_entirely_unremarkable_patch_of_floor.
+    colour          255 255 255
+    isPassable
+
+@tile TILE_MARKER 3
+    glyph           *
+    name            marker
+    colour          255 0 255
+    isPassable
+
+@tile TILE_DOOR 4
+    glyph           +
+    name            door
+    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    colour          165 42 42
+    isPassable
+    isOpaque
+
+@tile TILE_WATER 5
+    glyph           ~
+    name            water
+    colour          127 196 127
+
+@tile TILE_DOWN_STAIRS 6
+    glyph           >
+    name            stairs_down
+    colour          255 255 255
+    isPassable
+    isDownStair
+
+@tile TILE_UP_STAIRS 7
+    glyph           <
+    name            stairs_up
+    colour          255 255 255
+    isPassable
+    isUpStair

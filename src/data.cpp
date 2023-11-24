@@ -208,7 +208,13 @@ bool loadRawFromFile(const std::string &filename, RawData &rawData) {
         Origin origin(filename, lineNumber);
         auto parts = explodeOnWhitespace(line);
         if (parts.empty() || parts[0][0] == '#') continue;
-        if (parts[0][0] == '@') {
+        if (parts[0] == "@include") {
+            if (parts.size() != 2) {
+                rawData.addError(origin, "@include requries one argument");
+            } else {
+                loadRawFromFile(parts[1], rawData);
+            }
+        } else if (parts[0][0] == '@') {
             if (parts.size() != 3) {
                 rawData.addError(origin, "malformed object defintition");
                 continue;

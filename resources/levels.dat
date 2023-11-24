@@ -1,0 +1,30 @@
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Dungeon level defs
+@dungeon - 44
+    name the_Upper_Levels
+    hasEntrance
+    noUpStairs
+    actorCount      40
+    actor           0 45 ACTOR_GOBLIN
+    actor           0 45 ACTOR_KOBOLD
+    actor           0 10 ACTOR_SKELETON
+    itemCount       80
+    item            0 10 ITM_DAGGER
+    item            0 10 ITM_SWORD
+    item            0 10 ITM_POTION_LESSER_HEALING
+    item            0  7 ITM_POTION_LESSER_REGEN
+    item            0 10 ITM_POTION_LESSER_MUTATION
+    item            0 10 ITM_TALIS_ENERGY
+    item            0 10 ITM_TALIS_ENERGY
+    item            0 10 ITM_TALIS_EVASION
+    item            0 13 ITM_WAND_HEALING
+
+@dungeon - 45
+    name the_Halls_Of_Change
+
+@dungeon - 46
+    name the_Dark_Depths
+
+@dungeon - 47
+    name the_Forgotten_Mines
+    noDownStairs
