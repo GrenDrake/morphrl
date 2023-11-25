@@ -366,16 +366,23 @@ void addExtraDoors(Dungeon &d) {
     d.floorAt(where, TILE_DOOR);
 }
 
-void spawnActors(Dungeon &d) {
-    for (unsigned i = 0; i < d.data.actorCount; ++i) {
+void spawnActors(Dungeon &d, bool forRefresh) {
+    unsigned targetCount = d.data.actorCount;
+    if (forRefresh) targetCount = targetCount / 4;
+    unsigned initialSpeedCounter = d.getHighestSpeedCounter();
+
+    for (unsigned i = 0; i < targetCount; ++i) {
         bool isGood = false;
         int iterations = 20;
         Coord c;
         do {
+            --iterations;
+            isGood = false;
             if (iterations <= 0) break;
             c = d.randomOfTile(TILE_FLOOR);
-            isGood = d.actorAt(c) == nullptr;
-            --iterations;
+            if (d.actorAt(c) != nullptr) continue;
+            if (forRefresh && d.isSeen(c)) continue;
+            isGood = true;
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
@@ -385,6 +392,7 @@ void spawnActors(Dungeon &d) {
                 Actor *actor = Actor::create(getActorData(line.ident));
                 if (actor) {
                     actor->reset();
+                    actor->speedCounter = initialSpeedCounter + 1;
                     d.addActor(actor, c);
                 }
                 break;
@@ -441,6 +449,6 @@ void doMapgen(Dungeon &d) {
     // for (int i = 0; i < 50; ++i) {
         // createLake(d);
     // }
-    spawnActors(d);
+    spawnActors(d, false);
     spawnItems(d);
 }

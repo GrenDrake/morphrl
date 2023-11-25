@@ -356,6 +356,7 @@ public:
 
     void clearDeadActors();
     Actor* getNextActor();
+    unsigned getHighestSpeedCounter() const;
     void tick(World &world);
 
     const DungeonData &data;
@@ -450,6 +451,7 @@ const DungeonData& getDungeonData(unsigned ident);
 std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target);
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
+void spawnActors(Dungeon &d, bool forRefresh);
 
 void ui_alertBox(const std::string &title, const std::string &message);
 bool ui_getString(const std::string &title, const std::string &message, std::string &result);

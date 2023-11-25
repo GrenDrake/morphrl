@@ -1,4 +1,5 @@
 #include <deque>
+#include <iostream>
 #include <sstream>
 #include <vector>
 
@@ -427,8 +428,27 @@ Actor* Dungeon::getNextActor() {
     return next;
 }
 
+unsigned Dungeon::getHighestSpeedCounter() const {
+    unsigned highestSpeedCounter = 0;
+    for (const Actor *oldActor : mActors) {
+        if (oldActor->speedCounter > highestSpeedCounter) {
+            highestSpeedCounter = oldActor->speedCounter;
+        }
+    }
+    return highestSpeedCounter;
+}
+
 void Dungeon::tick(World &world) {
+    const unsigned refreshFrequency = 35;
+    static unsigned turnCount = 0;
     while (1) {
+        if (turnCount >= refreshFrequency) {
+            turnCount = 0;
+            if (mActors.size() < data.actorCount / 2) {
+                spawnActors(*this, true);
+            }
+        }
+
         if (world.player->isDead()) {
             clearDeadActors();
             return;
@@ -475,6 +495,7 @@ void Dungeon::tick(World &world) {
         actor->verify();
         if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
         if (actor->isPlayer) {
+            ++turnCount;
             clearDeadActors();
             return; // skip player
         }
