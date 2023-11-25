@@ -363,7 +363,7 @@ bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
     resultData.name = "unknown";
     resultData.minDuration = 0;
     resultData.maxDuration = 4294967295;
-    resultData.resistDC = 10;
+    resultData.resistDC = 9999;
     resultData.resistEveryTurn = false;
 
     resultData.ident = rawStatus->ident;
@@ -401,6 +401,10 @@ bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
             }
         }
     }
+    if (resultData.minDuration > resultData.maxDuration) {
+        rawData.addError(rawStatus->origin, "maximum duration of status is less than its minimum");
+        return false;
+    }
     const StatusData &oldStatusData = getStatusData(resultData.ident);
     if (oldStatusData.ident == resultData.ident) {
         rawData.addError(rawStatus->origin, "status ident " + std::to_string(resultData.ident) + " already used");
@@ -427,6 +431,7 @@ bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
     MutationData resultData;
     resultData.name = "unknown";
     resultData.gainVerb = "gaining";
+    resultData.slot = 0;
 
     resultData.ident = rawMutation->ident;
     for (const DataProp &prop : rawMutation->props) {

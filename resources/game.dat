@@ -36,7 +36,7 @@
     name            regeneration
     description     Causes_the_subject_to_slowly_recover_health_over_time.
     minDuration     4
-    maxDuration     3
+    maxDuration     7
     resistDC        9999
     effect          ET_ON_TICK 100 EFFECT_HEALING 15 0
 
