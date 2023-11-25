@@ -17,7 +17,7 @@ World* createGame(uint64_t gameSeed) {
     World *world = new World;
     if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
-    std::cerr << "SEED " << world->gameSeed << '\n';
+    std::cerr << "New game with seed: " << world->gameSeed << "\n\n";
     world->player = Actor::create(getActorData(0));
     world->player->isPlayer = true;
     world->player->reset();
@@ -63,7 +63,6 @@ int main(int argc, char *argv[]) {
     PHYSFS_mount(writeDir, "/saves", 1);
     PHYSFS_mount("resources", "/", 1);
     PHYSFS_mount("gamedata.dat", "/", 1);
-    std::cerr << "LOADING DATA\n";
     if (!loadAllData()) return 1;
 
     terminal_open();
@@ -75,7 +74,6 @@ int main(int argc, char *argv[]) {
     const int menuItemCount = 5;
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
-    std::cerr << "ENTERING main menu\n";
     const std::string versionString = "Development Release 1";
     const int versionX = 79 - versionString.size();
     Image *logo = loadImage("logo.png");
@@ -134,7 +132,7 @@ int main(int argc, char *argv[]) {
             switch(selection) {
                 case 0:
                 case 1: {
-                    int newGameSeed = 0;
+                    unsigned newGameSeed = 0;
                     if (selection == 1) {
                         std::string result;
                         if (!ui_getString("Seed", "Input seed for new game", result) || result.empty()) break;
@@ -145,12 +143,9 @@ int main(int argc, char *argv[]) {
                     }
                     // start new game
                     if (world) {
-                        std::cerr << "FREEING old game\n";
                         delete world;
                     }
-                    std::cerr << "STARTING new game\n";
-                    if (selection == 0) world = createGame(0);
-                    else                world = createGame(newGameSeed);
+                    world = createGame(newGameSeed);
                     if (!world) {
                         ui_alertBox("Error", "Could not create game world.");
                     } else {

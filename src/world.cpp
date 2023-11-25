@@ -14,8 +14,6 @@ Dungeon* World::getDungeon(int depth) {
         if (d->depth() == depth) return d;
     }
     // otherwise existing level not found, create new
-    std::cerr << "CREATE DEPTH " << depth << '\n';
-
     const DungeonData &dungeonData = getDungeonData(depth);
     if (dungeonData.ident == BAD_VALUE) {
         std::cerr << "Failed to find dungeon for depth " << depth << '\n';
@@ -35,7 +33,6 @@ void World::movePlayerToDepth(int newDepth, int enterFrom) {
     // don't move to current depth
     if (map && newDepth == map->depth()) return;
 
-    std::cerr << "MOVING TO DEPTH " << newDepth << '\n';
     Dungeon *newMap = getDungeon(newDepth);
     if (!newMap) return; // failed to fetch new map
 
@@ -75,7 +72,7 @@ void World::movePlayerToDepth(int newDepth, int enterFrom) {
         startPosition.x = MAP_WIDTH / 2;
         startPosition.y = MAP_HEIGHT / 2;
     }
-    std::cerr << "ENTER AT " << startPosition << '\n';
+    std::cerr << "    initial position @ " << startPosition << '\n';
     map->addActor(player, startPosition);
     map->resetSpeedCounter();
     map->doActorFOV(player);

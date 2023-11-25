@@ -93,6 +93,14 @@ bool strToInt(const std::string &text, int &result) {
     return true;
 }
 
+bool strToInt(const std::string &text, unsigned &result) {
+    char *endPtr = nullptr;
+    long num = strtol(text.c_str(), &endPtr, 10);
+    if (*endPtr != 0) return false;
+    result = num;
+    return true;
+}
+
 template<typename CharT>
 struct Sep : public std::numpunct<CharT> {
     virtual std::string do_grouping() const { return "\003"; }

@@ -411,6 +411,7 @@ std::vector<std::string> explodeOnWhitespace(std::string text);
 const std::string& trim(const std::string &text);
 std::string& trim(std::string &text);
 std::string intToString(long long number);
+bool strToInt(const std::string &text, unsigned &result);
 bool strToInt(const std::string &text, int &result);
 void addUniqueToVector(std::vector<int> &v, int item);
 
