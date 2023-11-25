@@ -70,7 +70,17 @@ void showDocument(Document *document) {
         if (canScroll && key == TK_HOME) topLine = 0;
         if (canScroll && key == TK_END) topLine = document->lines.size() - linesShown;
         if (canScroll && key == TK_UP && topLine > 0) --topLine;
+        if (canScroll && (key == TK_UP || key == TK_KP_8) && topLine > 0) --topLine;
         if (canScroll && key == TK_DOWN && topLine < document->lines.size() - linesShown) ++topLine;
+        if (canScroll && (key == TK_DOWN || key == TK_KP_2) && topLine < document->lines.size() - linesShown) ++topLine;
+        if (canScroll && key == TK_PAGEDOWN) {
+            topLine += linesShown / 2;
+            if (topLine > document->lines.size() - linesShown) topLine = document->lines.size() - linesShown;
+        }
+        if (canScroll && key == TK_PAGEUP) {
+            if (topLine >= linesShown / 2) topLine -= linesShown / 2;
+            else topLine = 0;
+        }
         if (key == TK_ESCAPE || key == TK_MOUSE_RIGHT) return;
     }
 }
