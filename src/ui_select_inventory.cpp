@@ -195,8 +195,9 @@ void doInventory(World &world, bool showFloor) {
                                           selectedItem->data.minDamage, selectedItem->data.maxDamage);
                 ++yPos;
             }
-            for (unsigned i = 0; i < 10 && i < selectedItem->data.effects.size(); ++i)
-            terminal_print(41, yPos + i, selectedItem->data.effects[i].toString().c_str());
+            for (unsigned i = 0; i < 10 && i < selectedItem->data.effects.size(); ++i) {
+                terminal_print(41, yPos + i, selectedItem->data.effects[i].toString().c_str());
+            }
         }
 
         terminal_refresh();
