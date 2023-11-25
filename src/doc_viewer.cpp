@@ -1,8 +1,9 @@
-#include <fstream>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
+#include "physfs.h"
 #include "BearLibTerminal.h"
 #include "morph.h"
 
@@ -75,11 +76,8 @@ void showDocument(Document *document) {
 }
 
 Document* loadDocument(const std::string &filename) {
-    std::ifstream docfile(filename);
-    if (!docfile) {
-        std::cerr << "Failed to load document " << filename << ".\n";
-        return nullptr;
-    }
+    std::string rawDocument = readFile(filename);
+    std::stringstream docfile(rawDocument);
 
     Document *doc = new Document;
     std::string line;

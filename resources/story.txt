@@ -49,5 +49,5 @@ unwelcoming of mutants (though it's not particularly welcoming, either), though
 
 
 
-@image resources/story1.png 60 0
-@image resources/story2.png 0 27
+@image story1.png 60 0
+@image story2.png 0 27

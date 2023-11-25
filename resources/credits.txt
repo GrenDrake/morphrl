@@ -18,6 +18,7 @@
 MorphRL was developed using:
     BearLibTerminal    http://foo.wyrd.name/en:bearlibterminal
     libfov             https://github.com/google-code-export/libfov
+    physfs             https://www.icculus.org/physfs/
     DejaVu Fonts       https://dejavu-fonts.github.io/
     stb                https://github.com/nothings/stb
-@image resources/logo.png 0 0
+@image logo.png 0 0

@@ -431,6 +431,8 @@ std::ostream& operator<<(std::ostream &out, Direction d);
 std::ostream& operator<<(std::ostream &out, const Coord &where);
 
 bool loadAllData();
+std::string readFile(const std::string &filename);
+std::vector<unsigned char> readFileAsBinary(const std::string &filename);
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
 const MutationData& getRandomMutationData();

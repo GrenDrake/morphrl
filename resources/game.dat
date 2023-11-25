@@ -175,7 +175,7 @@
     slot            MUT_SLOT_NONE
 
 
-@include resources/actors.dat
-@include resources/items.dat
-@include resources/levels.dat
-@include resources/tiles.dat
+@include actors.dat
+@include items.dat
+@include levels.dat
+@include tiles.dat

@@ -12,7 +12,7 @@
 
 
 Image::~Image() {
-    if (pixels) stbi_image_free(pixels); 
+    if (pixels) stbi_image_free(pixels);
 }
 
 Color Image::at(int x, int y) const {
@@ -25,9 +25,13 @@ Color Image::at(int x, int y) const {
 }
 
 Image* loadImage(const std::string &filename) {
+    std::vector<unsigned char> filedata = readFileAsBinary(filename);
+    if (filedata.empty()) return nullptr;
+
     Image *image = new Image;
     int channels_in_file;
-    image->pixels = stbi_load(filename.c_str(), &image->w, &image->h, &channels_in_file, 3);
+    image->pixels = stbi_load_from_memory(filedata.data(), filedata.size(), &image->w, &image->h, &channels_in_file, 3);
+    // image->pixels = stbi_load(filename.c_str(), &image->w, &image->h, &channels_in_file, 3);
     if (!image->pixels) {
         std::cerr << "Failed to load image " << filename << ": ";
         std::cerr << stbi_failure_reason() << '\n';

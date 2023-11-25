@@ -1,10 +1,10 @@
 #include <cstdint>
 #include <ctime>
-#include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 
+#include "physfs.h"
 #include "BearLibTerminal.h"
 #include "morph.h"
 
@@ -46,15 +46,31 @@ int keyToInt(int key) {
     }
 }
 
-int main() {
+int main(int argc, char *argv[]) {
+    PHYSFS_init(argv[0]);
+    const char *writeDir = PHYSFS_getPrefDir("grendrake", "morphrl");
+    if (!writeDir) {
+        std::cerr << "failed to find suitable location for writing files: ";
+        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        return 1;
+    }
+    std::cerr << "Write directory: " << writeDir << "\n\n";
+    if (PHYSFS_setWriteDir(writeDir) == 0) {
+        std::cerr << "failed to set write directory: ";
+        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        return 1;
+    }
+    PHYSFS_mount(writeDir, "/saves", 1);
+    PHYSFS_mount("resources", "/", 1);
+    PHYSFS_mount("gamedata.dat", "/", 1);
     std::cerr << "LOADING DATA\n";
     if (!loadAllData()) return 1;
 
     terminal_open();
     terminal_set("window.title='MorphRL';");
     terminal_set("input.filter = [keyboard, mouse];");
-    terminal_set("font: resources/DejaVuSansMono.ttf, size=24;");
-    terminal_set("italic font: resources/DejaVuSansMono-Oblique.ttf, size=24;");
+    terminal_set("font: DejaVuSansMono.ttf, size=24;");
+    terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
 
     uint64_t newGameSeed = 1;
     const int menuItemCount = 5;
@@ -63,7 +79,7 @@ int main() {
     std::cerr << "ENTERING main menu\n";
     const std::string versionString = "Development Release 1";
     const int versionX = 79 - versionString.size();
-    Image *logo = loadImage("resources/logo.png");
+    Image *logo = loadImage("logo.png");
     bool done = false;
     int selection = 0;
     color_t fgColor = color_from_argb(255, 196, 196, 196);
@@ -155,10 +171,10 @@ int main() {
                     }
                     break;
                 case 3:
-                    showDocument("resources/story.txt");
+                    showDocument("story.txt");
                     break;
                 case 4:
-                    showDocument("resources/credits.txt");
+                    showDocument("credits.txt");
                     break;
                 case 5:
                     // quit
@@ -172,6 +188,6 @@ int main() {
     delete logo;
     terminal_close();
 
-
+    PHYSFS_deinit();
     return 0;
 }

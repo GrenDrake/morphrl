@@ -1,8 +1,9 @@
 #include <iostream>
-#include <fstream>
 #include <string>
+#include <sstream>
 #include <vector>
 
+#include "physfs.h"
 #include "morph.h"
 
 
@@ -171,6 +172,60 @@ unsigned getDungeonEntranceIdent() {
 }
 
 
+std::string readFile(const std::string &filename) {
+    PHYSFS_File *fp = PHYSFS_openRead(filename.c_str());
+    if (!fp) {
+        std::cerr << "Failed to read file " << filename << ": ";
+        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        return "";
+    }
+    auto length = PHYSFS_fileLength(fp);
+    if (length == -1) {
+        std::cerr << "File " << filename << " is of indeterminate length.\n";
+        PHYSFS_close(fp);
+        return "";
+    }
+    char *buffer = new char[length + 1];
+    auto bytesRead = PHYSFS_readBytes(fp, buffer, length);
+    buffer[length] = 0;
+    std::string result(buffer);
+    delete[] buffer;
+    if (length != bytesRead) {
+        std::cerr << "Unexpected file length " << filename << ": ";
+        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+    }
+    PHYSFS_close(fp);
+    return result;
+}
+
+std::vector<unsigned char> readFileAsBinary(const std::string &filename) {
+    std::vector<unsigned char> result;
+    PHYSFS_File *fp = PHYSFS_openRead(filename.c_str());
+    if (!fp) {
+        std::cerr << "Failed to read file " << filename << ": ";
+        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        return result;
+    }
+    auto length = PHYSFS_fileLength(fp);
+    if (length == -1) {
+        std::cerr << "File " << filename << " is of indeterminate length.\n";
+        PHYSFS_close(fp);
+        return result;
+    }
+    result.reserve(length);
+    while (1) {
+        char theByte;
+        auto readCount = PHYSFS_readBytes(fp, &theByte, 1);
+        if (PHYSFS_eof(fp)) break;
+        if (readCount != 1) {
+            std::cerr << "Read error in " << filename << ": ";
+            std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        }
+        result.push_back(theByte);
+    }
+    PHYSFS_close(fp);
+    return result;
+}
 
 std::string convertUnderscores(std::string text) {
     for (char &c : text) {
@@ -199,11 +254,9 @@ const DataDef& getDataDef(const std::vector<DataDef> &defs, const std::string &t
 
 
 bool loadRawFromFile(const std::string &filename, RawData &rawData) {
-    std::ifstream inf(filename);
-    if (!inf) {
-        rawData.addError(Origin(filename, 0), "failed to open " + filename + " for reading.");
-        return false;
-    }
+    std::string fileContent = readFile(filename);
+    if (fileContent.empty()) return false;
+    std::stringstream inf(fileContent);
 
     DataTemp *data = nullptr;
 
@@ -701,7 +754,7 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
 
 bool loadAllData() {
     RawData rawData;
-    loadRawFromFile("resources/game.dat", rawData);
+    loadRawFromFile("game.dat", rawData);
 
     if (rawData.hasErrors()) {
         for (const ErrorMessage &msg : rawData.errors) {
