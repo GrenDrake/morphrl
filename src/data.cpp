@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -751,6 +752,10 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
     }
 }
 
+template<class T>
+void sortDataEntries(std::vector<T> &data) {
+    std::sort(data.begin(), data.end(), [](const T &lhs, const T &rhs){ return lhs.ident < rhs.ident; });
+}
 
 bool loadAllData() {
     RawData rawData;
@@ -790,6 +795,13 @@ bool loadAllData() {
             rawData.addError(data->origin, "unknown object type " + data->typeName);
         }
     }
+
+    sortDataEntries(tileData);
+    sortDataEntries(itemData);
+    sortDataEntries(actorData);
+    sortDataEntries(statusData);
+    sortDataEntries(mutationData);
+    sortDataEntries(dungeonData);
 
     std::cerr << "LOADED " << tileData.size() << " tiles (next ident: " << maxTile+1 << ")\n";
     std::cerr << "LOADED " << itemData.size() << " items (next ident: " << maxItem+1 << ")\n";

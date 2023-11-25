@@ -10,6 +10,7 @@
 
 
 void gameloop(World &world);
+void doDebugCodex();
 
 RNG globalRNG;
 
@@ -71,7 +72,7 @@ int main(int argc, char *argv[]) {
     terminal_set("font: DejaVuSansMono.ttf, size=24;");
     terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
 
-    const int menuItemCount = 5;
+    const int menuItemCount = 6;
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
     const std::string versionString = "Development Release 1";
@@ -101,6 +102,8 @@ int main(int argc, char *argv[]) {
         mouseRegions.push_back(UIRect{8, 20, 20, 1, 4});
         terminal_print(8, 21, "Quit");
         mouseRegions.push_back(UIRect{8, 21, 20, 1, 5});
+        terminal_print(8, 22, "Data Codex ([color=yellow]DEBUG[/color])");
+        mouseRegions.push_back(UIRect{8, 22, 20, 1, 6});
         terminal_print(5, 16+selection, "->");
         terminal_color(fgColorDark);
         terminal_print(31, 12, "Pre-Alpha Release");
@@ -169,6 +172,10 @@ int main(int argc, char *argv[]) {
                 case 5:
                     // quit
                     done = true;
+                    break;
+
+                case 6:
+                    doDebugCodex();
                     break;
             }
         }
