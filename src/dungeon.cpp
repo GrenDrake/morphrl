@@ -457,6 +457,15 @@ void Dungeon::tick(World &world) {
                 }
             } else ++statusIter;
         }
+        for (const MutationItem *mutationItem : actor->mutations) {
+            for (const EffectData &effect : mutationItem->data.effects) {
+                if (effect.trigger != ET_ON_TICK) continue;
+                std::string resultString = triggerEffect(world, effect, actor, nullptr);
+                if (!resultString.empty()) {
+                    msg << resultString;
+                }
+            }
+        }
         if (actor->isPlayer) {
             const std::string &text = msg.str();
             if (!text.empty()) world.addMessage(text);

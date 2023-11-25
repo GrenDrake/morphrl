@@ -15,6 +15,7 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
     switch (effect.effectId) {
         case EFFECT_HEALING: {
             int amount = effect.effectStrength * user->getStat(STAT_HEALTH) / 100;
+            if (amount < 1) amount = 1;
             user->takeDamage(-amount);
             return "Received " + std::to_string(amount) + " healing. "; }
         case EFFECT_DAMAGE: {

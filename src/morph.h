@@ -53,13 +53,12 @@ const int STAT_TOUGHNESS    = 3;
 const int STAT_BASE_COUNT   = 4;
 const int STAT_TO_HIT       = 4;
 const int STAT_EVASION      = 5;
-const int STAT_XP           = 6;
+const int STAT_BULK_MAX     = 6;
 const int STAT_EXTRA_COUNT  = 7;
-const int STAT_BULK         = 7;
-const int STAT_BULK_MAX     = 8;
-const int STAT_HEALTH       = 9;
-const int STAT_ENERGY       = 10;
-const int STAT_ALL_COUNT    = 11;
+const int STAT_HEALTH       = 7;
+const int STAT_ENERGY       = 8;
+const int STAT_BULK         = 9;
+const int STAT_ALL_COUNT    = 10;
 
 
 const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
@@ -225,6 +224,10 @@ struct Actor {
 
     std::string getName(bool definitive = false) const;
     void reset();
+    int getStatStatusBonus(int statNumber) const;
+    int getStatMutationBonus(int statNumber) const;
+    int getStatItemBonus(int statNumber) const;
+    int getStatBase(int statNumber) const;
     int getStat(int statNumber) const;
     // AttackResult makeAttack(Actor *target);
     void takeDamage(int amount);

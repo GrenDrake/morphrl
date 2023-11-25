@@ -10,6 +10,7 @@ void debug_saveMapToPNG(const Dungeon &d, bool showActors);
 void showActorInfo(World &world, const Actor *actor);
 void doInventory(World &world, bool showFloor);
 void doMessageLog(World &world);
+void doCharInfo(World &world);
 
 void tryMeleeAttack(World &world, Direction dir);
 void tryMovePlayer(World &world, Direction dir);
@@ -286,6 +287,7 @@ void gameloop(World &world) {
             }
 
             if (key == TK_I)        doInventory(world, false);
+            if (key == TK_C)        doCharInfo(world);
             if (key == TK_X) {
                 uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;

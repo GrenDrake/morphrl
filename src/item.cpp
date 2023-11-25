@@ -13,7 +13,7 @@ std::string Item::getName(bool definitive) const {
 int Item::getStatBonus(int statNumber) const {
     // items can never provide a static bonus to current bulk (use the bulk_max
     // stat instead) or to current XP
-    if (statNumber == STAT_BULK || statNumber == STAT_XP) return 0;
+    if (statNumber == STAT_BULK) return 0;
 
     int result = 0;
     for (const EffectData &effect : data.effects) {

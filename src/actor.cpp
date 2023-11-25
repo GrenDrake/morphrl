@@ -90,47 +90,58 @@ void Actor::reset() {
     energy = getStat(STAT_ENERGY);
 }
 
-int Actor::getStat(int statNumber) const {
-    int itemBonus = 0;
-
-    // current bulk and XP can never be boosted
-    if (statNumber != STAT_BULK && statNumber != STAT_XP) {
-        for (const Item *item : inventory) {
-            if (!item->isEquipped) continue; // items only provide static bonuses when equipped
-            itemBonus += item->getStatBonus(statNumber);
-        }
-        for (const StatusItem *status : statusEffects) {
-            if (!status) continue;
-            for (const EffectData &data : status->data.effects) {
-                if (data.trigger != ET_BOOST) continue;
-                if (data.effectId == statNumber) {
-                    itemBonus += data.effectStrength;
-                }
-            }
-        }
-        for (const MutationItem *mutation : mutations) {
-            if (!mutation) continue;
-            for (const EffectData &data : mutation->data.effects) {
-                if (data.trigger != ET_BOOST) continue;
-                if (data.effectId == statNumber) {
-                    itemBonus += data.effectStrength;
-                }
+int Actor::getStatStatusBonus(int statNumber) const {
+    if (statNumber == STAT_BULK) return 0;
+    int bonus = 0;
+    for (const StatusItem *status : statusEffects) {
+        if (!status) continue;
+        for (const EffectData &data : status->data.effects) {
+            if (data.trigger != ET_BOOST) continue;
+            if (data.effectId == statNumber) {
+                bonus += data.effectStrength;
             }
         }
     }
+    return bonus;
+}
 
+int Actor::getStatMutationBonus(int statNumber) const {
+    if (statNumber == STAT_BULK) return 0;
+    int bonus = 0;
+    for (const MutationItem *mutation : mutations) {
+        if (!mutation) continue;
+        for (const EffectData &data : mutation->data.effects) {
+            if (data.trigger != ET_BOOST) continue;
+            if (data.effectId == statNumber) {
+                bonus += data.effectStrength;
+            }
+        }
+    }
+    return bonus;
+}
+
+int Actor::getStatItemBonus(int statNumber) const {
+    if (statNumber == STAT_BULK) return 0;
+    int bonus = 0;
+    for (const Item *item : inventory) {
+        if (!item->isEquipped) continue; // items only provide static bonuses when equipped
+        bonus += item->getStatBonus(statNumber);
+    }
+    return bonus;
+}
+
+int Actor::getStatBase(int statNumber) const {
     switch(statNumber) {
         case STAT_STRENGTH:
         case STAT_SPEED:
         case STAT_AGILITY:
-        case STAT_TOUGHNESS:
-            return itemBonus + data.baseStats[statNumber];
-        case STAT_XP:           return xp;
-        case STAT_HEALTH:       return 20 + itemBonus + getStat(STAT_TOUGHNESS) * 4;
-        case STAT_ENERGY:       return 20 + itemBonus + getStat(STAT_TOUGHNESS) * 2;
-        case STAT_TO_HIT:       return itemBonus + getStat(STAT_AGILITY);
-        case STAT_EVASION:      return 10 + itemBonus + getStat(STAT_AGILITY);
-        case STAT_BULK_MAX:     return 10 + itemBonus + getStat(STAT_STRENGTH) * 2;
+        case STAT_TOUGHNESS:    return data.baseStats[statNumber];
+
+        case STAT_HEALTH:       return 20 + getStat(STAT_TOUGHNESS) * 4;
+        case STAT_ENERGY:       return 20 + getStat(STAT_TOUGHNESS) * 2;
+        case STAT_TO_HIT:       return getStat(STAT_AGILITY);
+        case STAT_EVASION:      return 10 + getStat(STAT_AGILITY);
+        case STAT_BULK_MAX:     return 10 + getStat(STAT_STRENGTH) * 2;
         case STAT_BULK: {
             int total = 0;
             for (const Item *item : inventory) {
@@ -142,6 +153,18 @@ int Actor::getStat(int statNumber) const {
         default:
             return 0;
     }
+}
+
+int Actor::getStat(int statNumber) const {
+    int bonus = 0;
+
+    // current bulk can never be boosted
+    if (statNumber != STAT_BULK) {
+        bonus += getStatItemBonus(statNumber);
+        bonus += getStatStatusBonus(statNumber);
+        bonus += getStatMutationBonus(statNumber);
+    }
+    return bonus += getStatBase(statNumber);
 }
 
 void Actor::takeDamage(int amount) {
@@ -327,7 +350,6 @@ std::string statName(int statNumber) {
         case STAT_EVASION:      return "evasion";
         case STAT_BULK_MAX:     return "max bulk";
         case STAT_BULK:         return "bulk";
-        case STAT_XP:           return "XP";
         default: return "unknown stat " + std::to_string(statNumber);
     }
 }
