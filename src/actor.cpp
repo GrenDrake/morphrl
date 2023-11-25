@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <vector>
 
@@ -277,6 +278,13 @@ bool Actor::hasMutation(unsigned mutationIdent) const {
     return false;
 }
 
+bool mutationSort(const MutationItem *lhs, const MutationItem *rhs) {
+    if (lhs->data.slot < rhs->data.slot) return true;
+    if (lhs->data.slot > rhs->data.slot) return false;
+    if (lhs->data.name < rhs->data.name) return true;
+    if (lhs->data.name > rhs->data.name) return false;
+    return false;
+}
 void Actor::applyMutation(MutationItem *mutation) {
     if (!mutation) return;
     if (hasMutation(mutation->data.ident)) {
@@ -288,6 +296,7 @@ void Actor::applyMutation(MutationItem *mutation) {
         if (old) removeMutation(old);
     }
     mutations.push_back(mutation);
+    std::sort(mutations.begin(), mutations.end(), mutationSort);
 }
 
 void Actor::removeMutation(MutationItem *mutation) {
