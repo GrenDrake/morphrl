@@ -159,7 +159,7 @@ int main(int argc, char *argv[]) {
                             ui_alertBox("Error", "Could not create game world.");
                         } else {
                             gameloop(*world);
-                            ++selection;
+                            selection = 2;
                         }
                     }
                     break;
