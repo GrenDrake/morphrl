@@ -297,6 +297,72 @@ void gameloop(World &world) {
                 world.player->takeDamage(-99999);
                 world.player->spendEnergy(-99999);
                 world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
+            } else if (key == TK_F2) {
+                std::string result;
+                if (ui_getString("Teleport", "Enter coordinate pair", result) && !result.empty()) {
+                    auto parts = explodeOnWhitespace(result);
+                    int x, y;
+                    if (parts.size() != 2 || !strToInt(parts[0], x) || !strToInt(parts[1], y)) {
+                        ui_alertBox("Error", "Malformed coordinates.");
+                    } else if (!world.map->isValidPosition(Coord(x,y))) {
+                        ui_alertBox("Error", "Coordinates not on map.");
+                    } else {
+                        world.map->moveActor(world.player, Coord(x,y));
+                        world.map->doActorFOV(world.player);
+                        world.addMessage("[color=cyan]DEBUG[/color] teleported player player to " + std::to_string(x) + "," + std::to_string(y));
+                    }
+                }
+            } else if (key == TK_F3) {
+                std::string result;
+                if (ui_getString("Add Item", "Enter item ident", result) && !result.empty()) {
+                    unsigned ident = 0;
+                    if (!strToInt(result, ident)) {
+                        ui_alertBox("Error", "Malformed ident number.");
+                    } else {
+                        const ItemData &itemData = getItemData(ident);
+                        if (itemData.ident == BAD_VALUE) {
+                            ui_alertBox("Error", "Unknown item ident.");
+                        } else {
+                            Item *item = new Item(itemData);
+                            world.player->addItem(item);
+                            world.addMessage("[color=cyan]DEBUG[/color] give item " + itemData.name);
+                        }
+                    }
+                }
+            } else if (key == TK_F4) {
+                std::string result;
+                if (ui_getString("Add Mutation", "Enter mutation ident", result) && !result.empty()) {
+                    unsigned ident = 0;
+                    if (!strToInt(result, ident)) {
+                        ui_alertBox("Error", "Malformed ident number.");
+                    } else {
+                        const MutationData &mutationData = getMutationData(ident);
+                        if (mutationData.ident == BAD_VALUE) {
+                            ui_alertBox("Error", "Unknown mutation ident.");
+                        } else {
+                            MutationItem *mutation = new MutationItem(mutationData);
+                            world.player->applyMutation(mutation);
+                            world.addMessage("[color=cyan]DEBUG[/color] give mutation " + mutationData.name);
+                        }
+                    }
+                }
+            } else if (key == TK_F5) {
+                std::string result;
+                if (ui_getString("Add Status Effect", "Enter status effect ident", result) && !result.empty()) {
+                    unsigned ident = 0;
+                    if (!strToInt(result, ident)) {
+                        ui_alertBox("Error", "Malformed ident number.");
+                    } else {
+                        const StatusData &statusData = getStatusData(ident);
+                        if (statusData.ident == BAD_VALUE) {
+                            ui_alertBox("Error", "Unknown status effect ident.");
+                        } else {
+                            StatusItem *statusEffect = new StatusItem(statusData);
+                            world.player->applyStatus(statusEffect);
+                            world.addMessage("[color=cyan]DEBUG[/color] give status effect " + statusData.name);
+                        }
+                    }
+                }
             } else if (key == TK_F6) {
                 world.disableFOV = !world.disableFOV;
                 world.addMessage("[color=cyan]DEBUG[/color] toggled FOV");
