@@ -3,58 +3,6 @@
 
 #include "morph.h"
 
-// const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
-// const int EFFECT_REGEN      = 1; // regen status - strength = regen rate
-// const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
-// const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
-// const int EFFECT_POISON     = 4; // poison status - strength = damage rate
-// const int EFFECT_BOOST      = 5; // stat boost status - strength = ?
-
-
-void addUniqueToVector(std::vector<int> &v, int item) {
-    for (const int &iter : v) {
-        if (iter == item) return;
-    }
-    v.push_back(item);
-}
-
-
-std::string EffectData::toString() const {
-    if (trigger == ET_BOOST) {
-        std::string text;
-        if (effectStrength >= 0) text += "[color=cyan]+";
-        else text += "[color=red]";
-        text += std::to_string(effectStrength) + "[/color] " + statName(effectId);
-        return text;
-    }
-
-    std::string text;
-    switch(trigger) {
-        case ET_GIVE_ABILITY: // grant special ability
-            text += "gives ability: ";
-            break;
-        case ET_ON_HIT:
-            text += "on hit: ";
-            break;
-        case ET_ON_USE:
-            text += "when used: ";
-            break;
-        case ET_ON_TICK:
-            text += "every turn: ";
-            break;
-        default:
-            text = "Unhandled trigger " + std::to_string(trigger);
-    }
-    switch(effectId) {
-        case EFFECT_HEALING:
-            text += "instantly heal for [color=cyan]" + std::to_string(effectStrength) + "%";
-            break;
-        default:
-            text = "Unhandled effectId " + std::to_string(trigger);
-    }
-    return text;
-}
-
 
 StatusItem::StatusItem(const StatusData &data)
 : data(data), duration(0)
@@ -313,6 +261,44 @@ AttackData Actor::meleeAttack(Actor *target) {
 
 void Actor::advanceSpeedCounter() {
     speedCounter += getStat(STAT_SPEED) * -2 + 10;
+}
+
+MutationItem* Actor::mutationForSlot(unsigned slotNumber) {
+    for (MutationItem *item : mutations) {
+        if (item && item->data.slot == slotNumber) return item;
+    }
+    return nullptr;
+}
+
+bool Actor::hasMutation(unsigned mutationIdent) const {
+    for (const MutationItem *mut : mutations) {
+        if (mut && mut->data.ident == mutationIdent) return true;
+    }
+    return false;
+}
+
+void Actor::applyMutation(MutationItem *mutation) {
+    if (!mutation) return;
+    if (hasMutation(mutation->data.ident)) {
+        delete mutation;
+        return;
+    }
+    if (mutation->data.slot != 0) {
+        MutationItem *old = mutationForSlot(mutation->data.slot);
+        if (old) removeMutation(old);
+    }
+    mutations.push_back(mutation);
+}
+
+void Actor::removeMutation(MutationItem *mutation) {
+    auto iter = mutations.begin();
+    while (iter != mutations.end()) {
+        if (*iter == mutation) {
+            mutations.erase(iter);
+            return;
+        }
+        ++iter;
+    }
 }
 
 void Actor::applyStatus(StatusItem *statusItem) {

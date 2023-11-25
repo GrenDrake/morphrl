@@ -6,51 +6,6 @@
 #include "morph.h"
 
 
-std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target) {
-    if (!user) {
-        std::cerr << "Tried to trigger effect with no user.\n";
-        return "";
-    }
-    if (globalRNG.upto(100) >= effect.effectChance) return "";
-
-    switch (effect.effectId) {
-        case EFFECT_HEALING: {
-            int amount = effect.effectStrength * user->getStat(STAT_HEALTH) / 100;
-            user->takeDamage(-amount);
-            return "Received " + std::to_string(amount) + " healing. "; }
-        case EFFECT_DAMAGE: {
-            user->takeDamage(effect.effectStrength);
-            std::string message = ucFirst(user->getName(true)) + " took "
-                    + std::to_string(effect.effectStrength) + " damage. ";
-            if (user->isDead()) {
-                if (user->isPlayer) {
-                    message += "You [color=red]die[/color]. ";
-                } else {
-                    std::vector<Item*> drops;
-                    for (Item *item : user->inventory) drops.push_back(item);
-                    user->dropAllItems();
-                    message += "They [color=red]die[/color] and drop " + makeItemList(drops, 4) + ". ";
-                }
-            }
-            return message; }
-        case EFFECT_APPLY_STATUS: {
-            const StatusData &statusData = getStatusData(effect.effectStrength);
-            if (statusData.ident == BAD_VALUE) {
-                std::cerr << "ERROR: Tried to apply invalid status " << effect.effectStrength << '\n';
-                return "";
-            } else {
-                StatusItem *statusItem = new StatusItem(statusData);
-                user->applyStatus(statusItem);
-                return "You are now effected by [color=yellow]" + statusData.name + "[/color]. ";
-            }
-            break; }
-        default:
-            std::cerr << "ERROR: Unhandled effect " << effect.effectId << ".\n";
-    }
-    return "";
-}
-
-
 void activateItem(World &world, Item *item, Actor *user) {
     std::stringstream msg;
     bool didEffect = false;

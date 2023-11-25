@@ -137,6 +137,12 @@ const MutationData& getMutationData(unsigned ident) {
     return BAD_MUTATION;
 }
 
+const MutationData& getRandomMutationData() {
+    if (mutationData.empty()) return BAD_MUTATION;
+    unsigned i = globalRNG.upto(mutationData.size());
+    return mutationData[i];
+}
+
 const StatusData& getStatusData(unsigned ident) {
     for (const StatusData &data : statusData) {
         if (data.ident == ident) return data;
@@ -406,8 +412,10 @@ bool processStatusData(RawData &rawData, const DataTemp *rawStatus) {
 }
 
 std::vector<DataDef> mutationPropData{
+    { "gainVerb",       1 },
     { "name",           1 },
     { "description",    1 },
+    { "slot",           1 },
     { "effect",         5 },
 };
 bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
@@ -418,6 +426,7 @@ bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
 
     MutationData resultData;
     resultData.name = "unknown";
+    resultData.gainVerb = "gaining";
 
     resultData.ident = rawMutation->ident;
     for (const DataProp &prop : rawMutation->props) {
@@ -431,8 +440,12 @@ bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
         } else {
             if (prop.name == "name") {
                 resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "gainVerb") {
+                resultData.gainVerb = convertUnderscores(prop.value[0]);
             } else if (prop.name == "description") {
                 resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "slot") {
+                resultData.slot = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "effect") {
                 EffectData effectData;
                 effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);

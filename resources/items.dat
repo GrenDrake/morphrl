@@ -38,6 +38,7 @@
     type            IT_CONSUMABLE
     consumeChance   100
     effect          ET_ON_USE 100 EFFECT_HEALING 20 0
+    effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
 
 @item ITM_POTION_RAGE 10
     glyph           !
@@ -69,6 +70,10 @@
     colour          127 127 255
     consumeChance   100
     type            IT_CONSUMABLE
+    effect          ET_ON_USE 100 EFFECT_MUTATE 1 0
+    effect          ET_ON_USE 50 EFFECT_MUTATE 1 0
+    effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
+    effect          ET_ON_USE 12 EFFECT_MUTATE 1 0
 
 @item ITM_TALIS_EVASION 4
     glyph           "

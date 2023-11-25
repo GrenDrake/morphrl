@@ -125,9 +125,10 @@ struct StatusData {
 
 struct MutationData {
     unsigned ident;
+    std::string gainVerb;
     std::string name;
     std::string desc;
-    unsigned slot;          // what part of the body is mutated? (arms, tail, 
+    unsigned slot;          // what part of the body is mutated? (arms, tail,
                             // etc.) or 0 for "minor" muations that do not require a slot
     std::vector<EffectData> effects;
 };
@@ -238,6 +239,10 @@ struct Actor {
     const Item* getCurrentWeapon() const;
     AttackData meleeAttack(Actor *target);
     void advanceSpeedCounter();
+    MutationItem* mutationForSlot(unsigned slotNumber);
+    bool hasMutation(unsigned mutationIdent) const;
+    void applyMutation(MutationItem *mutation);
+    void removeMutation(MutationItem *mutation);
     void applyStatus(StatusItem *statusItem);
 
     const ActorData &data;
@@ -404,6 +409,7 @@ const std::string& trim(const std::string &text);
 std::string& trim(std::string &text);
 std::string intToString(long long number);
 bool strToInt(const std::string &text, int &result);
+void addUniqueToVector(std::vector<int> &v, int item);
 
 void showDocument(const std::string &filename);
 void showDocument(Document *document);
@@ -427,6 +433,7 @@ std::ostream& operator<<(std::ostream &out, const Coord &where);
 bool loadAllData();
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
+const MutationData& getRandomMutationData();
 const MutationData& getMutationData(unsigned ident);
 const StatusData& getStatusData(unsigned ident);
 const TileData& getTileData(unsigned ident);

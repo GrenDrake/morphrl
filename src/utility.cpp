@@ -104,3 +104,10 @@ std::string intToString(long long number) {
     line << number;
     return line.str();
 }
+
+void addUniqueToVector(std::vector<int> &v, int item) {
+    for (const int &iter : v) {
+        if (iter == item) return;
+    }
+    v.push_back(item);
+}
