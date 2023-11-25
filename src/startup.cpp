@@ -15,7 +15,7 @@ RNG globalRNG;
 
 World* createGame(uint64_t gameSeed) {
     World *world = new World;
-    if (gameSeed == 0)  world->gameSeed = globalRNG.next64();
+    if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
     std::cerr << "SEED " << world->gameSeed << '\n';
     world->player = Actor::create(getActorData(0));
@@ -72,7 +72,6 @@ int main(int argc, char *argv[]) {
     terminal_set("font: DejaVuSansMono.ttf, size=24;");
     terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
 
-    uint64_t newGameSeed = 1;
     const int menuItemCount = 5;
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
@@ -95,7 +94,6 @@ int main(int argc, char *argv[]) {
         terminal_print(8, 16, "Start new game");
         mouseRegions.push_back(UIRect{8, 16, 20, 1, 0});
         terminal_print(8, 17, "Start game from seed");
-        terminal_print(35, 17, std::to_string(newGameSeed).c_str());
         mouseRegions.push_back(UIRect{8, 17, 20, 1, 1});
         terminal_print(8, 18, "Resume current game");
         mouseRegions.push_back(UIRect{8, 18, 20, 1, 2});
@@ -131,38 +129,35 @@ int main(int argc, char *argv[]) {
                 break;
             }
         }
-        if (key == TK_LEFT && newGameSeed > 0) --newGameSeed;
-        if (key == TK_RIGHT && newGameSeed < UINT64_MAX) ++newGameSeed;
-        if (key == TK_BACKSPACE && newGameSeed > 0) newGameSeed /= 10;
-        if (keyToInt(key) != -1) {
-            int num = keyToInt(key);
-            uint64_t newValue = newGameSeed * 10 + num;
-            if (newValue > newGameSeed) newGameSeed = newValue;
-        }
 
         if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
             switch(selection) {
                 case 0:
-                case 1:
-                    if (selection == 1 && newGameSeed == 0) {
-                        ui_alertBox("Error", "New game seed cannot be zero.");
-                    } else {
-                        // start new game
-                        if (world) {
-                            std::cerr << "FREEING old game\n";
-                            delete world;
-                        }
-                        std::cerr << "STARTING new game\n";
-                        if (selection == 0) world = createGame(0);
-                        else                world = createGame(newGameSeed);
-                        if (!world) {
-                            ui_alertBox("Error", "Could not create game world.");
-                        } else {
-                            gameloop(*world);
-                            selection = 2;
+                case 1: {
+                    int newGameSeed = 0;
+                    if (selection == 1) {
+                        std::string result;
+                        if (!ui_getString("Seed", "Input seed for new game", result) || result.empty()) break;
+                        if (!strToInt(result, newGameSeed) || newGameSeed == 0) {
+                            ui_alertBox("Error", "Invalid game seed. Game seeds must be non-zero integer values.");
+                            break;
                         }
                     }
-                    break;
+                    // start new game
+                    if (world) {
+                        std::cerr << "FREEING old game\n";
+                        delete world;
+                    }
+                    std::cerr << "STARTING new game\n";
+                    if (selection == 0) world = createGame(0);
+                    else                world = createGame(newGameSeed);
+                    if (!world) {
+                        ui_alertBox("Error", "Could not create game world.");
+                    } else {
+                        gameloop(*world);
+                        selection = 2;
+                    }
+                    break; }
                 case 2:
                     if (world) {
                         gameloop(*world);

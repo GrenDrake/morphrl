@@ -450,6 +450,7 @@ void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void doMapgen(Dungeon &d);
 
 void ui_alertBox(const std::string &title, const std::string &message);
+bool ui_getString(const std::string &title, const std::string &message, std::string &result);
 
 extern RNG globalRNG;
 
