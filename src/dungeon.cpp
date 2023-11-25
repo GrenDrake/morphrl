@@ -434,6 +434,7 @@ void Dungeon::tick(World &world) {
             return;
         }
         Actor *actor = getNextActor();
+        actor->verify();
 
         std::stringstream msg;
         auto statusIter = actor->statusEffects.begin();
@@ -471,6 +472,7 @@ void Dungeon::tick(World &world) {
             if (!text.empty()) world.addMessage(text);
         }
 
+        actor->verify();
         if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
         if (actor->isPlayer) {
             clearDeadActors();

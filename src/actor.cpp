@@ -90,6 +90,11 @@ void Actor::reset() {
     energy = getStat(STAT_ENERGY);
 }
 
+void Actor::verify() {
+    if (health < 0) health = 0;
+    if (health > getStat(STAT_HEALTH)) health = getStat(STAT_HEALTH);
+}
+
 int Actor::getStatStatusBonus(int statNumber) const {
     if (statNumber == STAT_BULK) return 0;
     int bonus = 0;

@@ -224,6 +224,7 @@ struct Actor {
 
     std::string getName(bool definitive = false) const;
     void reset();
+    void verify();
     int getStatStatusBonus(int statNumber) const;
     int getStatMutationBonus(int statNumber) const;
     int getStatItemBonus(int statNumber) const;

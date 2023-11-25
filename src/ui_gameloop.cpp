@@ -90,6 +90,7 @@ void gameloop(World &world) {
     Coord cursorPos;
     bool shownDeathMessage = false;
     while (1) {
+        world.player->verify();
         if (uiMode == UIMode::Normal && world.player->isDead()) {
             uiMode = UIMode::PlayerDead;
             if (!shownDeathMessage) {
