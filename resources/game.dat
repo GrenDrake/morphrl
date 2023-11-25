@@ -140,6 +140,11 @@
     name            goring_horns
     slot            MUT_SLOT_HORNS
 
+@mutation MUT_DECORATIVE_HORNS 6
+    gainVerb        growing
+    name            decorative_horns
+    slot            MUT_SLOT_HORNS
+
 @mutation MUT_RAMMING_HORNS 16
     gainVerb        growing
     name            ramming_horns
