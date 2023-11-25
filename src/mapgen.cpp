@@ -137,7 +137,7 @@ void addDoorToRoom(Dungeon &d, Room &room) {
         // d.at(p)->floor = 3;
         Direction dir = randomCardinalDirection();
         if (dir == room.roomDirection) continue;
-        while (d.floorAt(p) == TILE_FLOOR) {
+        while (d.isValidPosition(p) && d.floorAt(p) != TILE_WALL) {
             p = p.shift(dir);
         }
         if (d.floorAt(p.shift(dir)) == TILE_FLOOR) {
@@ -185,6 +185,7 @@ void trimDeadEnds(Dungeon &d) {
     for (int y = 1; y < d.height(); y += 2) {
         for (int x = 1; x < d.width(); x += 2) {
             Coord here(x, y);
+            if (d.floorAt(here) != TILE_FLOOR) continue;
             int wallCount = 0;
             Direction dir = Direction::North;
             Direction opening;
@@ -341,7 +342,7 @@ void addEntranceHall(Dungeon &d) {
 
 void addExtraDoors(Dungeon &d) {
     Coord where;
-    bool isGood;
+    bool isGood = false;
     int iterations = 10;
     do {
         --iterations;
