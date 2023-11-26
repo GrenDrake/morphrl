@@ -303,7 +303,6 @@ AttackData Actor::meleeAttack(Actor *target) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
             int levelDiff = target->level - level;
-            std::cerr << levelDiff << '\n';
             int xpGain = 10 + levelDiff * 2;
             if (xpGain > 0) giveXP(xpGain);
         }
