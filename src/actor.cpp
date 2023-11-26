@@ -69,9 +69,14 @@ Actor* Actor::create(const ActorData &data) {
 
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
-  isPlayer(false), xp(0), playerLastSeenPosition(-1, -1),
+  isPlayer(false), level(0), xp(0), advancementPoints(0), playerLastSeenPosition(-1, -1),
   speedCounter(0), onMap(nullptr)
-{ }
+{
+    level = data.baseLevel;
+    for (int i = 0; i < STAT_BASE_COUNT; ++i) {
+    statLevels[i] = 0;
+    }
+}
 
 Actor::~Actor() {
     for (Item *item : inventory) {
@@ -93,6 +98,11 @@ void Actor::reset() {
 void Actor::verify() {
     if (health < 0) health = 0;
     if (health > getStat(STAT_HEALTH)) health = getStat(STAT_HEALTH);
+}
+
+int Actor::getStatLevelBonus(int statNumber) const {
+    if (statNumber >= STAT_BASE_COUNT) return 0;
+    return statLevels[statNumber];
 }
 
 int Actor::getStatStatusBonus(int statNumber) const {
@@ -165,6 +175,7 @@ int Actor::getStat(int statNumber) const {
 
     // current bulk can never be boosted
     if (statNumber != STAT_BULK) {
+        bonus += getStatLevelBonus(statNumber);
         bonus += getStatItemBonus(statNumber);
         bonus += getStatStatusBonus(statNumber);
         bonus += getStatMutationBonus(statNumber);
@@ -184,6 +195,15 @@ void Actor::spendEnergy(int amount) {
     if (energy < 0) energy = 0;
     int maxEnergy = getStat(STAT_ENERGY);
     if (energy > maxEnergy) energy = maxEnergy;
+}
+
+void Actor::giveXP(int amount) {
+    xp += amount;
+    while (xp >= XP_PER_LEVEL) {
+        xp -= XP_PER_LEVEL;
+        ++advancementPoints;
+        ++level;
+    }
 }
 
 bool Actor::isOverBurdened() const {
@@ -282,7 +302,10 @@ AttackData Actor::meleeAttack(Actor *target) {
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
-            xp += 10;
+            int levelDiff = target->level - level;
+            std::cerr << levelDiff << '\n';
+            int xpGain = 10 + levelDiff * 2;
+            if (xpGain > 0) giveXP(xpGain);
         }
     }
     return data;

@@ -74,6 +74,8 @@ const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
 const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
 const int EFFECT_APPLY_STATUS = 6;
 
+const int XP_PER_LEVEL      = 100;
+
 // special item numbers
 const int SIN_FISTS         = -2;
 
@@ -162,6 +164,7 @@ struct ActorData {
     int r, g, b;
     std::string name, desc;
     std::string artFile;
+    int baseLevel;
     int baseStats[STAT_BASE_COUNT];
     std::vector<SpawnLine> initialItems;
     std::vector<SpawnLine> initialMutations;
@@ -243,6 +246,7 @@ struct Actor {
     std::string getName(bool definitive = false) const;
     void reset();
     void verify();
+    int getStatLevelBonus(int statNumber) const;
     int getStatStatusBonus(int statNumber) const;
     int getStatMutationBonus(int statNumber) const;
     int getStatItemBonus(int statNumber) const;
@@ -251,6 +255,7 @@ struct Actor {
     // AttackResult makeAttack(Actor *target);
     void takeDamage(int amount);
     void spendEnergy(int amount);
+    void giveXP(int amount);
 
     bool isOverBurdened() const;
     void addItem(Item *item);
@@ -269,10 +274,12 @@ struct Actor {
     std::vector<unsigned> getAbilityList() const;
 
     const ActorData &data;
+    int statLevels[STAT_BASE_COUNT];
     unsigned ident;
     Coord position;
     bool isPlayer;
-    int xp;
+    int level;
+    int xp, advancementPoints;
     Coord playerLastSeenPosition;
     unsigned speedCounter;
 

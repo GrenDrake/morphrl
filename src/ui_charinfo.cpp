@@ -72,8 +72,12 @@ void doCharInfo(World &world) {
                 terminal_print(17, 2, std::to_string(world.player->health).c_str());
                 terminal_print(17, 3, std::to_string(world.player->energy).c_str());
                 terminal_print(17, 4, std::to_string(player->getStat(STAT_BULK)).c_str());
-                terminal_print(41, 2, "Experience");
-                terminal_print(55, 2, std::to_string(player->xp).c_str());
+                terminal_print(41, 2, "Level");
+                terminal_print(41, 3, "Experience");
+                terminal_print(41, 4, "Advances");
+                terminal_print(55, 2, std::to_string(player->level).c_str());
+                terminal_print(55, 3, std::to_string(player->xp).c_str());
+                terminal_print(55, 4, std::to_string(player->advancementPoints).c_str());
 
                 nextY = 6;
                 ++nextY;
@@ -101,14 +105,23 @@ void doCharInfo(World &world) {
                     ++nextY;
                 }
 
+                terminal_color(textColour);
+                if (selection >= STAT_BASE_COUNT) {
+                    terminal_print(0, 19, "You cannot improve this stat by leveling.");
+                } else if (world.player->advancementPoints == 0) {
+                    terminal_print(0, 19, "You haven't gained enough experience to improve this stat.");
+                } else {
+                    terminal_print(0, 19, "Press [color=yellow]SPACE[/color] to improve this stat.");
+                }
+
                 int value = 0;
                 terminal_color(textColour);
                 dimensions_t dims = terminal_print_ext(41, 7, 39, 10, TK_ALIGN_LEFT, statDescriptions[selection]);
                 nextY = 8 + dims.height;
 
-                if (selection < STAT_BASE_COUNT) {
-                    terminal_print(41, nextY, "Base value");
-                    value = player->getStatBase(selection);
+                value = player->getStatLevelBonus(selection);
+                if (value != 0) {
+                    terminal_print(41, nextY, "From levels");
                     if (value > 0) terminal_color(bonus);
                     else if (value < 0) terminal_color(malus);
                     terminal_print(61, nextY, std::to_string(value).c_str());
@@ -224,6 +237,12 @@ void doCharInfo(World &world) {
                 if (rect.ident < 10) mode = rect.ident;
                 break;
             }
+        }
+
+        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
+            if (selection >= STAT_BASE_COUNT || player->advancementPoints < 1) continue;
+            --player->advancementPoints;
+            ++player->statLevels[selection];
         }
 
         if (key == TK_CLOSE || key == TK_ESCAPE) return;

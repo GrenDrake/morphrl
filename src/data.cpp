@@ -325,6 +325,7 @@ bool loadRawFromFile(const std::string &filename, RawData &rawData) {
 std::vector<DataDef> actorPropData{
     { "glyph",          1 },
     { "name",           1 },
+    { "baseLevel",      1 },
     { "artfile",        1 },
     { "description",    1 },
     { "colour",         3 },
@@ -345,6 +346,7 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
     resultData.name = "unknown";
     resultData.glyph = '?';
     resultData.r = 255; resultData.g = 255; resultData.b = 255;
+    resultData.baseLevel = 1;
     for (int i = 0; i < STAT_BASE_COUNT; ++i) {
         resultData.baseStats[i] = 1;
     }
@@ -384,6 +386,8 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
                 resultData.b = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "baseLevel") {
+                resultData.baseLevel = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "base_strength") {
                 resultData.baseStats[STAT_STRENGTH] = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "base_agility") {

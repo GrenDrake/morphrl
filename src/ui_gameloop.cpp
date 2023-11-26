@@ -472,6 +472,9 @@ void gameloop(World &world) {
             } else if (key == TK_F11) {
                 debug_saveMapToPNG(*world.map, false);
                 world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (layout only) to file");
+            } else if (key == TK_F12) {
+                world.player->giveXP(50);
+                world.addMessage("[color=cyan]DEBUG[/color] granted XP points");
             }
         } else if (uiMode == UIMode::ExamineTile) {
             if (key == TK_MOUSE_LEFT) {
