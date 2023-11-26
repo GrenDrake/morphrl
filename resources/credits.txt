@@ -8,9 +8,9 @@
 
 
 
-
-                         [font=italic]Delving the Mutagenic Dungeons
+                        [font=italic]Delving the Mutagenic Dungeon
                                  by Gren Drake
+                       https://grendrake.itch.io/morphrl
 
                              originally created for
             [font=italic]Transformation game Jam 2023[/font] (https://itch.io/jam/tf23)
