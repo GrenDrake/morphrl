@@ -35,6 +35,13 @@ const int TILE_WATER = 5;
 const int TILE_STAIR_DOWN = 6;
 const int TILE_STAIR_UP = 7;
 
+const int AR_NONE = 0;
+const int AR_TARGET = 1;
+const int AR_CONE = 2;
+const int AR_LINE = 3;
+const int AR_BURST = 4;
+const int AR_PASSIVE = 5;
+
 const int ET_BOOST = 0;         // provides a constant, static boost to an actor's stats
                                 // effectId = statNumber, effectStrength = amount of boost
 const int ET_GIVE_ABILITY = 1;  // grants a specific ability as long as the source is equipped this ability may
@@ -131,6 +138,17 @@ struct MutationData {
                             // etc.) or 0 for "minor" muations that do not require a slot
     std::vector<EffectData> effects;
 };
+
+
+struct AbilityData {
+    unsigned ident;
+    std::string name, desc;
+    int energyCost;
+    int areaType;
+    int maxRange;
+    std::vector<EffectData> effects;
+};
+
 
 struct SpawnLine {
     int spawnGroup;
@@ -248,6 +266,7 @@ struct Actor {
     void applyMutation(MutationItem *mutation);
     void removeMutation(MutationItem *mutation);
     void applyStatus(StatusItem *statusItem);
+    std::vector<unsigned> getAbilityList() const;
 
     const ActorData &data;
     unsigned ident;
@@ -284,7 +303,7 @@ struct MapTile {
     Actor *actor;
     std::vector<Item*> items;
     int temperature;
-    bool isSeen, everSeen;
+    bool isSeen, everSeen, inFovCalc;
     int distanceValue;
 };
 
@@ -358,6 +377,10 @@ public:
     Actor* getNextActor();
     unsigned getHighestSpeedCounter() const;
     void tick(World &world);
+
+    void clearFovCalc();
+    std::vector<Coord> getEffectArea(const Coord &origin, const Coord &target, int areaType, int maxRange, bool includeWalls, bool includeOrigin);
+    void activateAbility(World &world, unsigned ident, const Coord &cursorPos, const std::vector<Coord> &targetArea);
 
     const DungeonData &data;
 private:
@@ -451,6 +474,7 @@ std::vector<unsigned char> readFileAsBinary(const std::string &filename);
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
 const MutationData& getRandomMutationData();
+const AbilityData& getAbilityData(unsigned ident);
 const MutationData& getMutationData(unsigned ident);
 const StatusData& getStatusData(unsigned ident);
 const TileData& getTileData(unsigned ident);
@@ -459,6 +483,8 @@ const DungeonData& getDungeonData(unsigned ident);
 
 std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target);
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
+void fovCalcBeam(Dungeon *dungeon, const Coord &origin, Direction dir, int maxRange);
+void fovCalcBurst(Dungeon *dungeon, const Coord &origin, int maxRange);
 std::vector<Coord> calcLine(const Dungeon &map, const Coord &start, const Coord &end, bool stopOpaque, bool stopSolid);
 void doMapgen(Dungeon &d);
 void spawnActors(Dungeon &d, bool forRefresh);

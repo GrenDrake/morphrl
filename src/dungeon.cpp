@@ -7,7 +7,7 @@
 
 
 MapTile::MapTile()
-: floor(0), actor(nullptr), temperature(0), isSeen(false), everSeen(false)
+: floor(0), actor(nullptr), temperature(0), isSeen(false), everSeen(false), inFovCalc(false)
 { }
 
 
@@ -540,6 +540,86 @@ void Dungeon::tick(World &world) {
             }
         }
     }
+}
+
+void Dungeon::clearFovCalc() {
+    for (int y = 0; y < MAP_HEIGHT; ++y) {
+        for (int x = 0; x < MAP_WIDTH; ++x) {
+            MapTile *tile = at(Coord(x, y));
+            if (tile) tile->inFovCalc = false;
+        }
+    }
+    return;
+}
+
+std::vector<Coord> Dungeon::getEffectArea(const Coord &origin, const Coord &target, int areaType, int maxRange, bool includeWalls, bool includeOrigin) {
+    std::vector<Coord> result;
+    if (areaType == AR_PASSIVE || areaType == AR_NONE) return result;
+    switch(areaType) {
+        case AR_CONE: {
+            Direction areaDirection = origin.directionTo(target);
+            clearFovCalc();
+            fovCalcBeam(this, origin, areaDirection, maxRange);
+            break; }
+        case AR_BURST:
+            clearFovCalc();
+            fovCalcBurst(this, origin, maxRange);
+            break;
+        case AR_LINE:
+            result = calcLine(*this, origin, target, true, true);
+            for (auto iter = result.begin(); iter != result.end(); ) {
+                if (!isValidPosition(*iter)) iter = result.erase(iter);
+                else if (!includeOrigin && *iter == origin) iter = result.erase(iter);
+                else {
+                    const MapTile *tile = at(*iter);
+                    if (getTileData(tile->floor).isOpaque) iter = result.erase(iter);
+                    else ++iter;
+                }
+            }
+            break;
+        default:
+            std::cerr << "Unhandled areaType in getEffectArea\n";
+    }
+
+    if (areaType == AR_CONE || areaType == AR_BURST) {
+        for (int y = 0; y < mHeight; ++y) {
+            for (int x = 0; x < mWidth; ++x) {
+                Coord here(x, y);
+                const MapTile *tile = at(here);
+                if (tile && tile->inFovCalc) {
+                    if (!includeOrigin && here == origin) continue;
+                    if (!includeWalls && getTileData(tile->floor).isOpaque) continue;
+                    result.push_back(here);
+                }
+            }
+        }
+    }
+    return result;
+}
+
+void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorPos, const std::vector<Coord> &targetArea) {
+    const AbilityData &data = getAbilityData(ident);
+    if (data.ident == BAD_VALUE) {
+        world.addMessage("Tried to use invalid ability");
+        return;
+    }
+    if (world.player->energy < data.energyCost) {
+        world.addMessage("You don't have enough energy to use your " + data.name + ".");
+        return;
+    }
+    world.player->energy -= data.energyCost;
+
+    std::vector<Actor*> targets;
+    std::string message = "You use your " + data.name + ". ";
+    for (const Coord &pos : targetArea) {
+        Actor *actor = actorAt(pos);
+        if (!actor) continue;
+
+        for (const EffectData &effect : data.effects) {
+            message += triggerEffect(world, effect, world.player, actor);
+        }
+    }
+    world.addMessage(message);
 }
 
 std::string makeItemList(const std::vector<Item*> &itemList, unsigned maxList) {

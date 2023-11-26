@@ -73,6 +73,9 @@ std::vector<StatusData> statusData;
 MutationData BAD_MUTATION{BAD_VALUE, "invalid"};
 std::vector<MutationData> mutationData;
 
+AbilityData BAD_ABILITY{BAD_VALUE, "invalid"};
+std::vector<AbilityData> abilityData;
+
 TileData BAD_TILE{BAD_VALUE, '?', "invalid"};
 std::vector<TileData> tileData;
 
@@ -137,6 +140,13 @@ const MutationData& getMutationData(unsigned ident) {
         if (data.ident == ident) return data;
     }
     return BAD_MUTATION;
+}
+
+const AbilityData& getAbilityData(unsigned ident) {
+    for (const AbilityData &data : abilityData) {
+        if (data.ident == ident) return data;
+    }
+    return BAD_ABILITY;
 }
 
 const MutationData& getRandomMutationData() {
@@ -478,7 +488,7 @@ std::vector<DataDef> mutationPropData{
 };
 bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
     if (!rawMutation || rawMutation->typeName != "@mutation") {
-        rawData.addError(Origin(), "processStatusData passed malformed data");
+        rawData.addError(Origin(), "processMutationData passed malformed data");
         return false;
     }
 
@@ -491,7 +501,7 @@ bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
     for (const DataProp &prop : rawMutation->props) {
         const DataDef &dataDef = getDataDef(mutationPropData, prop.name);
         if (dataDef.partCount == BAD_VALUE) {
-            rawData.addError(prop.origin, "unknown item property " + prop.name);
+            rawData.addError(prop.origin, "unknown mutation property " + prop.name);
         } else if (dataDef.partCount != prop.value.size()) {
             rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
                                           + " values, but found "
@@ -524,6 +534,69 @@ bool processMutationData(RawData &rawData, const DataTemp *rawMutation) {
         return false;
     } else {
         mutationData.push_back(resultData);
+        return true;
+    }
+}
+
+std::vector<DataDef> abilityPropData{
+    { "name",           1 },
+    { "description",    1 },
+    { "energyCost",     1 },
+    { "areaType",       1 },
+    { "maxRange",       1 },
+    { "effect",         5 },
+};
+bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
+    if (!rawAbility || rawAbility->typeName != "@ability") {
+        rawData.addError(Origin(), "processAbilityData passed malformed data");
+        return false;
+    }
+
+    AbilityData resultData;
+    resultData.name = "unknown";
+    resultData.energyCost = 0;
+    resultData.maxRange = 10;
+    resultData.areaType = AR_NONE;
+
+    resultData.ident = rawAbility->ident;
+    for (const DataProp &prop : rawAbility->props) {
+        const DataDef &dataDef = getDataDef(abilityPropData, prop.name);
+        if (dataDef.partCount == BAD_VALUE) {
+            rawData.addError(prop.origin, "unknown ability property " + prop.name);
+        } else if (dataDef.partCount != prop.value.size()) {
+            rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
+                                          + " values, but found "
+                                          + std::to_string(prop.value.size()));
+        } else {
+            if (prop.name == "name") {
+                resultData.name = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "description") {
+                resultData.desc = convertUnderscores(prop.value[0]);
+            } else if (prop.name == "energyCost") {
+                resultData.energyCost = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "areaType") {
+                resultData.areaType = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "maxRange") {
+                resultData.maxRange = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "effect") {
+                EffectData effectData;
+                effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);
+                effectData.effectChance = dataAsInt(rawData, prop.origin, prop.value[1]);
+                effectData.effectId = dataAsInt(rawData, prop.origin, prop.value[2]);
+                effectData.effectStrength = dataAsInt(rawData, prop.origin, prop.value[3]);
+                effectData.effectParam = dataAsInt(rawData, prop.origin, prop.value[4]);
+                resultData.effects.push_back(effectData);
+            } else {
+                rawData.addError(prop.origin, "unhandled property name " + prop.name);
+            }
+        }
+    }
+    const AbilityData &oldAbilityData = getAbilityData(resultData.ident);
+    if (oldAbilityData.ident == resultData.ident) {
+        rawData.addError(rawAbility->origin, "ability ident " + std::to_string(resultData.ident) + " already used");
+        return false;
+    } else {
+        abilityData.push_back(resultData);
         return true;
     }
 }
@@ -706,7 +779,7 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
     for (const DataProp &prop : rawDungeon->props) {
         const DataDef &dataDef = getDataDef(dungeonPropData, prop.name);
         if (dataDef.partCount == BAD_VALUE) {
-            rawData.addError(prop.origin, "unknown tile property " + prop.name);
+            rawData.addError(prop.origin, "unknown dungeon property " + prop.name);
         } else if (dataDef.partCount != prop.value.size()) {
             rawData.addError(prop.origin, "expected " + std::to_string(dataDef.partCount)
                                           + " values, but found "
@@ -768,7 +841,8 @@ bool loadAllData() {
         return false;
     }
 
-    int maxItem = 0, maxTile = 0, maxActor = 0, maxStatus = 0, maxDungeon = 0, maxMutation = 0;
+    int maxItem = 0, maxTile = 0, maxActor = 0, maxStatus = 0, maxDungeon = 0;
+    int maxAbility = 0, maxMutation = 0;
     for (const DataTemp *data : rawData.data) {
         if (!data) continue;
         if (data->typeName == "@define") {
@@ -782,6 +856,9 @@ bool loadAllData() {
         } else if (data->typeName == "@item") {
             if (maxItem < data->ident) maxItem = data->ident;
             processItemData(rawData, data);
+        } else if (data->typeName == "@ability") {
+            if (maxAbility < data->ident) maxAbility = data->ident;
+            processAbilityData(rawData, data);
         } else if (data->typeName == "@status") {
             if (maxStatus < data->ident) maxStatus = data->ident;
             processStatusData(rawData, data);
@@ -807,6 +884,7 @@ bool loadAllData() {
     std::cerr << "LOADED " << itemData.size() << " items (next ident: " << maxItem+1 << ")\n";
     std::cerr << "LOADED " << actorData.size() << " actors (next ident: " << maxActor+1 << ")\n";
     std::cerr << "LOADED " << statusData.size() << " status effects (next ident: " << maxStatus+1 << ")\n";
+    std::cerr << "LOADED " << abilityData.size() << " abilities (next ident: " << maxAbility+1 << ")\n";
     std::cerr << "LOADED " << mutationData.size() << " mutations (next ident: " << maxMutation+1 << ")\n";
     std::cerr << "LOADED " << dungeonData.size() << " dungeon levels (next ident: " << maxDungeon+1 << ")\n";
 

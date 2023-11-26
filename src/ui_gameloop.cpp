@@ -68,10 +68,79 @@ Direction keyToDirection(int key) {
     return Direction::Unknown;
 }
 
+void glyphAndColourForCoord(const World &world, const Coord &where, int &glyph, color_t &bkcolor, color_t &color) {
+    // const color_t hotZone = color_from_argb(255, 98, 32, 32);
+    // const color_t hotZoneDark = color_from_argb(255, 49, 16, 16);
+    // const color_t coldZone = color_from_argb(255, 0, 64, 64);
+    // const color_t coldZoneDark = color_from_argb(255, 0, 32, 32);
+    if (!world.map->isValidPosition(where)) {
+        color = color_from_argb(255, 192, 192, 192);
+        bkcolor = color_from_argb(255, 0, 0, 0);
+        glyph = ' ';
+        return;
+    }
+
+    const MapTile *tile = world.map->at(where);
+    const TileData &td = getTileData(tile->floor);
+    const Actor *actor = tile->actor;
+    const Item *item = tile->items.empty() ? nullptr : tile->items.front();
+
+    bkcolor = color_from_argb(255, 0, 0, 0);
+
+    // if we've never seen the space, don't show it
+    if (!world.disableFOV && !tile->everSeen) {
+        color = bkcolor;
+        glyph = ' ';
+        return;
+    }
+
+    // if we can currently see the space, show its content
+    if (world.disableFOV || tile->isSeen) {
+        if (actor) {
+            color = color_from_argb(255, actor->data.r, actor->data.g, actor->data.b);
+            glyph = actor->data.glyph;
+        } else if (item) {
+            color = color_from_argb(255, item->data.r, item->data.g, item->data.b);
+            glyph = item->data.glyph;
+        } else {
+            color = color_from_argb(255, td.r, td.g, td.b);
+            glyph = td.glyph;
+        }
+    // otherwise just show the terrain
+    } else {
+        color = color_from_argb(255, td.r / 2, td.g / 2, td.b / 2);
+        glyph = td.glyph;
+    }
+    return;
+}
+
+
+void drawStatBar(int x, int y, int amount, int maximum, color_t filledColour) {
+    const color_t depletedColour = color_from_argb(255, 127, 127, 127);
+    terminal_bkcolor(filledColour);
+    int fillPercent = 0;
+    if (amount < 1) fillPercent = 0;
+    else {
+        fillPercent = percentOf(amount, maximum) / 10;
+        if (fillPercent < 1) fillPercent = 1;
+    }
+
+    for (int i = 0; i < 10; ++i) {
+        if (i >= fillPercent) terminal_bkcolor(depletedColour);
+        terminal_put(x+i, y, ' ');
+    }
+}
+
+struct ListItem {
+    std::string name;
+    unsigned value;
+};
+
 enum class UIMode {
-    Normal, ExamineTile, ChooseDirection, ChooseTarget, PlayerDead
+    Normal, ExamineTile, ChooseDirection, ChooseTarget, PlayerDead, PickFromList
 };
 const int UI_DEBUG_TUNNEL = 10000;
+const int UI_USE_ABILITY  = 10001;
 void gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
@@ -79,18 +148,17 @@ void gameloop(World &world) {
     const color_t textColour = color_from_argb(255, 192, 192, 192);
     const color_t healthColour = color_from_argb(255, 255, 127, 127);
     const color_t energyColour = color_from_argb(255, 127, 127, 255);
-    const color_t depletedColour = color_from_argb(255, 127, 127, 127);
-    const color_t hotZone = color_from_argb(255, 98, 32, 32);
-    const color_t hotZoneDark = color_from_argb(255, 49, 16, 16);
-    const color_t coldZone = color_from_argb(255, 0, 64, 64);
-    const color_t coldZoneDark = color_from_argb(255, 0, 32, 32);
 
     std::string uiModeString;
     int uiModeAction = 0;
     UIMode uiMode = UIMode::Normal;
     Coord cursorPos(-1, -1);
     bool shownDeathMessage = false;
-    std::vector<Coord> targetLine;
+    std::vector<Coord> targetArea;
+    unsigned uiModeParam = 0;
+    int targetAreaType = AR_NONE;
+    int targetAreaRange = 0;
+    std::vector<ListItem> uiListOfThings;
     while (1) {
         world.player->verify();
         if (uiMode == UIMode::Normal && world.player->isDead()) {
@@ -130,137 +198,71 @@ void gameloop(World &world) {
             }
         } else if (uiMode == UIMode::ChooseTarget) {
             const std::string desc = previewMapSpace(world, cursorPos);
-            terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
+            terminal_print_ext(0, 21, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose target space or [color=yellow]Z[/color] to cancel");
         } else if (uiMode == UIMode::ChooseDirection) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose direction or [color=yellow]Z[/color] to cancel");
+        } else if (uiMode == UIMode::PickFromList) {
+            terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
+            int xPos = 0, yPos = 21, counter = 1;
+            for (unsigned i = 0; i < uiListOfThings.size(); ++i) {
+                terminal_printf(xPos, yPos, "%d) %s", counter, ucFirst(uiListOfThings[i].name).c_str());
+                ++yPos;
+                ++counter;
+            }
         } else {
             std::cerr << "Unsupported UIMode " << static_cast<int>(uiMode) << " in display\n";
         }
         terminal_clear_area(0, 0, 80, 20);
 
         // draw interface frame
-        for (int x = 0; x < 80; ++x) {
-            terminal_put(x, 19, 0x2500);
-        }
-        for (int y = 0; y < 19; ++y) {
-            terminal_put(60, y, 0x2502);
-        }
-        terminal_put(60, 19, 0x2534);
+        for (int x = 0; x < 80; ++x) terminal_put(x, 19, 0x2500);
 
         // draw map
         for (int y = 0; y < 19; ++y) {
-            for (int x = 0; x < 60; ++x) {
+            for (int x = 0; x < 80; ++x) {
                 Coord here(Coord(offsetX + x, offsetY + y));
+                color_t fgColor, bgColor;
+                int glyph;
+                glyphAndColourForCoord(world, here, glyph, bgColor, fgColor);
+
+                terminal_color(fgColor);
+                terminal_bkcolor(bgColor);
                 if (uiMode == UIMode::ExamineTile && here == cursorPos) {
                     terminal_bkcolor(cursorColour);
-                    terminal_put(x, y, ' ');
+                } else if (uiMode == UIMode::ChooseTarget) {
+                    if (here == cursorPos) {
+                        terminal_bkcolor(cursorColour);
+                    } else if (vectorContains(targetArea, here)) terminal_bkcolor(targetLineColour);
                 }
-                if (!world.map->isValidPosition(here)) continue;
-                const MapTile *tile = world.map->at(here);
-                const TileData &td = getTileData(world.map->floorAt(here));
-                bool isVisible = world.disableFOV || tile->isSeen;
-                Actor *actor = world.map->actorAt(here);
-                Item *item = world.map->itemAt(here);
-                if ((uiMode == UIMode::ExamineTile || uiMode == UIMode::ChooseTarget) && here == cursorPos) {
-                    ;
-                } else if (uiMode == UIMode::ChooseTarget && vectorContains(targetLine, here)) {
-                    terminal_bkcolor(targetLineColour);
-                } else if (td.isOpaque || tile->temperature == 0) {
-                    terminal_bkcolor(black);
-                } else if (tile->temperature < 0) {
-                    if (isVisible) terminal_bkcolor(coldZone);
-                    else           terminal_bkcolor(coldZoneDark);
-                } else { // if (tile->temperature > 0) {
-                    if (isVisible) terminal_bkcolor(hotZone);
-                    else           terminal_bkcolor(hotZoneDark);
-                }
-                if (uiMode == UIMode::ChooseTarget && here == cursorPos) {
-                    terminal_color(targetLineColour);
-                    terminal_bkcolor(cursorColour);
-                    terminal_put(x, y, '*');
-                } else if (!world.disableFOV && !tile->everSeen) {
-                    terminal_bkcolor(black);
-                    terminal_put(x, y, ' ');
-                } else if (isVisible && actor) {
-                    terminal_color(color_from_argb(255,
-                                                   actor->data.r,
-                                                   actor->data.g,
-                                                   actor->data.b));
-                    terminal_put(x, y, actor->data.glyph);
-                } else if (isVisible && item) {
-                    terminal_color(color_from_argb(255,
-                                                   item->data.r,
-                                                   item->data.g,
-                                                   item->data.b));
-                    terminal_put(x, y, item->data.glyph);
-                } else {
-                    if (isVisible) {
-                        terminal_color(color_from_argb(255, td.r, td.g, td.b));
-                    } else {
-                        terminal_color(color_from_argb(255, td.r / 2, td.g / 2, td.b / 2));
-                    }
-                    terminal_put(x, y, td.glyph);
-                }
+
+                terminal_put(x, y, glyph);
             }
         }
 
-        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
-        // health and energy
-        terminal_bkcolor(healthColour);
-        int healthPercent = 0;
-        if (world.player->health < 1) healthPercent = 0;
-        else {
-            healthPercent = percentOf(world.player->health,
-                                      world.player->getStat(STAT_HEALTH)) / 10;
-            if (world.player->health > 0 && healthPercent < 1) healthPercent = 1;
-        }
-        for (int i = 0; i < 10; ++i) {
-            if (i >= healthPercent) terminal_bkcolor(depletedColour);
-            terminal_put(61+i, 2, ' ');
-        }
-        terminal_bkcolor(energyColour);
-        int energyPercent = 0;
-        if (world.player->energy < 1) energyPercent = 0;
-        else {
-            energyPercent = percentOf(world.player->energy,
-                                      world.player->getStat(STAT_ENERGY)) / 10;
-            if (world.player->energy > 0 && energyPercent < 1) energyPercent = 1;
-        }
-        for (int i = 0; i < 10; ++i) {
-            if (i >= energyPercent) terminal_bkcolor(depletedColour);
-            terminal_put(61+i, 3, ' ');
-        }
-        terminal_bkcolor(black);
-
-        // player name & ID
-        terminal_color(textColour);
-        terminal_print(61, 0, "Player the Player");
+        // Health, energy, and level name info
         std::string healthLine = std::to_string(world.player->health) + "/"
                                + std::to_string(world.player->getStat(STAT_HEALTH));
         std::string energyLine = std::to_string(world.player->energy) + "/"
                                + std::to_string(world.player->getStat(STAT_ENERGY));
-        terminal_print(72, 2, healthLine.c_str());
-        terminal_print(72, 3, energyLine.c_str());
-
-        // stats
-        for (int i = 0; i < STAT_EXTRA_COUNT; ++i) {
-            int yPos = 5 + i;
-            if (i >= STAT_BASE_COUNT) ++yPos;
-            std::string text = statName(i) + ": " + std::to_string(world.player->getStat(i));
-            terminal_print(61, yPos, text.c_str());
-        }
+        drawStatBar( 4, 19, world.player->health, world.player->getStat(STAT_HEALTH), healthColour);
+        drawStatBar(23, 19, world.player->energy, world.player->getStat(STAT_ENERGY), energyColour);
+        terminal_color(textColour);
+        terminal_bkcolor(black);
+        terminal_print(15, 19, healthLine.c_str());
+        terminal_print(34, 19, energyLine.c_str());
+        terminal_print(79 - world.map->data.name.size(), 19, ucFirst(world.map->data.name).c_str());
 
         // (debug) position data
-        terminal_printf(61, 14, "Depth: %d", world.map->depth());
-        terminal_print(61, 15, ucFirst(world.map->data.name).c_str());
-        terminal_printf(61, 17, "Position: %d, %d", world.player->position.x, world.player->position.y);
-        terminal_print(61, 18, ("Turn: " + std::to_string(world.currentTurn) + " / " + std::to_string(world.player->speedCounter)).c_str());
+        terminal_printf(61, 0, "(%d, %d) Lv%d", world.player->position.x, world.player->position.y, world.map->depth());
+        terminal_printf(61, 1, "Turn: %u / %u", world.currentTurn, world.player->speedCounter);
 
         terminal_refresh();
 
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // INPUT HANDLING
         int key = terminal_read();
         if (key == TK_CLOSE)    break;
         if (uiMode == UIMode::PlayerDead) {
@@ -277,6 +279,47 @@ void gameloop(World &world) {
                 uiMode = UIMode::Normal;
                 shownDeathMessage = false;
                 world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
+            }
+        } else if (uiMode == UIMode::PickFromList) {
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            int choice = -1;
+            if (key == TK_1 && uiListOfThings.size() >= 1) choice = 0;
+            if (key == TK_2 && uiListOfThings.size() >= 2) choice = 1;
+            if (key == TK_3 && uiListOfThings.size() >= 3) choice = 2;
+            if (key == TK_4 && uiListOfThings.size() >= 4) choice = 3;
+            if (key == TK_5 && uiListOfThings.size() >= 5) choice = 4;
+            if (key == TK_6 && uiListOfThings.size() >= 6) choice = 5;
+            if (key == TK_7 && uiListOfThings.size() >= 7) choice = 6;
+            if (key == TK_8 && uiListOfThings.size() >= 8) choice = 7;
+            if (key == TK_9 && uiListOfThings.size() >= 9) choice = 8;
+            if (key == TK_0 && uiListOfThings.size() >= 10) choice = 9;
+            if (uiModeAction != UI_USE_ABILITY) {
+                world.addMessage("Unhandled action in UIMode::PickFromList");
+                continue;
+            }
+            if (choice >= 0) {
+                uiMode = UIMode::Normal;
+                unsigned ident = uiListOfThings[choice].value;
+                if (ident == BAD_VALUE) continue;
+                const AbilityData &data = getAbilityData(ident);
+                if (data.ident == BAD_VALUE) {
+                    world.addMessage("Tried to use invalid ability");
+                } else {
+                    if (data.areaType == AR_NONE || data.areaType == AR_BURST) {
+                        targetArea = world.map->getEffectArea(world.player->position, world.player->position, data.areaType, data.maxRange, false, false);
+                        world.map->activateAbility(world, data.ident, world.player->position, targetArea);
+                    } else {
+                        cursorPos = world.player->position;
+                        targetAreaRange = data.maxRange;
+                        targetAreaType = data.areaType;
+                        uiModeParam = ident;
+                        uiMode = UIMode::ChooseTarget;
+                        uiModeString = "Choose target for " + data.name + ".";
+                        targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
+                    }
+                }
             }
         } else if (uiMode == UIMode::Normal) {
             if (key == TK_ESCAPE)   break;
@@ -302,13 +345,32 @@ void gameloop(World &world) {
                     }
             }
 
+            if (key == TK_A) {
+                std::vector<unsigned> abilityList = world.player->getAbilityList();
+                if (abilityList.empty()) {
+                    world.addMessage("You have no special abilities.");
+                } else {
+                    uiListOfThings.clear();
+                    for (unsigned i : abilityList) {
+                        const AbilityData &data = getAbilityData(i);
+                        if (data.areaType == AR_PASSIVE) continue;
+                        if (data.energyCost <= world.player->energy) {
+                            std::string optionName = data.name + " (" + std::to_string(data.energyCost) + ")";
+                            uiListOfThings.push_back(ListItem{optionName, data.ident});
+                        }
+                    }
+                    if (uiListOfThings.empty()) {
+                        world.addMessage("You have no abilities you can use right now.");
+                    } else {
+                        uiListOfThings.push_back(ListItem{"Cancel", BAD_VALUE});
+                        uiMode = UIMode::PickFromList;
+                        uiModeAction = UI_USE_ABILITY;
+                        uiModeString = "Use which ability?";
+                    }
+                }
+            }
             if (key == TK_I)        doInventory(world, false);
             if (key == TK_C)        doCharInfo(world);
-            if (key == TK_T) {
-                uiMode = UIMode::ChooseTarget;
-                if (cursorPos.x < 0) cursorPos = world.player->position;
-                targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
-            }
             if (key == TK_X) {
                 uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;
@@ -423,6 +485,9 @@ void gameloop(World &world) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
             }
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
             if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
                 uiMode = UIMode::Normal;
                 const MapTile *tile = world.map->at(cursorPos);
@@ -439,7 +504,7 @@ void gameloop(World &world) {
                 if (mx < 60 && my < 20) {
                     cursorPos.x = mx + offsetX;
                     cursorPos.y = my + offsetY;
-                    targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
+                    targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
                 }
             }
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
@@ -448,15 +513,17 @@ void gameloop(World &world) {
             if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
                 uiMode = UIMode::Normal;
                 // DO THE THING
-                std::cerr << cursorPos << '\n';
-                world.addMessage("Targetted ");
-                // const MapTile *tile = world.map->at(cursorPos);
-                // if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
+                if (uiModeAction == UI_USE_ABILITY) {
+                    world.map->activateAbility(world, uiModeParam, cursorPos, targetArea);
+                    world.tick();
+                } else {
+                    world.addMessage("ERROR unhandled ui action in UIMode::ChooseTarget");
+                }
             }
             Direction theDir = keyToDirection(key);
             if (theDir != Direction::Unknown) {
                 cursorPos = cursorPos.shift(theDir);
-                targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
+                targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
             }
         } else if (uiMode == UIMode::ChooseDirection) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {

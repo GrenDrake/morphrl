@@ -342,6 +342,20 @@ void Actor::applyStatus(StatusItem *statusItem) {
     statusEffects.push_back(statusItem);
 }
 
+void addAbilitiesFromEffects(const std::vector<EffectData> &effects, std::vector<unsigned> &result) {
+    for (const EffectData &e : effects) {
+        if (e.trigger != ET_GIVE_ABILITY) continue;
+        result.push_back(e.effectId);
+    }
+}
+std::vector<unsigned> Actor::getAbilityList() const {
+    std::vector<unsigned> result;
+    for (const MutationItem *mutation : mutations) {
+        addAbilitiesFromEffects(mutation->data.effects, result);
+    }
+    return result;
+}
+
 
 std::string statName(int statNumber) {
     switch(statNumber) {

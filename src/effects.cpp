@@ -14,21 +14,21 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
 
     switch (effect.effectId) {
         case EFFECT_HEALING: {
-            int amount = effect.effectStrength * user->getStat(STAT_HEALTH) / 100;
+            int amount = effect.effectStrength * target->getStat(STAT_HEALTH) / 100;
             if (amount < 1) amount = 1;
-            user->takeDamage(-amount);
+            target->takeDamage(-amount);
             return "Received " + std::to_string(amount) + " healing. "; }
         case EFFECT_DAMAGE: {
-            user->takeDamage(effect.effectStrength);
-            std::string message = ucFirst(user->getName(true)) + " took "
+            target->takeDamage(effect.effectStrength);
+            std::string message = ucFirst(target->getName(true)) + " took "
                     + std::to_string(effect.effectStrength) + " damage. ";
-            if (user->isDead()) {
-                if (user->isPlayer) {
+            if (target->isDead()) {
+                if (target->isPlayer) {
                     message += "You [color=red]die[/color]. ";
                 } else {
                     std::vector<Item*> drops;
-                    for (Item *item : user->inventory) drops.push_back(item);
-                    user->dropAllItems();
+                    for (Item *item : target->inventory) drops.push_back(item);
+                    target->dropAllItems();
                     message += "They [color=red]die[/color] and drop " + makeItemList(drops, 4) + ". ";
                 }
             }
@@ -40,14 +40,14 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
                 return "";
             } else {
                 StatusItem *statusItem = new StatusItem(statusData);
-                user->applyStatus(statusItem);
+                target->applyStatus(statusItem);
                 return "You are now effected by [color=yellow]" + statusData.name + "[/color]. ";
             }
             break; }
         case EFFECT_MUTATE: {
             const MutationData &data = getRandomMutationData();
-            if (!user->hasMutation(data.ident)) {
-                user->applyMutation(new MutationItem(data));
+            if (!target->hasMutation(data.ident)) {
+                target->applyMutation(new MutationItem(data));
                 return "You mutate, " + data.gainVerb + " " + data.name + "! ";
             } else {
                 return "";
