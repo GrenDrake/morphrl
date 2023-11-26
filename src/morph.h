@@ -406,6 +406,15 @@ struct Document {
     std::vector<DocumentImage> images;
 };
 
+template<class T>
+bool vectorContains(std::vector<T> &v, T item) {
+    for (const T &iter : v) {
+        if (iter == item) return true;
+    }
+    return false;
+}
+
+
 int percentOf(int percent, int ofValue);
 std::string ucFirst(std::string text);
 std::vector<std::string> explode(const std::string &text, char onChar);
@@ -450,6 +459,7 @@ const DungeonData& getDungeonData(unsigned ident);
 
 std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target);
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
+std::vector<Coord> calcLine(const Dungeon &map, const Coord &start, const Coord &end, bool stopOpaque, bool stopSolid);
 void doMapgen(Dungeon &d);
 void spawnActors(Dungeon &d, bool forRefresh);
 

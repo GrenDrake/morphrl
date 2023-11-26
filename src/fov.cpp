@@ -30,3 +30,56 @@ void handlePlayerFOV(Dungeon *dungeon, Actor *player) {
 }
 
 
+static bool lineShouldStop(const Dungeon &map, const Coord &where, bool stopOpaque, bool stopSolid) {
+    if (!map.isValidPosition(where)) return true;
+    int tile = map.floorAt(where);
+    const TileData &td = getTileData(tile);
+    if (stopOpaque && td.isOpaque) return true;
+    if (stopSolid && !td.isPassable) return true;
+    return false;
+    
+}
+std::vector<Coord> calcLine(const Dungeon &map, const Coord &start, const Coord &end, bool stopOpaque, bool stopSolid) {
+    std::vector<Coord> results;
+    
+    int dx = end.x - start.x;
+    signed char const ix = (dx > 0) - (dx < 0);
+    dx = abs(dx) << 1;
+    
+    int dy = end.y - start.y;
+    signed char iy = (dy > 0) - (dy < 0);
+    dy = abs(dy) << 1;
+    
+    results.push_back(start);
+    
+    Coord pos = start;
+    if (dx > dy) {
+        int error = dy - (dx >> 1);
+        if (pos.x != end.x) while (1) {
+            if ((error > 0) || (!error && (ix > 0))) {
+                error -= dx;
+                pos.y += iy;
+            }
+            error += dy;
+            pos.x += ix;
+            results.push_back(pos);
+            if (lineShouldStop(map, pos, stopOpaque, stopSolid)) break;
+        }
+    } else {
+        int error(dx - (dy >> 1));
+        if (pos.y != end.y) while (1) {
+            if ((error > 0) || (!error && (iy > 0))) {
+                error -= dy;
+                pos.x += ix;
+            }
+            error += dx;
+            pos.y += iy;
+            results.push_back(pos);
+            if (lineShouldStop(map, pos, stopOpaque, stopSolid)) break;
+        }
+    }
+    
+    return results;
+}
+
+

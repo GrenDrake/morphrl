@@ -69,12 +69,13 @@ Direction keyToDirection(int key) {
 }
 
 enum class UIMode {
-    Normal, ExamineTile, ChooseDirection, PlayerDead
+    Normal, ExamineTile, ChooseDirection, ChooseTarget, PlayerDead
 };
 const int UI_DEBUG_TUNNEL = 10000;
 void gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
+    const color_t targetLineColour = color_from_argb(255, 63, 63, 63);
     const color_t textColour = color_from_argb(255, 192, 192, 192);
     const color_t healthColour = color_from_argb(255, 255, 127, 127);
     const color_t energyColour = color_from_argb(255, 127, 127, 255);
@@ -87,8 +88,9 @@ void gameloop(World &world) {
     std::string uiModeString;
     int uiModeAction = 0;
     UIMode uiMode = UIMode::Normal;
-    Coord cursorPos;
+    Coord cursorPos(-1, -1);
     bool shownDeathMessage = false;
+    std::vector<Coord> targetLine;
     while (1) {
         world.player->verify();
         if (uiMode == UIMode::Normal && world.player->isDead()) {
@@ -126,6 +128,11 @@ void gameloop(World &world) {
             } else {
                 terminal_print(0, 24, "[color=yellow]X[/color] to finish");
             }
+        } else if (uiMode == UIMode::ChooseTarget) {
+            const std::string desc = previewMapSpace(world, cursorPos);
+            terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
+            terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
+            terminal_print(0, 24, "Choose target space or [color=yellow]Z[/color] to cancel");
         } else if (uiMode == UIMode::ChooseDirection) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose direction or [color=yellow]Z[/color] to cancel");
@@ -154,12 +161,13 @@ void gameloop(World &world) {
                 if (!world.map->isValidPosition(here)) continue;
                 const MapTile *tile = world.map->at(here);
                 const TileData &td = getTileData(world.map->floorAt(here));
-                if (!world.disableFOV && !tile->everSeen) continue;
                 bool isVisible = world.disableFOV || tile->isSeen;
                 Actor *actor = world.map->actorAt(here);
                 Item *item = world.map->itemAt(here);
-                if (uiMode == UIMode::ExamineTile && here == cursorPos) {
+                if ((uiMode == UIMode::ExamineTile || uiMode == UIMode::ChooseTarget) && here == cursorPos) {
                     ;
+                } else if (uiMode == UIMode::ChooseTarget && vectorContains(targetLine, here)) {
+                    terminal_bkcolor(targetLineColour);
                 } else if (td.isOpaque || tile->temperature == 0) {
                     terminal_bkcolor(black);
                 } else if (tile->temperature < 0) {
@@ -169,7 +177,14 @@ void gameloop(World &world) {
                     if (isVisible) terminal_bkcolor(hotZone);
                     else           terminal_bkcolor(hotZoneDark);
                 }
-                if (isVisible && actor) {
+                if (uiMode == UIMode::ChooseTarget && here == cursorPos) {
+                    terminal_color(targetLineColour);
+                    terminal_bkcolor(cursorColour);
+                    terminal_put(x, y, '*');
+                } else if (!world.disableFOV && !tile->everSeen) {
+                    terminal_bkcolor(black);
+                    terminal_put(x, y, ' ');
+                } else if (isVisible && actor) {
                     terminal_color(color_from_argb(255,
                                                    actor->data.r,
                                                    actor->data.g,
@@ -289,6 +304,11 @@ void gameloop(World &world) {
 
             if (key == TK_I)        doInventory(world, false);
             if (key == TK_C)        doCharInfo(world);
+            if (key == TK_T) {
+                uiMode = UIMode::ChooseTarget;
+                if (cursorPos.x < 0) cursorPos = world.player->position;
+                targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
+            }
             if (key == TK_X) {
                 uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;
@@ -411,6 +431,32 @@ void gameloop(World &world) {
             Direction theDir = keyToDirection(key);
             if (theDir != Direction::Unknown) {
                 cursorPos = cursorPos.shift(theDir);
+            }
+        } else if (uiMode == UIMode::ChooseTarget) {
+            if (key == TK_MOUSE_LEFT) {
+                int mx = terminal_state(TK_MOUSE_X);
+                int my = terminal_state(TK_MOUSE_Y);
+                if (mx < 60 && my < 20) {
+                    cursorPos.x = mx + offsetX;
+                    cursorPos.y = my + offsetY;
+                    targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
+                }
+            }
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
+                uiMode = UIMode::Normal;
+                // DO THE THING
+                std::cerr << cursorPos << '\n';
+                world.addMessage("Targetted ");
+                // const MapTile *tile = world.map->at(cursorPos);
+                // if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
+            }
+            Direction theDir = keyToDirection(key);
+            if (theDir != Direction::Unknown) {
+                cursorPos = cursorPos.shift(theDir);
+                targetLine = calcLine(*world.map, world.player->position, cursorPos, true, true);
             }
         } else if (uiMode == UIMode::ChooseDirection) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
