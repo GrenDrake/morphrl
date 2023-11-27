@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
     terminal_set("font: DejaVuSansMono.ttf, size=24;");
     terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
 
-    const int menuItemCount = 6;
+    const int menuItemCount = 7;
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
     const std::string versionString = "Development Release 1";
@@ -103,12 +103,14 @@ int main(int argc, char *argv[]) {
         mouseRegions.push_back(UIRect{8, 18, 20, 1, 2});
         terminal_print(8, 19, "Story");
         mouseRegions.push_back(UIRect{8, 19, 20, 1, 3});
-        terminal_print(8, 20, "Credits");
+        terminal_print(8, 20, "Instructions");
         mouseRegions.push_back(UIRect{8, 20, 20, 1, 4});
-        terminal_print(8, 21, "Quit");
+        terminal_print(8, 21, "Credits");
         mouseRegions.push_back(UIRect{8, 21, 20, 1, 5});
-        terminal_print(8, 22, "Data Codex ([color=yellow]DEBUG[/color])");
+        terminal_print(8, 22, "Quit");
         mouseRegions.push_back(UIRect{8, 22, 20, 1, 6});
+        terminal_print(8, 23, "Data Codex ([color=yellow]DEBUG[/color])");
+        mouseRegions.push_back(UIRect{8, 23, 20, 1, 7});
         terminal_print(5, 16+selection, "->");
         terminal_color(fgColorDark);
         terminal_print(31, 12, "Pre-Alpha Release");
@@ -180,14 +182,16 @@ int main(int argc, char *argv[]) {
                     showDocument("story.txt");
                     break;
                 case 4:
-                    showDocument("credits.txt");
+                    showDocument("instructions.txt");
                     break;
                 case 5:
-                    // quit
+                    showDocument("credits.txt");
+                    break;
+                case 6: // quit
                     done = true;
                     break;
 
-                case 6:
+                case 7:
                     doDebugCodex();
                     break;
             }

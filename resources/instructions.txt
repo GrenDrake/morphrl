@@ -1,0 +1,47 @@
+
+The goal of MorphRL is to delve into a randomly generated dungeon in pursuit of
+one of the pieces of ethereal ore located on the very bottom floor. You begin
+with very little equipment and are opposed by a range of monsters, and by the
+transformative nature of the dungeon itself.
+
+You can at any point press the escape key to leave the current game menu, or to
+return to the main menu if a game is in progress. [color=red]Beware[/color], however! MorphRL
+currently does [color=red]not[/color] support saving, so if you quit before finishing a run, you
+will not be able to resume it.
+
+Movement through the dungeon is straight-forward. You character is represented
+by the [color=#7FFF7F]@[/color] symbol and you can move around using the numeric keypad. The arrow
+keys also work, but do not allow for diagonal movement.
+Many rooms and corridors are separated by doors; you       Floor -> [color=#FFFFFF]..[color=#A52A2A]+[/color] <- door
+canmove freely through these, but they’ll block your         you -> [color=#7FFF7F]@[color=#FFFFFF].[color=#7F7F7F]#[/color] <- wall
+line-of-sight until you step into them. When you’re       goblin -> [color=#FF7F7F]g[color=#FFFFFF].[color=#7F7F7F]/[/color] <- item
+standing on a staircase (‘[color=yellow]<[/color]’ or ‘[color=yellow]>[/color]’), you can press    up stairs -> [color=#FFFFFF]<..[/color]
+the period or comma keys to climb up and down them.
+
+You can access your character sheet with the ‘[color=yellow]c[/color]’ key and view and use your
+inventory with ‘[color=yellow]i[/color]’. You can see a log of all past messages by pressing ‘[color=yellow]l[/color]’. If
+you press ‘[color=yellow]x[/color]’ you can move the cursor around the dungeon to see exactly what is
+occupying any given space.
+
+Engaging in combat with the monsters of the dungeon (represented by the letters
+of the alphabet) is performed by trying to move into their space. This will
+automatically cause you to perform a melee attack. But be careful! The monsters
+are going to try and do the same thing to you.
+
+Various items can be found throughout the dungeon; they’re typically
+represented by non-alphanumeric symbols. The majority of these will be useful
+to you (especially the ethereal ore that you’re trying to recover!). If there’s
+an item on the space you’re standing on, you can press ‘[color=yellow]g[/color]’ to pick it up. If
+multiple items are present, this will take you to a screen allowing you to pick
+which items you want to take. Be careful of taking too much, though! If you try
+and carry too much, you’ll become overburdened and unable to move.
+
+Once you’ve been in the dungeon long enough, you may start to acquire
+mutations. These can give you new abilities, or effect your stats. On the other
+hand, some have no effect at all.
+
+Any abilities you’ve gained can be activated by pressing ‘[color=yellow]a[/color]’. They offer access
+to more powerful attacks and special abilities you cannot otherwise use, but be
+careful when using them as abilities cost energy to activate, so you can only
+use them so much.
+
