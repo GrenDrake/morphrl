@@ -270,6 +270,7 @@ struct Actor {
     void dropAllItems();
     bool tryEquipItem(Item *item);
     int getTalismanCount() const;
+    bool hasVictoryArtifact() const;
     const Item* getCurrentWeapon() const;
     std::string triggerOnHitEffects(Actor *target);
     AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
@@ -413,6 +414,9 @@ struct LogMessage {
     std::string text;
 };
 
+enum class GameState {
+    Normal, Victory
+};
 class World {
 public:
     World();
@@ -426,6 +430,7 @@ public:
     bool disableFOV;
     uint64_t gameSeed;
     bool showCombatMath;
+    GameState gameState;
 
     Dungeon* getDungeon(int depth);
     bool movePlayerToDepth(int newDepth, int enterFrom);

@@ -615,6 +615,7 @@ std::vector<DataDef> itemPropData{
     { "damage",         2 },
     { "effect",         5 },
     { "consumeChance",  1 },
+    { "isVictoryArtifact", 0 },
 };
 bool processItemData(RawData &rawData, const DataTemp *rawItem) {
     if (!rawItem || rawItem->typeName != "@item") {
@@ -631,6 +632,7 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
     resultData.minDamage = 0;
     resultData.maxDamage = 0;
     resultData.consumeChance = 0;
+    resultData.isVictoryArtifact = false;
 
     resultData.ident = rawItem->ident;
     for (const DataProp &prop : rawItem->props) {
@@ -663,6 +665,8 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
                 resultData.maxDamage = dataAsInt(rawData, prop.origin, prop.value[1]);
             } else if (prop.name == "consumeChance") {
                 resultData.consumeChance = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "isVictoryArtifact") {
+                resultData.isVictoryArtifact = true;
             } else if (prop.name == "effect") {
                 EffectData effectData;
                 effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);

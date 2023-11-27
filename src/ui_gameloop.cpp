@@ -160,6 +160,11 @@ void gameloop(World &world) {
     int targetAreaRange = 0;
     std::vector<ListItem> uiListOfThings;
     while (1) {
+        if (world.gameState == GameState::Victory) {
+            showDocument("ending.txt");
+            return;
+        }
+
         world.player->verify();
         if (uiMode == UIMode::Normal && world.player->isDead()) {
             uiMode = UIMode::PlayerDead;

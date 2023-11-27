@@ -158,12 +158,20 @@ int main(int argc, char *argv[]) {
                         ui_alertBox("Error", "Could not create game world.");
                     } else {
                         gameloop(*world);
+                        if (world->gameState == GameState::Victory) {
+                            delete world;
+                            world = nullptr;
+                        }
                         selection = 2;
                     }
                     break; }
                 case 2:
                     if (world) {
                         gameloop(*world);
+                        if (world->gameState == GameState::Victory) {
+                            delete world;
+                            world = nullptr;
+                        }
                     } else {
                         ui_alertBox("Error", "No game in progress.");
                     }

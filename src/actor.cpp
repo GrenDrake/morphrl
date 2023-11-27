@@ -281,6 +281,13 @@ int Actor::getTalismanCount() const {
     return count;
 }
 
+bool Actor::hasVictoryArtifact() const {
+    for (const Item *item : inventory) {
+        if (item && item->data.isVictoryArtifact) return true;
+    }
+    return false;
+}
+
 static std::vector<Item*> unarmedWeapons;
 const Item* Actor::getCurrentWeapon() const {
     // first check if the actor is wielding a weapon; if so, just return that one

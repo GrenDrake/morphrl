@@ -1,0 +1,21 @@
+
+
+
+
+
+
+
+You have managed to escape the mutagenic dungeons with the vital ethereal ore!
+
+
+Thanks to your efforts, the barrier protecting the city of Sanctuary can be
+reinforced, allowing it's residents to live in peace and without transformative
+winds for another generation.
+
+
+Thanks for playing! I hope you enjoyed the game. If you want to leave feedback,
+you can do so on the game's itch.io page:
+
+  * https://grendrake.itch.io/morphrl
+
+@image ending1.png 0 0
