@@ -207,12 +207,17 @@ unsigned Dungeon::toPosition(const Coord &where) const {
 }
 
 
+int Dungeon::distanceAt(const Coord &where) const {
+    const MapTile *tile = at(where);
+    if (!tile) return -1;
+    return tile->distanceValue;
+}
+
 int Dungeon::floorAt(const Coord &where) const {
     const MapTile *tile = at(where);
     if (!tile) return TILE_UNASSIGNED;
     return tile->floor;
 }
-
 
 void Dungeon::floorAt(const Coord &where, int toTile) {
     MapTile *tile = at(where);

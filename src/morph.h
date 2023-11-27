@@ -360,6 +360,7 @@ public:
     bool isValidPosition(const Coord &where) const;
     unsigned toPosition(const Coord &where) const;
 
+    int distanceAt(const Coord &where) const;
     int floorAt(const Coord &where) const;
     void floorAt(const Coord &where, int toTile);
     const MapTile* at(const Coord &where) const;

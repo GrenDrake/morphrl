@@ -19,14 +19,38 @@ Dungeon* World::getDungeon(int depth) {
         std::cerr << "Failed to find dungeon for depth " << depth << '\n';
         return nullptr;
     }
-    Dungeon *newMap = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
-    if (!newMap) return nullptr;
+    int iteration = -1;
     auto oldSeed = globalRNG.getState();
-    globalRNG.seed(gameSeed + dungeonData.ident);
-    doMapgen(*newMap);
-    globalRNG.seed(oldSeed);
-    levels.push_back(newMap);
-    return newMap;
+    while (1) {
+        ++iteration;
+        Dungeon *newMap = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
+        if (!newMap) return nullptr;
+        globalRNG.seed(gameSeed + dungeonData.ident + iteration);
+        doMapgen(*newMap);
+        // verify map connectivity
+        Coord entrance = newMap->firstOfTile(TILE_GRASS);
+        Coord downStair = newMap->firstOfTile(TILE_STAIR_DOWN);
+        Coord upStair = newMap->firstOfTile(TILE_STAIR_UP);
+        Coord startPos = entrance;
+        if (startPos.x < 0) startPos = downStair;
+        if (startPos.x < 0) startPos = upStair;
+        if (startPos.x < 0) {
+            std::cerr << "ERROR  Failed to find entrance, or up or down stair\n";
+            continue;
+        }
+        newMap->calcDistances(startPos);
+        // ensure all exits are accessable
+        if ( (entrance.x >= 0 && newMap->distanceAt(entrance) < 0) ||
+             (upStair.x >= 0 && newMap->distanceAt(upStair) < 0) ||
+             (downStair.x >= 0 && newMap->distanceAt(downStair) < 0) ) {
+            std::cerr << "ERROR  map connectivity failed\n";
+            continue;
+        }
+
+        globalRNG.seed(oldSeed);
+        levels.push_back(newMap);
+        return newMap;
+    }
 }
 
 bool World::movePlayerToDepth(int newDepth, int enterFrom) {
