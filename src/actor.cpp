@@ -284,13 +284,18 @@ const Item* Actor::getCurrentWeapon() const {
 }
 
 
-AttackData Actor::meleeAttack(Actor *target) {
+AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     AttackData data;
-    data.weapon = getCurrentWeapon();
-    if (data.weapon == nullptr) {
-        data.errorMessage = "Weapon was nullptr";
+    data.weapon = weapon;
+    if (!target) {
+        data.errorMessage = "meleeAttackWithWeapon: target was nullptr";
         return data;
     }
+    if (data.weapon == nullptr) {
+        data.errorMessage = "meleeAttackWithWeapon: Weapon was nullptr";
+        return data;
+    }
+
     data.roll = 1 + globalRNG.upto(20);
     data.toHit = getStat(STAT_TO_HIT);
     data.evasion = target->getStat(STAT_EVASION);
@@ -308,6 +313,10 @@ AttackData Actor::meleeAttack(Actor *target) {
         }
     }
     return data;
+}
+
+AttackData Actor::meleeAttack(Actor *target) {
+    return meleeAttackWithWeapon(target, getCurrentWeapon());
 }
 
 void Actor::advanceSpeedCounter() {

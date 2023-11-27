@@ -266,6 +266,7 @@ struct Actor {
     bool tryEquipItem(Item *item);
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
+    AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
     AttackData meleeAttack(Actor *target);
     void advanceSpeedCounter();
     MutationItem* mutationForSlot(unsigned slotNumber);
