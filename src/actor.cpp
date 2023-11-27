@@ -404,6 +404,7 @@ void Actor::applyMutation(MutationItem *mutation) {
     if (mutation->data.slot != 0) {
         MutationItem *old = mutationForSlot(mutation->data.slot);
         if (old) removeMutation(old);
+        delete old;
     }
     mutations.push_back(mutation);
     std::sort(mutations.begin(), mutations.end(), mutationSort);
@@ -422,6 +423,13 @@ void Actor::removeMutation(MutationItem *mutation) {
 
 void Actor::applyStatus(StatusItem *statusItem) {
     statusEffects.push_back(statusItem);
+}
+
+bool Actor::hasStatus(unsigned statusIdent) const {
+    for (const StatusItem *status : statusEffects) {
+        if (status && status->data.ident == statusIdent) return true;
+    }
+    return false;
 }
 
 void addAbilitiesFromEffects(const std::vector<EffectData> &effects, std::vector<unsigned> &result) {

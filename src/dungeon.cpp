@@ -475,6 +475,7 @@ void Dungeon::tick(World &world) {
                 statusIter = actor->statusEffects.erase(statusIter);
                 if (actor->isPlayer) {
                     if (actor->isPlayer) msg << "Your " << status->data.name << " fades. ";
+                    else msg << ucFirst(actor->getName(true)) + "'s " << status->data.name << " fades. ";
                 }
             } else ++statusIter;
         }
@@ -487,10 +488,12 @@ void Dungeon::tick(World &world) {
                 }
             }
         }
-        if (actor->isPlayer) {
-            const std::string &text = msg.str();
-            if (!text.empty()) world.addMessage(text);
-        }
+        int energyToRecover = actor->getStat(STAT_ENERGY) / 20;
+        if (energyToRecover < 1) energyToRecover = 1;
+        actor->spendEnergy(-energyToRecover);
+
+        const std::string &text = msg.str();
+        if (!text.empty()) world.addMessage(text);
 
         actor->verify();
         if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
@@ -498,7 +501,7 @@ void Dungeon::tick(World &world) {
             ++turnCount;
             clearDeadActors();
             return; // skip player
-        }
+        } else
 
         actor->advanceSpeedCounter();
         const MapTile *tile = at(actor->position);

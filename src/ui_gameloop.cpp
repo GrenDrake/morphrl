@@ -310,6 +310,9 @@ void gameloop(World &world) {
                     if (data.areaType == AR_NONE || data.areaType == AR_BURST) {
                         targetArea = world.map->getEffectArea(world.player->position, world.player->position, data.areaType, data.maxRange, false, false);
                         world.map->activateAbility(world, data.ident, world.player->position, targetArea);
+                        world.player->advanceSpeedCounter();
+                        world.player->advanceSpeedCounter();
+                        world.tick();
                     } else {
                         cursorPos = world.player->position;
                         targetAreaRange = data.maxRange;
@@ -518,6 +521,8 @@ void gameloop(World &world) {
                 // DO THE THING
                 if (uiModeAction == UI_USE_ABILITY) {
                     world.map->activateAbility(world, uiModeParam, cursorPos, targetArea);
+                    world.player->advanceSpeedCounter();
+                    world.player->advanceSpeedCounter();
                     world.tick();
                 } else {
                     world.addMessage("ERROR unhandled ui action in UIMode::ChooseTarget");

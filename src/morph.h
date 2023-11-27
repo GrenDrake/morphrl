@@ -279,6 +279,7 @@ struct Actor {
     void applyMutation(MutationItem *mutation);
     void removeMutation(MutationItem *mutation);
     void applyStatus(StatusItem *statusItem);
+    bool hasStatus(unsigned statusIdent) const;
     std::vector<unsigned> getAbilityList() const;
 
     const ActorData &data;

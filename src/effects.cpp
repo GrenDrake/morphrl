@@ -34,20 +34,39 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             }
             return message; }
         case EFFECT_APPLY_STATUS: {
+            if (target->hasStatus(effect.effectStrength)) return ""; // prevent stacking status effects
             const StatusData &statusData = getStatusData(effect.effectStrength);
             if (statusData.ident == BAD_VALUE) {
                 std::cerr << "ERROR: Tried to apply invalid status " << effect.effectStrength << '\n';
                 return "";
             } else {
+                std::string message;
+                if (statusData.resistDC < 1000) {
+                    int roll = globalRNG.upto(20);
+                    int stat = target->getStat(STAT_TOUGHNESS);
+                    message = "[[" + std::to_string(roll) + "+" + std::to_string(stat);
+                    message += " vs " + std::to_string(statusData.resistDC) + "]] ";
+                    if (roll + stat >= statusData.resistDC) { // effect was resisted
+                        message += ucFirst(target->getName(true)) + " resisted the ";
+                        message += statusData.name + " effect. ";
+                        return message;
+                    }
+                }
                 StatusItem *statusItem = new StatusItem(statusData);
                 target->applyStatus(statusItem);
-                std::string message;
                 if (target->isPlayer) message = "You are";
                 else message = ucFirst(target->getName(true)) + " is";
                 message += " now effected by [color=yellow]" + statusData.name + "[/color]. ";
                 return message;
             }
             break; }
+        case EFFECT_PURIFY: {
+            unsigned index = globalRNG.upto(target->mutations.size());
+            MutationItem *which = target->mutations[index];
+            target->removeMutation(which);
+            std::string message = "You no longer have " + which->data.name + ". ";
+            delete which;
+            return message; }
         case EFFECT_MUTATE: {
             const MutationData &data = getRandomMutationData();
             if (!target->hasMutation(data.ident)) {
@@ -109,6 +128,9 @@ std::string EffectData::toString() const {
             break;
         case EFFECT_MUTATE:
             text += "mutate the user";
+            break;
+        case EFFECT_PURIFY:
+            text += "removes a mutation";
             break;
         case EFFECT_APPLY_STATUS: {
             const StatusData &statusData = getStatusData(effectStrength);
