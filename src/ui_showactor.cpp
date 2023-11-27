@@ -17,7 +17,7 @@ void showActorInfo(World &world, const Actor *actor) {
 
     Image *actorArt = nullptr;
     if (!actor->data.artFile.empty()) {
-        actorArt = loadImage("resources/" + actor->data.artFile);
+        actorArt = loadImage(actor->data.artFile);
     }
 
     bool done = false;
