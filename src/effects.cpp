@@ -17,11 +17,12 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             int amount = effect.effectStrength * target->getStat(STAT_HEALTH) / 100;
             if (amount < 1) amount = 1;
             target->takeDamage(-amount);
-            return "Received " + std::to_string(amount) + " healing. "; }
+            return "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] received [color=green]" + std::to_string(amount) + "[/color] healing. ";
+            }
         case EFFECT_DAMAGE: {
             target->takeDamage(effect.effectStrength);
-            std::string message = ucFirst(target->getName(true)) + " took "
-                    + std::to_string(effect.effectStrength) + " damage. ";
+            std::string message = "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] took [color=red]"
+                    + std::to_string(effect.effectStrength) + "[/color] damage. ";
             if (target->isDead()) {
                 if (target->isPlayer) {
                     message += "You [color=red]die[/color]. ";
@@ -47,15 +48,15 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
                     message = "[[" + std::to_string(roll) + "+" + std::to_string(stat);
                     message += " vs " + std::to_string(statusData.resistDC) + "]] ";
                     if (roll + stat >= statusData.resistDC) { // effect was resisted
-                        message += ucFirst(target->getName(true)) + " resisted the ";
-                        message += statusData.name + " effect. ";
+                        message += "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] resisted the [color=yellow]";
+                        message += statusData.name + "[/color] effect. ";
                         return message;
                     }
                 }
                 StatusItem *statusItem = new StatusItem(statusData);
                 target->applyStatus(statusItem);
-                if (target->isPlayer) message = "You are";
-                else message = ucFirst(target->getName(true)) + " is";
+                if (target->isPlayer) message = "[color=yellow]You[/color] are";
+                else message = "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] is";
                 message += " now effected by [color=yellow]" + statusData.name + "[/color]. ";
                 return message;
             }
@@ -64,14 +65,14 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             unsigned index = globalRNG.upto(target->mutations.size());
             MutationItem *which = target->mutations[index];
             target->removeMutation(which);
-            std::string message = "You no longer have " + which->data.name + ". ";
+            std::string message = "[color=yellow]You[/color] no longer have [color=yellow]" + which->data.name + "[/color]. ";
             delete which;
             return message; }
         case EFFECT_MUTATE: {
             const MutationData &data = getRandomMutationData();
             if (!target->hasMutation(data.ident)) {
                 target->applyMutation(new MutationItem(data));
-                return "You mutate, " + data.gainVerb + " " + data.name + "! ";
+                return "[color=yellow]You[/color] mutate, " + data.gainVerb + " [color=yellow]" + data.name + "[/color]! ";
             } else {
                 return "";
             }

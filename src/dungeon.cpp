@@ -480,7 +480,7 @@ void Dungeon::tick(World &world) {
             if (status->duration >= status->data.maxDuration) {
                 statusIter = actor->statusEffects.erase(statusIter);
                 if (actor->isPlayer) {
-                    if (actor->isPlayer) msg << "Your " << status->data.name << " fades. ";
+                    if (actor->isPlayer) msg << "Your [color=yellow]" << status->data.name << "[/color] fades. ";
                     else msg << ucFirst(actor->getName(true)) + "'s " << status->data.name << " fades. ";
                 }
             } else ++statusIter;
@@ -602,7 +602,7 @@ void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorP
     world.player->energy -= data.energyCost;
 
     std::vector<Actor*> targets;
-    std::string message = "You use your " + data.name + ". ";
+    std::string message = "[color=yellow]You[/color] use your [color=yellow]" + data.name + "[/color]. ";
     if (data.areaType == AR_NONE) {
         for (const EffectData &effect : data.effects) {
             message += triggerEffect(effect, world.player, world.player);

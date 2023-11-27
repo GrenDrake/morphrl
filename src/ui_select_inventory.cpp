@@ -12,7 +12,7 @@ void activateItem(World &world, Item *item, Actor *user) {
     if (user->isDead()) return;
     if (user == world.player)   msg << "Used ";
     else                        msg << ucFirst(user->getName()) << " used ";
-    msg << "[color=yellow]" << item->getName() << "[/color]: ";
+    msg << "[color=yellow]" << item->getName() << "[/color]. ";
 
     for (const EffectData &data : item->data.effects) {
         if (data.trigger != ET_ON_USE) continue;
