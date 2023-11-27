@@ -24,7 +24,7 @@ const int DE_DOWNSTAIRS = 2;
 
 const int RT_GENERIC = 0;
 const int RT_ENTRANCE = 1;
-const int RT_STAIR = 1;
+const int RT_STAIR = 2;
 
 const int TILE_UNASSIGNED = 0;
 const int TILE_WALL = 1;
@@ -191,6 +191,7 @@ struct ItemData {
     int bulk;
     int minDamage, maxDamage;
     int consumeChance;
+    bool isVictoryArtifact;
     std::vector<EffectData> effects;
 };
 
