@@ -1,5 +1,5 @@
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
-# Actor defs
+# The player
 
 @actor ACTOR_PLAYER 0
     glyph           @
@@ -11,19 +11,18 @@
     base_speed      0
     base_toughness  0
     item            0 100 ITM_POTION_LESSER_HEALING
-    item            0 100 ITM_POTION_LESSER_MUTATION
-    item            1 50 ITM_SWORD
-    item            1 99 ITM_DAGGER
-    item            2 33 ITM_TALIS_EVASION
-    item            2 33 ITM_TALIS_HEALTH
-    item            2 99 ITM_TALIS_ENERGY
-    item            0 100 ITM_POTION_POISON
-    item            0 100 ITM_POTION_RAGE
+    item            0 100 ITM_DAGGER
+
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Level 1
 
 @actor ACTOR_GOBLIN 1
     glyph           g
     name            goblin
+    description     These_squat_humanoids_are_the_descendants_of_those_who_could_not_escape_the_accursed_transformative_winds._Their_bodies_are_still_superficially_human,_but_with_strange,_twisted_features_that_have_left_them_quite_frail.
     artfile         goblin.png
+    baseLevel       1
     colour          255 127 127
     base_strength   -2
     base_agility    -3
@@ -38,22 +37,29 @@
 @actor ACTOR_KOBOLD 2
     glyph           k
     name            kobold
+    description     Short,_reptilian_humanoids_with_a_penchant_for_pragmatism_and_industry._While_the_first_kobolds_were_those_caught_outside,_they_were_fortunate_enough_to_be_able_to_retreat_into_mines_and_other_underground_structures.
     artfile         kobold.png
+    baseLevel       1
     colour          255 127 127
     base_strength   -3
     base_agility    -1
     base_speed      -2
     base_toughness  -3
     item            0 25 ITM_POTION_LESSER_HEALING
-    item            1 33 ITM_SWORD
-    item            1 33 ITM_DAGGER
+    item            1 50 ITM_SWORD
+    item            1 99 ITM_DAGGER
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
+    mutation        0 100 MUT_DECORATIVE_TAIL
+    mutation        0 100 MUT_SHARP_CLAWS
+    mutation        0 100 MUT_DECORATIVE_HORNS
 
 @actor ACTOR_HOBGOBLIN 3
     glyph           h
     name            hobgoblin
-    artfile         orc.png
+    description     The_larger,_more_dangerous_kin_of_goblins,_hobgoblins_still_retain_the_twisted_features_are_their_weaker_kin,_but_lack_the_frailty._This_has_resulted_in_them_becoming_the_leaders_of_goblin_society,_keeping_order_through_violence._Even_in_the_best_of_circumstances,_they_are_not_known_for_their_pleasant_personalities.
+    artfile         hobgoblin.png
+    baseLevel       2
     colour          255 127 127
     base_strength   -1
     base_agility    -1
@@ -61,13 +67,52 @@
     base_toughness  -1
     item            0 100 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_SWORD
-    item            2 33 ITM_TALIS_EVASION
-    item            2 33 ITM_TALIS_HEALTH
+    item            0 50 ITM_TALIS_EVASION
+    item            0 50 ITM_TALIS_HEALTH
+
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Level 2
+
+@actor ACTOR_SKELETON 6
+    glyph           s
+    name            skeleton
+    description     The_remains_of_fallen_adventurers_and_other_unfortunates,_risen_up_to_new_life_due_to_the_strange_magics_that_have_pervaded_the_world_since_the_Great_War._They_serve_as_a_grim_reminder_of_the_importance_of_your_quest.
+    artfile         skeleton.png
+    baseLevel       2
+    colour          255 127 127
+    base_strength   0
+    base_agility    0
+    base_speed      -2
+    base_toughness  0
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+
+@actor ACTOR_ZOMBIE 7
+    glyph           z
+    name            zombie
+    description     The_remains_of_the_fallen,_brought_to_new_life_by_the_dark_magics_pervading_the_world_since_the_Great_War._Unlike_their_more_skeletal_kin,_zombies_got_a_much_stronger_dose_of_magic,_slowing_the_decay_of_their_rotting_flesh.
+    artfile         zombie.png
+    baseLevel       2
+    colour          255 127 127
+    base_strength   0
+    base_agility    -4
+    base_speed      -2
+    base_toughness  2
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+
+# reuses chaos beast as rare enemy
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Level 3
 
 @actor ACTOR_ORC 4
     glyph           o
     name            orc
+    description     Orcish_ancestors_were_mostly_able_to_avoid_having_their_bodies_twisted_during_the_Great_War._In_the_chaos_that_resulted,_they_turned_to_raiding_and_forcing_the_less_capable_to_serve_them._Not_all_modern_orcs_are_raiders,_but_enough_are_that_the_stereotype_has_stuck_quite_firmly_to_them.
     artfile         orc.png
+    baseLevel       3
     colour          255 127 127
     base_strength   -1
     base_agility    -1
@@ -78,33 +123,79 @@
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
 
+
+@actor ACTOR_CHAOSBEAST 8
+    glyph           b
+    name            chaos_beast
+    description     The_wildlife_of_the_world_was_not_spared_by_the_forces_unleashed_by_the_Great_War,_and_these_“chaos_beasts”_are_the_result._Powerful,_animalistic_creatures_that_look_like_nothing_so_much_as_the_result_of_combining_a_dozen_or_more_different_creatures._Their_chimeric_nature_leaves_them_with_unpredictable_temperaments_and_abilities.
+    artfile         chaos_beast.png
+    baseLevel       3
+    colour          255 127 127
+    base_strength   -1
+    base_agility    -1
+    base_speed      -2
+    base_toughness  -1
+    mutation        0 100 MUT_QUADRUPED
+    mutation        1 50 MUT_SHARP_CLAWS
+    mutation        1 99 MUT_POISON_CLAWS
+    mutation        2 16 MUT_BAT_WINGS
+    mutation        2 16 MUT_BIRD_WINGS
+    mutation        3 33 MUT_FUR
+    mutation        3 33 MUT_SCALES
+    mutation        3 99 MUT_FEATHERS
+    mutation        4 30 MUT_WHIP_TAIL
+    mutation        4 30 MUT_DECORATIVE_TAIL
+    mutation        4 30 MUT_BASHING_TAIL
+    mutation        5 30 MUT_GORING_HORNS
+    mutation        5 30 MUT_DECORATIVE_HORNS
+    mutation        5 30 MUT_RAMMING_HORNS
+    mutation        6 33 MUT_SMALL
+    mutation        6 33 MUT_LARGE
+
 @actor ACTOR_TROLL 5
     glyph           t
     name            troll
+    description     Large_brutish_humanoids_covered_with_shaggy_fur_and_short_tufted_tails,_trolls_are_best_known_for_their_constantly_regenerating_health._Despite_their_fearsome_appearance,_they’re_quite_intelligent_and_many_become_valued_members_of_civilized_society._Others,_such_as_the_ones_you_might_find_lurking_in_the_depths_of_a_dungeon,_instead_turn_to_taking_what_they_want_with_force.
     artfile         troll.png
+    baseLevel       4
     colour          255 127 127
-    base_strength   1
+    base_strength   6
     base_agility    -2
     base_speed      -2
     base_toughness  1
+    item            1 16 ITM_SWORD
+    item            1 16 ITM_DAGGER
+    mutation        0 100 MUT_REGENERATION
+    mutation        0 100 MUT_FUR
+    mutation        0 100 MUT_SHARP_CLAWS
+    mutation        0 100 MUT_DECORATIVE_TAIL
+    mutation        0 100 MUT_DECORATIVE_HORNS
 
-@actor ACTOR_SKELETON 6
-    glyph           s
-    name            skeleton
-    artfile         skeleton.png
-    colour          255 127 127
-    base_strength   0
-    base_agility    0
-    base_speed      -2
-    base_toughness  0
 
-@actor ACTOR_ZOMBIE 7
-    glyph           z
-    name            zombie
-    artfile         zombie.png
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Level 4
+
+@actor ACTOR_DEMON 9
+    glyph           d
+    name            demon
+    description     Fearsome_creatures_created_entirely_from_the_dark_magic_used_during_the_Great_War,_demons_are_terrible_to_behold,_and_worse_to_deal_with._They_are,_by_nature,_selfish_and_amoral,_viewing_others_as_tools_to_be_used_to_their_own_ends,_though_they_can_be_surprisingly_generous_with_those_they’ve_claimed_as_their_own._While_not_all_demons_are_evil,_enough_are_that_few_are_willing_to_give_them_the_benefit_of_the_doubt,_especially_given_the_power_that_demons_can_wield.
+    artfile         demon.png
+    baseLevel       5
     colour          255 127 127
-    base_strength   0
-    base_agility    -4
+    base_strength   6
+    base_agility    -2
     base_speed      -2
-    base_toughness  2
+    base_toughness  1
+    item            1 33 ITM_SWORD
+    item            1 33 ITM_DAGGER
+    mutation        0 100 MUT_BAT_WINGS
+    mutation        0 100 MUT_TALONS
+    mutation        3 33 MUT_FUR
+    mutation        3 33 MUT_SCALES
+    mutation        4 30 MUT_WHIP_TAIL
+    mutation        4 30 MUT_DECORATIVE_TAIL
+    mutation        4 30 MUT_BASHING_TAIL
+    mutation        5 33 MUT_GORING_HORNS
+    mutation        5 33 MUT_DECORATIVE_HORNS
+    mutation        5 99 MUT_RAMMING_HORNS
 
