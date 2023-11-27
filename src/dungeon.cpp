@@ -461,6 +461,7 @@ void Dungeon::tick(World &world) {
         while (statusIter != actor->statusEffects.end()) {
             StatusItem *status = *statusIter;
             ++status->duration;
+            if (status->duration <= 1) continue; // don't apply status conditions on the first turn they're received
 
             for (const EffectData &effect : status->data.effects) {
                 if (effect.trigger != ET_ON_TICK) continue;
@@ -597,12 +598,18 @@ void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorP
 
     std::vector<Actor*> targets;
     std::string message = "You use your " + data.name + ". ";
-    for (const Coord &pos : targetArea) {
-        Actor *actor = actorAt(pos);
-        if (!actor) continue;
-
+    if (data.areaType == AR_NONE) {
         for (const EffectData &effect : data.effects) {
-            message += triggerEffect(effect, world.player, actor);
+            message += triggerEffect(effect, world.player, world.player);
+        }
+    } else {
+        for (const Coord &pos : targetArea) {
+            Actor *actor = actorAt(pos);
+            if (!actor) continue;
+
+            for (const EffectData &effect : data.effects) {
+                message += triggerEffect(effect, world.player, actor);
+            }
         }
     }
     world.addMessage(message);
