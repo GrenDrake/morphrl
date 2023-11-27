@@ -4,7 +4,7 @@
 
 #include "morph.h"
 
-std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target) {
+std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) {
     if (!user) {
         std::cerr << "Tried to trigger effect with no user.\n";
         return "";
@@ -41,7 +41,11 @@ std::string triggerEffect(World &world, const EffectData &effect, Actor *user, A
             } else {
                 StatusItem *statusItem = new StatusItem(statusData);
                 target->applyStatus(statusItem);
-                return "You are now effected by [color=yellow]" + statusData.name + "[/color]. ";
+                std::string message;
+                if (target->isPlayer) message = "You are";
+                else message = ucFirst(target->getName(true)) + " is";
+                message += " now effected by [color=yellow]" + statusData.name + "[/color]. ";
+                return message;
             }
             break; }
         case EFFECT_MUTATE: {
@@ -67,11 +71,18 @@ std::string EffectData::toString() const {
         else text += "[color=red]";
         text += std::to_string(effectStrength) + "[/color] " + statName(effectId);
         return text;
+    } else if (trigger == ET_UNARMED_ATTACK) {
+        const ItemData &itemData = getItemData(effectId);
+        std::string text = "unarmed attack [color=yellow]";
+        if (itemData.ident == BAD_VALUE) text += "invalid item #" + std::to_string(effectId);
+        else text += itemData.name;
+        text += "[/color]";
+        return text;
     }
 
     std::string text;
     switch(trigger) {
-        case ET_GIVE_ABILITY: // grant special ability
+        case ET_GIVE_ABILITY:
             text += "gives ability: ";
             break;
         case ET_ON_HIT:
@@ -90,6 +101,9 @@ std::string EffectData::toString() const {
         text += "[color=cyan]" + std::to_string(effectChance) + "[/color]% chance to ";
     }
     switch(effectId) {
+        case EFFECT_DAMAGE:
+            text += "cause [color=red]" + std::to_string(effectStrength) + "[/color] damage";
+            break;
         case EFFECT_HEALING:
             text += "heal for [color=cyan]" + std::to_string(effectStrength) + "[/color]%";
             break;

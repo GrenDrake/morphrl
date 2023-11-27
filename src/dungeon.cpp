@@ -464,7 +464,7 @@ void Dungeon::tick(World &world) {
 
             for (const EffectData &effect : status->data.effects) {
                 if (effect.trigger != ET_ON_TICK) continue;
-                std::string resultString = triggerEffect(world, effect, actor, nullptr);
+                std::string resultString = triggerEffect(effect, actor, nullptr);
                 if (!resultString.empty()) {
                     msg << resultString;
                 }
@@ -481,7 +481,7 @@ void Dungeon::tick(World &world) {
         for (const MutationItem *mutationItem : actor->mutations) {
             for (const EffectData &effect : mutationItem->data.effects) {
                 if (effect.trigger != ET_ON_TICK) continue;
-                std::string resultString = triggerEffect(world, effect, actor, nullptr);
+                std::string resultString = triggerEffect(effect, actor, nullptr);
                 if (!resultString.empty()) {
                     msg << resultString;
                 }
@@ -506,24 +506,7 @@ void Dungeon::tick(World &world) {
             double dist = actor->position.distanceTo(world.player->position);
             if (dist < 2) {
                 AttackData attackData = actor->meleeAttack(world.player);
-                std::stringstream s;
-                s << "[color=yellow]" << ucFirst(actor->getName(true));
-                s << "[/color] attacks [color=yellow]you[/color] with their [color=yellow]";
-                if (attackData.weapon) s << attackData.weapon->data.name;
-                else s << "(nullptr weapon)";
-                s << "[/color]. (" << attackData.roll << '+' << attackData.toHit;
-                s << " vs " << attackData.evasion << ") ";
-                if (attackData.roll + attackData.toHit > attackData.evasion) {
-                    s << "you take [color=red]";
-                    s << attackData.damage << "[/color] damage";
-                    if (world.player->isDead()) {
-                        s << " and [color=red]die[/color]!";
-                    } else s << '.';
-                    world.addMessage(s.str());
-                } else {
-                    s << "[color=red]Miss[/color]!";
-                    world.addMessage(s.str());
-                }
+                world.addMessage(buildCombatMessage(actor, world.player, attackData, world.showCombatMath));
             } else {
                 actor->playerLastSeenPosition = world.player->position;
                 Direction dirToPlayer = actor->position.directionTo(world.player->position);
@@ -616,7 +599,7 @@ void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorP
         if (!actor) continue;
 
         for (const EffectData &effect : data.effects) {
-            message += triggerEffect(world, effect, world.player, actor);
+            message += triggerEffect(effect, world.player, actor);
         }
     }
     world.addMessage(message);

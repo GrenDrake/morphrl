@@ -16,7 +16,7 @@ void activateItem(World &world, Item *item, Actor *user) {
 
     for (const EffectData &data : item->data.effects) {
         if (data.trigger != ET_ON_USE) continue;
-        std::string result = triggerEffect(world, data, user, nullptr);
+        std::string result = triggerEffect(data, user, nullptr);
         if (!result.empty()) {
             msg << result;
             didEffect = true;

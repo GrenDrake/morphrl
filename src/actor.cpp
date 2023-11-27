@@ -132,6 +132,15 @@ int Actor::getStatMutationBonus(int statNumber) const {
             }
         }
     }
+    // add the bonus from any mutation-granted unarmed attack
+    const Item *weapon = getCurrentWeapon();
+    if (!weapon || weapon->isEquipped) return bonus;
+    for (const EffectData &data : weapon->data.effects) {
+        if (data.trigger != ET_BOOST) continue;
+        if (data.effectId == statNumber) {
+            bonus += data.effectStrength;
+        }
+    }
     return bonus;
 }
 
@@ -272,17 +281,56 @@ int Actor::getTalismanCount() const {
     return count;
 }
 
-static Item *fistsWeapon = nullptr;
+static std::vector<Item*> unarmedWeapons;
 const Item* Actor::getCurrentWeapon() const {
+    // first check if the actor is wielding a weapon; if so, just return that one
     for (const Item *item : inventory) {
         if (item && item->data.type == ItemData::Weapon && item->isEquipped) {
             return item;
         }
     }
-    if (!fistsWeapon) fistsWeapon = new Item(getItemData(SIN_FISTS));
-    return fistsWeapon;
+
+    // check for any mutation granted unarmed attacks
+    unsigned weaponIdent = BAD_VALUE;
+    for (const MutationItem *mutation : mutations) {
+        for (const EffectData &data : mutation->data.effects) {
+            if (data.trigger == ET_UNARMED_ATTACK) {
+                weaponIdent = data.effectId;
+            }
+        }
+    }
+    // otherwise just use the generic fists weapon
+    if (weaponIdent == BAD_VALUE) weaponIdent = SIN_FISTS;
+
+    // retrieve (or create) and return the item for this weapon
+    for (Item *item : unarmedWeapons) {
+        if (item && item->data.ident == weaponIdent) return item;
+    }
+    Item *newWeapon = new Item(getItemData(weaponIdent));
+    unarmedWeapons.push_back(newWeapon);
+    return newWeapon;
 }
 
+std::string Actor::triggerOnHitEffects(Actor *target) {
+    std::string result;
+    const Item *weapon = getCurrentWeapon();
+    if (weapon && !weapon->isEquipped) {
+        for (const EffectData &data : weapon->data.effects) {
+            if (data.trigger == ET_ON_HIT) {
+                result += triggerEffect(data, this, target);
+            }
+        }
+    }
+    for (const Item *item : inventory) {
+        if (!item || !item->isEquipped) continue;
+        for (const EffectData &data : item->data.effects) {
+            if (data.trigger == ET_ON_HIT) {
+                result += triggerEffect(data, this, target);
+            }
+        }
+    }
+    return result;
+}
 
 AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     AttackData data;
@@ -292,7 +340,7 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         return data;
     }
     if (data.weapon == nullptr) {
-        data.errorMessage = "meleeAttackWithWeapon: Weapon was nullptr";
+        data.errorMessage = "meleeAttackWithWeapon: weapon was nullptr";
         return data;
     }
 
@@ -303,7 +351,10 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
         if (damageRange < 1) damageRange = 1;
         data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
+        data.damage += getStat(STAT_DAMAGE_BONUS);
+        if (data.damage < 1) data.damage = 1;
         target->takeDamage(data.damage);
+        data.effectsMessage = triggerOnHitEffects(target);
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
@@ -399,6 +450,7 @@ std::string statName(int statNumber) {
         case STAT_TO_HIT:       return "to hit bonus";
         case STAT_EVASION:      return "evasion";
         case STAT_BULK_MAX:     return "max bulk";
+        case STAT_DAMAGE_BONUS: return "damage bonus";
         case STAT_BULK:         return "bulk";
         default: return "unknown stat " + std::to_string(statNumber);
     }

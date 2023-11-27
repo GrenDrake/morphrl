@@ -6,6 +6,40 @@
 
 void doInventory(World &world, bool showFloor);
 
+std::string buildCombatMessage(Actor *attacker, Actor *victim, const AttackData &attackData, bool showCalc) {
+    std::stringstream s;
+    if (attacker->isPlayer) s << "[color=yellow]You[/color] attack [color=yellow]";
+    else                    s << "[color=yellow]" << ucFirst(attacker->getName(true)) << "[/color] attacks [color=yellow]";
+    s << victim->getName() << "[/color] with ";
+    if (attacker->isPlayer) s << "your";
+    else s << "their";
+    s << " [color=yellow]";
+    if (attackData.weapon) s << attackData.weapon->data.name;
+    else s << "(nullptr weapon)";
+    s << "[/color]. ";
+
+    if (showCalc) {
+        s << "[[attack " << attackData.roll << '+' << attackData.toHit;
+        s << " vs evasion " << attackData.evasion << "]] ";
+    }
+
+    if (attackData.roll + attackData.toHit > attackData.evasion) {
+        if (victim->isPlayer) s << "You take [color=red]";
+        else s << ucFirst(victim->getName(true)) << " takes [color=red]";
+        s << attackData.damage << "[/color] damage. ";
+        s << attackData.effectsMessage;
+        if (victim->isDead()) {
+            s << (victim->isPlayer ? "You" : "They");
+            s << " [color=red]die[/color]! ";
+        }
+        if (!attackData.drops.empty()) {
+            s << "They drop " << makeItemList(attackData.drops, 4) << ". ";
+        }
+    } else {
+        s << "[color=red]Miss[/color]! ";
+    }
+    return s.str();
+}
 
 void tryMeleeAttack(World &world, Direction dir) {
     Actor *actor = world.map->actorAt(world.player->position.shift(dir));
@@ -15,28 +49,7 @@ void tryMeleeAttack(World &world, Direction dir) {
     }
 
     AttackData attackData = world.player->meleeAttack(actor);
-    std::stringstream s;
-    s << "[color=yellow]You[/color] attack [color=yellow]";
-    s << actor->getName() << "[/color] with your [color=yellow]";
-    if (attackData.weapon) s << attackData.weapon->data.name;
-    else s << "(nullptr weapon)";
-    s << "[/color]. (" << attackData.roll << '+' << attackData.toHit;
-    s << " vs " << attackData.evasion << ") ";
-    if (attackData.roll + attackData.toHit > attackData.evasion) {
-        s << ucFirst(actor->getName(true)) << " takes [color=red]";
-        s << attackData.damage << "[/color] damage";
-        if (actor->isDead()) {
-            s << " and [color=red]dies[/color]";
-        }
-        s << '!';
-        if (!attackData.drops.empty()) {
-            s << " They drop " << makeItemList(attackData.drops, 4) << '.';
-        }
-        world.addMessage(s.str());
-    } else {
-        s << "[color=red]Miss[/color]!";
-        world.addMessage(s.str());
-    }
+    world.addMessage(buildCombatMessage(world.player, actor, attackData, world.showCombatMath));
     world.player->advanceSpeedCounter();
     world.tick();
 }

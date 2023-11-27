@@ -2,7 +2,7 @@
 #include "morph.h"
 
 World::World()
-: map(nullptr), currentTurn(0), disableFOV(false)
+: map(nullptr), currentTurn(0), disableFOV(false), showCombatMath(true)
 { }
 
 World::~World() {

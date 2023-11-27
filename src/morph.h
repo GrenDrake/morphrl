@@ -51,6 +51,7 @@ const int ET_GIVE_ABILITY = 1;  // grants a specific ability as long as the sour
 const int ET_ON_HIT = 2;        // triggers a special effect every time the actor makes a successful attack
 const int ET_ON_USE = 3;        // triggers a special effect when the item is used from the inventory (item may be destroyed)
 const int ET_ON_TICK = 4;       // triggers a special effect at the end of the actor's turn, every turn
+const int ET_UNARMED_ATTACK = 5;
 
 const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
@@ -65,14 +66,16 @@ const int STAT_BULK_MAX     = 6;
 const int STAT_EXTRA_COUNT  = 7;
 const int STAT_HEALTH       = 7;
 const int STAT_ENERGY       = 8;
-const int STAT_BULK         = 9;
-const int STAT_ALL_COUNT    = 10;
+const int STAT_DAMAGE_BONUS = 9;
+const int STAT_BULK         = 10;
+const int STAT_ALL_COUNT    = 11;
 
 
 const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
 const int EFFECT_DAMAGE     = 1; // take damage - strength = amount
 const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
 const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
+const int EFFECT_ATTACK     = 4;
 const int EFFECT_APPLY_STATUS = 6;
 
 const int XP_PER_LEVEL      = 100;
@@ -223,6 +226,7 @@ struct AttackData {
     int damage;
     const Item *weapon;
     std::vector<Item*> drops;
+    std::string effectsMessage;
     std::string errorMessage;
 };
 
@@ -266,6 +270,7 @@ struct Actor {
     bool tryEquipItem(Item *item);
     int getTalismanCount() const;
     const Item* getCurrentWeapon() const;
+    std::string triggerOnHitEffects(Actor *target);
     AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
     AttackData meleeAttack(Actor *target);
     void advanceSpeedCounter();
@@ -418,6 +423,7 @@ public:
     std::vector<Dungeon*> levels;
     bool disableFOV;
     uint64_t gameSeed;
+    bool showCombatMath;
 
     Dungeon* getDungeon(int depth);
     bool movePlayerToDepth(int newDepth, int enterFrom);
@@ -491,7 +497,8 @@ const TileData& getTileData(unsigned ident);
 unsigned getDungeonEntranceIdent();
 const DungeonData& getDungeonData(unsigned ident);
 
-std::string triggerEffect(World &world, const EffectData &effect, Actor *user, Actor *target);
+std::string buildCombatMessage(Actor *attacker, Actor *victim, const AttackData &attackData, bool showCalc);
+std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target);
 void handlePlayerFOV(Dungeon *dungeon, Actor *player);
 void fovCalcBeam(Dungeon *dungeon, const Coord &origin, Direction dir, int maxRange);
 void fovCalcBurst(Dungeon *dungeon, const Coord &origin, int maxRange);
