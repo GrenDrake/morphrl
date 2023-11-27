@@ -62,6 +62,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             }
             break; }
         case EFFECT_PURIFY: {
+            if (target->mutations.empty()) return ""; // no mutations to remove
             unsigned index = globalRNG.upto(target->mutations.size());
             MutationItem *which = target->mutations[index];
             target->removeMutation(which);

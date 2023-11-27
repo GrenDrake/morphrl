@@ -24,7 +24,7 @@ void activateItem(World &world, Item *item, Actor *user) {
     }
 
     if (!didEffect) {
-        msg << "no effect. ";
+        msg << "Nothing happens. ";
     }
     int roll = globalRNG.upto(100);
     if (item->data.consumeChance > roll) {
