@@ -51,3 +51,11 @@
     colour          255 255 255
     isPassable
     isUpStair
+
+@tile TILE_GRASS 8
+    glyph           ,
+    name            grass
+    description     A_patch_of_grass_that's_managed_to_survive_the_conditions_of_the_dungeon.
+    colour          196 255 196
+    isPassable
+    preventActorSpawns

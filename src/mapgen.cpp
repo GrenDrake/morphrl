@@ -140,7 +140,8 @@ void addDoorToRoom(Dungeon &d, Room &room) {
         while (d.isValidPosition(p) && d.floorAt(p) != TILE_WALL) {
             p = p.shift(dir);
         }
-        if (d.floorAt(p.shift(dir)) == TILE_FLOOR) {
+        int targetFloor = d.floorAt(p.shift(dir));
+        if (targetFloor == TILE_FLOOR || targetFloor == TILE_GRASS) {
             d.floorAt(p, TILE_DOOR);
             isValid = true;
         }
@@ -174,7 +175,10 @@ void setupRooms(Dungeon &d) {
             for (int y = 0; y < room.h; ++y) {
                 for (int x = 0; x < room.w; ++x) {
                     MapTile *tile = d.at(Coord(x + room.x, y + room.y));
-                    if (tile) tile->temperature = 0;
+                    if (tile) {
+                        tile->temperature = 0;
+                        if (tile->floor == TILE_FLOOR) tile->floor = TILE_GRASS;
+                    }
                 }
             }
         }

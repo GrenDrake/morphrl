@@ -29,12 +29,12 @@ Dungeon* World::getDungeon(int depth) {
     return newMap;
 }
 
-void World::movePlayerToDepth(int newDepth, int enterFrom) {
+bool World::movePlayerToDepth(int newDepth, int enterFrom) {
     // don't move to current depth
-    if (map && newDepth == map->depth()) return;
+    if (map && newDepth == map->depth()) return true;
 
     Dungeon *newMap = getDungeon(newDepth);
-    if (!newMap) return; // failed to fetch new map
+    if (!newMap) return false; // failed to fetch new map
 
     if (map) {
         map->removeActor(player);
@@ -65,17 +65,20 @@ void World::movePlayerToDepth(int newDepth, int enterFrom) {
         startPosition = map->firstOfTile(TILE_STAIR_UP);
     } else {
         std::cerr << "ERROR  unknown dungeon enterFrom value " << enterFrom << '\n';
+        return false;
     }
 
     if (startPosition.x < 0) {
         std::cerr << "ERROR  failed to find valid start position.\n";
         startPosition.x = MAP_WIDTH / 2;
         startPosition.y = MAP_HEIGHT / 2;
+        return false;
     }
     std::cerr << "    initial position @ " << startPosition << '\n';
     map->addActor(player, startPosition);
     map->resetSpeedCounter();
     map->doActorFOV(player);
+    return true;
 }
 
 void World::addMessage(const std::string &text) {

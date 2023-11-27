@@ -34,6 +34,7 @@ const int TILE_DOOR = 4;
 const int TILE_WATER = 5;
 const int TILE_STAIR_DOWN = 6;
 const int TILE_STAIR_UP = 7;
+const int TILE_GRASS = 8;
 
 const int AR_NONE = 0;
 const int AR_TARGET = 1;
@@ -199,6 +200,7 @@ struct TileData {
     int r, g, b;
     bool isUpStair;
     bool isDownStair;
+    bool preventActorSpawns;
 };
 
 struct DungeonData {
@@ -417,7 +419,7 @@ public:
     uint64_t gameSeed;
 
     Dungeon* getDungeon(int depth);
-    void movePlayerToDepth(int newDepth, int enterFrom);
+    bool movePlayerToDepth(int newDepth, int enterFrom);
     void addMessage(const std::string &text);
 
     void tick();

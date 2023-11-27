@@ -18,11 +18,16 @@ World* createGame(uint64_t gameSeed) {
     World *world = new World;
     if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
-    std::cerr << "New game with seed: " << world->gameSeed << "\n\n";
+    std::cerr << "NEW GAME with seed: " << world->gameSeed << "\n";
     world->player = Actor::create(getActorData(0));
     world->player->isPlayer = true;
     world->player->reset();
-    world->movePlayerToDepth(getDungeonEntranceIdent(), DE_ENTRANCE);
+    if (!world->movePlayerToDepth(getDungeonEntranceIdent(), DE_ENTRANCE)) {
+        std::cerr << "ERROR world generation failed\n";
+        uint64_t newSeed = world->gameSeed + 1;
+        delete world;
+        return createGame(newSeed);
+    }
     world->addMessage("Welcome to [color=yellow]MorphRL[/color]!");
     return world;
 }

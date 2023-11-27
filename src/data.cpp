@@ -695,6 +695,7 @@ std::vector<DataDef> tilePropData{
     { "isPassable",     0 },
     { "isUpStair",      0 },
     { "isDownStair",    0 },
+    { "preventActorSpawns", 0 },
 };
 bool processTileData(RawData &rawData, const DataTemp *rawTile) {
     if (!rawTile || rawTile->typeName != "@tile") {
@@ -710,6 +711,7 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
     resultData.isPassable = false;
     resultData.isUpStair = false;
     resultData.isDownStair = false;
+    resultData.preventActorSpawns = false;
     resultData.ident = rawTile->ident;
     for (const DataProp &prop : rawTile->props) {
         const DataDef &dataDef = getDataDef(tilePropData, prop.name);
@@ -740,6 +742,8 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
                 resultData.isUpStair = true;
             } else if (prop.name == "isDownStair") {
                 resultData.isDownStair = true;
+            } else if (prop.name == "preventActorSpawns") {
+                resultData.preventActorSpawns = true;
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
             }
