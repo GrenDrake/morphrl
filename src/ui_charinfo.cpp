@@ -33,13 +33,15 @@ void doCharInfo(World &world) {
     const color_t malus = color_from_argb(255, 255, 127, 127);
 
     Actor *player = world.player;
-    const unsigned modeCount = 3;
+    const unsigned modeCount = 4;
     unsigned mode = 0, selection = 0;
     const char *modeNames[modeCount] = {
         "Stats",
         "Mutations",
-        "Status Effects",
+        "Statuses",
+        "Abilities",
     };
+    std::vector<unsigned> abilityList = player->getAbilityList();
     std::vector<UIRect> uiRects;
     while (1) {
         uiRects.clear();
@@ -107,11 +109,11 @@ void doCharInfo(World &world) {
 
                 terminal_color(textColour);
                 if (selection >= STAT_BASE_COUNT) {
-                    terminal_print(0, 19, "You cannot improve this stat by leveling.");
+                    terminal_print(0, 20, "You cannot improve this stat by leveling.");
                 } else if (world.player->advancementPoints == 0) {
-                    terminal_print(0, 19, "You haven't gained enough experience to improve this stat.");
+                    terminal_print(0, 20, "You haven't gained enough experience to improve this stat.");
                 } else {
-                    terminal_print(0, 19, "Press [color=yellow]SPACE[/color] to improve this stat.");
+                    terminal_print(0, 20, "Press [color=yellow]SPACE[/color] to improve this stat.");
                 }
 
                 int value = 0;
@@ -222,6 +224,39 @@ void doCharInfo(World &world) {
                     }
                 }
                 break;
+            case 3: // abilities
+                if (abilityList.empty()) {
+                    terminal_print(2, nextY, "You have no special abilities.");
+                } else {
+                    unsigned counter = 0;
+                    terminal_put(1, nextY + selection, '*');
+                    for (unsigned abilityId : abilityList) {
+                        const AbilityData &thisAbility = getAbilityData(abilityId);
+                        if (counter == selection) {
+                            terminal_bkcolor(textColour);
+                            terminal_color(black);
+                        } else {
+                            terminal_color(textColour);
+                            terminal_bkcolor(black);
+                        }
+                        if (thisAbility.ident == BAD_VALUE) terminal_print(3, nextY, ("Invalid ability #" + std::to_string(abilityId)).c_str());
+                        else terminal_print(3, nextY, ucFirst(thisAbility.name).c_str());
+                        if (counter == selection) {
+                            terminal_color(textColour);
+                            terminal_bkcolor(black);
+                        }
+                        ++counter;
+                        ++nextY;
+                    }
+
+                    const AbilityData &thisAbility = getAbilityData(abilityList[selection]);
+                    dimensions_t dims = terminal_print_ext(41, 2, 39, 10, TK_ALIGN_LEFT, thisAbility.desc.c_str());
+                    nextY = 3 + dims.height;
+                    for (unsigned i = 0; i < 10 && i < thisAbility.effects.size(); ++i) {
+                        terminal_print(41, nextY + i, thisAbility.effects[i].toString().c_str());
+                    }
+                }
+                break;
         }
 
 
@@ -239,7 +274,7 @@ void doCharInfo(World &world) {
             }
         }
 
-        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
+        if (mode == 0 && (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER)) {
             if (selection >= STAT_BASE_COUNT || player->advancementPoints < 1) continue;
             --player->advancementPoints;
             ++player->statLevels[selection];
@@ -249,14 +284,18 @@ void doCharInfo(World &world) {
         if ((key == TK_LEFT || key == TK_KP_4) && mode > 0) { --mode; selection = 0; }
         if ((key == TK_RIGHT || key == TK_KP_6) && mode < modeCount - 1) { ++mode; selection = 0; }
         if ((key == TK_UP || key == TK_KP_8) && selection > 0) --selection;
-        if ((key == TK_DOWN || key == TK_KP_2)) {
+        if (key == TK_HOME) selection = 0;
+        if ((key == TK_DOWN || key == TK_KP_2) || key == TK_END) {
+            unsigned max = 0;
             switch(mode) {
-                case 0: if (selection < STAT_BULK - 1) ++selection; break;
-                case 1: if (selection < player->mutations.size() - 1) ++selection; break;
-                case 2: if (selection < player->statusEffects.size() - 1) ++selection; break;
+                case 0: max = STAT_BULK - 1; break;
+                case 1: max = player->mutations.size() - 1; break;
+                case 2: max = player->statusEffects.size() - 1; break;
+                case 3: max = abilityList.size() - 1; break;
                 default:
                     selection = 0;
             }
+            if (selection < max) ++selection;
         }
     }
 

@@ -115,13 +115,17 @@ std::string EffectData::toString() const {
         else text += itemData.name;
         text += "[/color]";
         return text;
+    } else if (trigger == ET_GIVE_ABILITY) {
+        const AbilityData &abilityData = getAbilityData(effectId);
+        std::string text = "gives ability: [color=yellow]";
+        if (abilityData.ident == BAD_VALUE) text += "invalid ability #" + std::to_string(effectId);
+        else text += abilityData.name;
+        text += "[/color]";
+        return text;
     }
 
     std::string text;
     switch(trigger) {
-        case ET_GIVE_ABILITY:
-            text += "gives ability: ";
-            break;
         case ET_ON_HIT:
             text += "on hit: ";
             break;
