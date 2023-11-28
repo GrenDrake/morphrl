@@ -153,6 +153,7 @@ struct AbilityData {
     int energyCost;
     int areaType;
     int maxRange;
+    int speedMult;
     std::vector<EffectData> effects;
 };
 
@@ -276,7 +277,7 @@ struct Actor {
     std::string triggerOnHitEffects(Actor *target);
     AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
     AttackData meleeAttack(Actor *target);
-    void advanceSpeedCounter();
+    void advanceSpeedCounter(int multiplier = 100);
     MutationItem* mutationForSlot(unsigned slotNumber);
     bool hasMutation(unsigned mutationIdent) const;
     void applyMutation(MutationItem *mutation);

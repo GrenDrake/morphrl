@@ -548,6 +548,7 @@ std::vector<DataDef> abilityPropData{
     { "energyCost",     1 },
     { "areaType",       1 },
     { "maxRange",       1 },
+    { "speedMult",      1 },
     { "effect",         5 },
 };
 bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
@@ -561,6 +562,7 @@ bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
     resultData.energyCost = 0;
     resultData.maxRange = 10;
     resultData.areaType = AR_NONE;
+    resultData.speedMult = 100;
 
     resultData.ident = rawAbility->ident;
     for (const DataProp &prop : rawAbility->props) {
@@ -582,6 +584,8 @@ bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
                 resultData.areaType = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "maxRange") {
                 resultData.maxRange = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "speedMult") {
+                resultData.speedMult = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "effect") {
                 EffectData effectData;
                 effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);

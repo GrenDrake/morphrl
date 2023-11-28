@@ -391,8 +391,10 @@ AttackData Actor::meleeAttack(Actor *target) {
     return meleeAttackWithWeapon(target, nullptr);
 }
 
-void Actor::advanceSpeedCounter() {
-    speedCounter += getStat(STAT_SPEED) * -2 + 10;
+void Actor::advanceSpeedCounter(int multiplier) {
+    int turnTime = getStat(STAT_SPEED) * -2 + 10;
+    turnTime = turnTime * multiplier / 100;
+    speedCounter += turnTime;
 }
 
 MutationItem* Actor::mutationForSlot(unsigned slotNumber) {
