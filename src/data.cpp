@@ -697,7 +697,6 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
 std::vector<DataDef> tilePropData{
     { "glyph",          1 },
     { "name",           1 },
-    { "description",    1 },
     { "colour",         3 },
     { "isOpaque",       0 },
     { "isPassable",     0 },
@@ -736,8 +735,6 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
                 } else resultData.glyph = prop.value[0][0];
             } else if (prop.name == "name") {
                 resultData.name = convertUnderscores(prop.value[0]);
-            } else if (prop.name == "description") {
-                resultData.desc = convertUnderscores(prop.value[0]);
             } else if (prop.name == "colour") {
                 resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);

@@ -260,9 +260,11 @@ void gameloop(World &world) {
         terminal_print(34, 19, energyLine.c_str());
         terminal_print(79 - world.map->data.name.size(), 19, ucFirst(world.map->data.name).c_str());
 
+#ifdef DEBUG
         // (debug) position data
         terminal_printf(61, 0, "(%d, %d) Lv%d", world.player->position.x, world.player->position.y, world.map->depth());
         terminal_printf(61, 1, "Turn: %u / %u", world.currentTurn, world.player->speedCounter);
+#endif
 
         terminal_refresh();
 
@@ -278,6 +280,7 @@ void gameloop(World &world) {
                 uiMode = UIMode::ExamineTile;
                 cursorPos = world.player->position;
             }
+#ifdef DEBUG
             if (key == TK_F1) {
                 world.player->takeDamage(-99999);
                 world.player->spendEnergy(-99999);
@@ -285,6 +288,7 @@ void gameloop(World &world) {
                 shownDeathMessage = false;
                 world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
             }
+#endif
         } else if (uiMode == UIMode::PickFromList) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
@@ -383,6 +387,7 @@ void gameloop(World &world) {
                 cursorPos = world.player->position;
             }
 
+#ifdef DEBUG
             if (key == TK_F1) {
                 world.player->takeDamage(-99999);
                 world.player->spendEnergy(-99999);
@@ -483,6 +488,7 @@ void gameloop(World &world) {
                 world.player->giveXP(50);
                 world.addMessage("[color=cyan]DEBUG[/color] granted XP points");
             }
+#endif
         } else if (uiMode == UIMode::ExamineTile) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);

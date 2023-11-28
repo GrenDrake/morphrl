@@ -77,7 +77,11 @@ int main(int argc, char *argv[]) {
     terminal_set("font: DejaVuSansMono.ttf, size=24;");
     terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
 
+#ifdef DEBUG
     const int menuItemCount = 7;
+#else
+    const int menuItemCount = 6;
+#endif
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
     const std::string versionString = "Development Release 1";
@@ -109,8 +113,10 @@ int main(int argc, char *argv[]) {
         mouseRegions.push_back(UIRect{8, 21, 20, 1, 5});
         terminal_print(8, 22, "Quit");
         mouseRegions.push_back(UIRect{8, 22, 20, 1, 6});
+#ifdef DEBUG
         terminal_print(8, 23, "Data Codex ([color=yellow]DEBUG[/color])");
         mouseRegions.push_back(UIRect{8, 23, 20, 1, 7});
+#endif
         terminal_print(5, 16+selection, "->");
         terminal_color(fgColorDark);
         terminal_print(31, 12, "Pre-Alpha Release");

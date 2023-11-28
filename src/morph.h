@@ -200,7 +200,7 @@ struct ItemData {
 struct TileData {
     unsigned ident;
     int glyph;
-    std::string name, desc;
+    std::string name;
     bool isPassable;
     bool isOpaque;
     int r, g, b;
