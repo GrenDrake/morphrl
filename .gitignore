@@ -1,3 +1,7 @@
+# the distribution directory
+morphrl/
+morphrl.zip
+
 # Prerequisites
 *.d
 
