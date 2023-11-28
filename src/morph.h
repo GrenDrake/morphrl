@@ -76,6 +76,7 @@ const int EFFECT_DAMAGE     = 1; // take damage - strength = amount
 const int EFFECT_MUTATE     = 2; // add mutation - strength = # to add
 const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
 const int EFFECT_ADJ_ENERGY = 4;
+const int EFFECT_ATTACK     = 5;
 const int EFFECT_APPLY_STATUS = 6;
 
 const int XP_PER_LEVEL      = 100;

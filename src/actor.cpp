@@ -341,7 +341,8 @@ std::string Actor::triggerOnHitEffects(Actor *target) {
 
 AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     AttackData data;
-    data.weapon = weapon;
+    if (weapon) data.weapon = weapon;
+    else data.weapon = getCurrentWeapon();
     if (!target) {
         data.errorMessage = "meleeAttackWithWeapon: target was nullptr";
         return data;
@@ -354,11 +355,24 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     data.roll = 1 + globalRNG.upto(20);
     data.toHit = getStat(STAT_TO_HIT);
     data.evasion = target->getStat(STAT_EVASION);
+    int damageBonus = getStat(STAT_DAMAGE_BONUS);
+
+    if (weapon) {
+        // attacking with specific weapon (for ability-based attacks, etc.)
+        const Item *actualWeapon = getCurrentWeapon();
+        // remove normal weapon stats
+        data.toHit -= actualWeapon->getStatBonus(STAT_TO_HIT);
+        damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS);
+        // add special weapon stats
+        data.toHit += weapon->getStatBonus(STAT_TO_HIT);
+        damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS);
+    }
+
     if (data.roll + data.toHit > data.evasion) {
         int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
         if (damageRange < 1) damageRange = 1;
         data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
-        data.damage += getStat(STAT_DAMAGE_BONUS);
+        data.damage += damageBonus;
         if (data.damage < 1) data.damage = 1;
         target->takeDamage(data.damage);
         data.effectsMessage = triggerOnHitEffects(target);
@@ -374,7 +388,7 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
 }
 
 AttackData Actor::meleeAttack(Actor *target) {
-    return meleeAttackWithWeapon(target, getCurrentWeapon());
+    return meleeAttackWithWeapon(target, nullptr);
 }
 
 void Actor::advanceSpeedCounter() {

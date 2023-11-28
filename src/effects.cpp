@@ -50,6 +50,16 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
                 }
             }
             return message; }
+        case EFFECT_ATTACK: {
+            const ItemData &itemData = getItemData(effect.effectStrength);
+            if (itemData.ident == BAD_VALUE) {
+                return "Tried to attack with invalid item #" + std::to_string(effect.effectStrength) + ". ";
+            }
+            Item *weapon = new Item(itemData);
+            AttackData result = user->meleeAttackWithWeapon(target, weapon);
+            delete weapon;
+            return buildCombatMessage(user, target, result, true);
+            break; }
         case EFFECT_APPLY_STATUS: {
             if (target->hasStatus(effect.effectStrength)) return ""; // prevent stacking status effects
             const StatusData &statusData = getStatusData(effect.effectStrength);
@@ -157,9 +167,13 @@ std::string EffectData::toString() const {
         case EFFECT_PURIFY:
             text += "removes a mutation";
             break;
+        case EFFECT_ATTACK: {
+            const ItemData &itemData = getItemData(effectStrength);
+            text += "attack using a [color=yellow]" + itemData.name + "[/color]";
+            break; }
         case EFFECT_APPLY_STATUS: {
             const StatusData &statusData = getStatusData(effectStrength);
-            text += "apply [color=cyan]" + statusData.name + "[/color]";
+            text += "apply [color=yellow]" + statusData.name + "[/color]";
             break; }
         default:
             text += "Unhandled effectId " + std::to_string(effectId);
