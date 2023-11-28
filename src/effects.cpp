@@ -14,15 +14,31 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
 
     switch (effect.effectId) {
         case EFFECT_HEALING: {
-            int amount = effect.effectStrength * target->getStat(STAT_HEALTH) / 100;
+            int max = effect.effectParam;
+            int min = effect.effectStrength;
+            int range = max - min;
+            int amount = globalRNG.upto(range) + min;
             if (amount < 1) amount = 1;
             target->takeDamage(-amount);
             return "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] received [color=green]" + std::to_string(amount) + "[/color] healing. ";
             }
+        case EFFECT_ADJ_ENERGY: {
+            int max = effect.effectParam;
+            int min = effect.effectStrength;
+            int range = max - min;
+            int amount = globalRNG.upto(range) + min;
+            if (amount < 1) amount = 1;
+            target->spendEnergy(-amount);
+            return "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] regained [color=green]" + std::to_string(amount) + "[/color] energy. ";
+            }
         case EFFECT_DAMAGE: {
-            target->takeDamage(effect.effectStrength);
+            int max = effect.effectParam;
+            int min = effect.effectStrength;
+            int range = max - min;
+            int amount = globalRNG.upto(range) + min;
+            target->takeDamage(amount);
             std::string message = "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] took [color=red]"
-                    + std::to_string(effect.effectStrength) + "[/color] damage. ";
+                    + std::to_string(amount) + "[/color] damage. ";
             if (target->isDead()) {
                 if (target->isPlayer) {
                     message += "You [color=red]die[/color]. ";
@@ -123,10 +139,13 @@ std::string EffectData::toString() const {
     }
     switch(effectId) {
         case EFFECT_DAMAGE:
-            text += "cause [color=red]" + std::to_string(effectStrength) + "[/color] damage";
+            text += "cause [color=red]" + std::to_string(effectStrength) + "[/color] to [color=red]" + std::to_string(effectParam) + "[/color] damage";
+            break;
+        case EFFECT_ADJ_ENERGY:
+            text += "recover [color=cyan]" + std::to_string(effectStrength) + "[/color] to [color=cyan]" + std::to_string(effectParam) + "[/color] energy";
             break;
         case EFFECT_HEALING:
-            text += "heal for [color=cyan]" + std::to_string(effectStrength) + "[/color]%";
+            text += "heal for [color=cyan]" + std::to_string(effectStrength) + "[/color] to [color=cyan]" + std::to_string(effectParam) + "[/color]";
             break;
         case EFFECT_MUTATE:
             text += "mutate the user";
