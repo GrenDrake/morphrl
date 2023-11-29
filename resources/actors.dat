@@ -4,7 +4,7 @@
 @actor ACTOR_PLAYER 0
     glyph           @
     name            player
-    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    description     You_are_an_adventurer_sent_out_from_the_city_of_Sanctuary_to_obtain_the_ethereal_ore_required_to_reinforce_the_barrier_around_the_city,_thus_protecting_it_from_the_horrors_of_the_post-Great_War_world._You_began_your_quest_as_human,_but_the_nature_of_the_world_beyond_the_barrier_means_you’re_unlikely_to_end_it_that_way.
     colour          127 255 127
     base_strength   0
     base_agility    0
@@ -24,10 +24,10 @@
     artfile         goblin.png
     baseLevel       1
     colour          255 127 127
-    base_strength   -2
-    base_agility    -3
-    base_speed      -2
-    base_toughness  -4
+    base_strength   -1
+    base_agility    -1
+    base_speed      0
+    base_toughness  -2
     item            0 25 ITM_POTION_LESSER_HEALING
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
@@ -41,10 +41,10 @@
     artfile         kobold.png
     baseLevel       1
     colour          255 127 127
-    base_strength   -3
+    base_strength   -1
     base_agility    -1
-    base_speed      -2
-    base_toughness  -3
+    base_speed      1
+    base_toughness  -1
     item            0 25 ITM_POTION_LESSER_HEALING
     item            1 50 ITM_SWORD
     item            1 99 ITM_DAGGER
@@ -61,10 +61,10 @@
     artfile         hobgoblin.png
     baseLevel       2
     colour          255 127 127
-    base_strength   -1
-    base_agility    -1
-    base_speed      -2
-    base_toughness  -1
+    base_strength   1
+    base_agility    0
+    base_speed      0
+    base_toughness  1
     item            0 100 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_SWORD
     item            0 50 ITM_TALIS_EVASION
@@ -81,10 +81,10 @@
     artfile         skeleton.png
     baseLevel       2
     colour          255 127 127
-    base_strength   0
-    base_agility    0
+    base_strength   1
+    base_agility    1
     base_speed      -2
-    base_toughness  0
+    base_toughness  2
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
 
@@ -95,14 +95,14 @@
     artfile         zombie.png
     baseLevel       2
     colour          255 127 127
-    base_strength   0
+    base_strength   2
     base_agility    -4
     base_speed      -2
-    base_toughness  2
+    base_toughness  4
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
 
-# reuses chaos beast as rare enemy
+# reuses orc as rare enemy
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Level 3
@@ -114,11 +114,11 @@
     artfile         orc.png
     baseLevel       3
     colour          255 127 127
-    base_strength   -1
-    base_agility    -1
-    base_speed      -2
-    base_toughness  0
-    item            0 25 ITM_POTION_LESSER_HEALING
+    base_strength   2
+    base_agility    1
+    base_speed      0
+    base_toughness  1
+    item            0 50 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_SWORD
     item            2 33 ITM_TALIS_EVASION
     item            2 33 ITM_TALIS_HEALTH
@@ -131,10 +131,10 @@
     artfile         chaos_beast.png
     baseLevel       3
     colour          255 127 127
-    base_strength   -1
-    base_agility    -1
-    base_speed      -2
-    base_toughness  -1
+    base_strength   1
+    base_agility    2
+    base_speed      0
+    base_toughness  1
     mutation        0 100 MUT_QUADRUPED
     mutation        1 50 MUT_SHARP_CLAWS
     mutation        1 99 MUT_POISON_CLAWS
@@ -159,10 +159,10 @@
     artfile         troll.png
     baseLevel       4
     colour          255 127 127
-    base_strength   6
+    base_strength   7
     base_agility    -2
     base_speed      -2
-    base_toughness  1
+    base_toughness  3
     item            1 16 ITM_SWORD
     item            1 16 ITM_DAGGER
     mutation        0 100 MUT_REGENERATION
@@ -182,10 +182,10 @@
     artfile         demon.png
     baseLevel       5
     colour          255 127 127
-    base_strength   6
-    base_agility    -2
-    base_speed      -2
-    base_toughness  1
+    base_strength   5
+    base_agility    2
+    base_speed      0
+    base_toughness  2
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
     mutation        0 100 MUT_BAT_WINGS

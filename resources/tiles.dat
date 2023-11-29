@@ -15,7 +15,6 @@
 @tile TILE_FLOOR 2
     glyph           .
     name            floor
-    description     An_entirely_unremarkable_patch_of_floor.
     colour          255 255 255
     isPassable
 
@@ -28,7 +27,6 @@
 @tile TILE_DOOR 4
     glyph           +
     name            door
-    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
     colour          165 42 42
     isPassable
     isOpaque
@@ -55,7 +53,6 @@
 @tile TILE_GRASS 8
     glyph           ,
     name            grass
-    description     A_patch_of_grass_that's_managed_to_survive_the_conditions_of_the_dungeon.
     colour          196 255 196
     isPassable
     preventActorSpawns

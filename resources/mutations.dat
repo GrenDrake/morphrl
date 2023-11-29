@@ -1,0 +1,152 @@
+
+@mutation MUT_BAT_WINGS 1
+    gainVerb        growing
+    name            bat-like_wings
+    description     Large,_bat-like_wings_extend_backwards_from_your_shoulders,_granting_you_the_power_of_flight!_They'd_probably_be_more_useful_if_you_weren't_underground...
+    effect          ET_BOOST 100 STAT_EVASION -1 0
+    effect          ET_GIVE_ABILITY 100 ABILITY_FLIGHT 0 0
+    slot            MUT_SLOT_WINGS
+
+@mutation MUT_BIRD_WINGS 2
+    gainVerb        growing
+    name            feathery_wings
+    description     Large,_feathery_wings_extend_backwards_from_your_shoulders,_granting_you_the_power_of_flight!_They'd_probably_be_more_useful_if_you_weren't_underground...
+    effect          ET_BOOST 100 STAT_EVASION 1 0
+    effect          ET_GIVE_ABILITY 100 ABILITY_FLIGHT 0 0
+    slot            MUT_SLOT_WINGS
+
+@mutation MUT_SHARP_CLAWS 3
+    gainVerb        growing
+    name            sharp_claws
+    description     Your_fingers_end_in_sharp_claws,_doubtless_weapons_in_their_own_right.
+    slot            MUT_SLOT_CLAWS
+    effect          ET_UNARMED_ATTACK 100 ITM_SHARP_CLAWS 0 0
+
+@mutation MUT_TALONS 4
+    gainVerb        growing
+    name            talons
+    description     Long_talons_extend_from_your_fingertips._They're_fearsome_weapons,_but_will_likely_make_it_hard_to_handle_regular_objects.
+    slot            MUT_SLOT_CLAWS
+    effect          ET_UNARMED_ATTACK 100 ITM_TALONS 0 0
+
+@mutation MUT_POISON_CLAWS 5
+    gainVerb        growing
+    name            poison_claws
+    description     Sharp,_pointed_claws_that_drip_with_some_unidentified_poison.
+    slot            MUT_SLOT_CLAWS
+    effect          ET_UNARMED_ATTACK 100 ITM_POISON_CLAWS 0 0
+
+@mutation MUT_QUADRUPED 7
+    gainVerb        becoming_a
+    name            quadruped
+    description     You_stand_on_all_fours._You're_agile,_but_poorly_equipped_for_delicate_tasks.
+    slot            MUT_SLOT_SHAPE
+    effect          ET_BOOST 100 STAT_EVASION 3 0
+    effect          ET_BOOST 100 STAT_TO_HIT -2 0
+    effect          ET_BOOST 100 STAT_BULK_MAX 5 0
+
+@mutation MUT_THEROPOD 8
+    gainVerb        becoming_a
+    name            theropod
+    description     You_look_like_a_dinosaur:_only_two_legs,_but_still_horizontal._It'd_be_awkward_in_regular_life,_but_now_only_makes_you_faster,_albeit_a_bit_more_delicate.
+    slot            MUT_SLOT_SHAPE
+    effect          ET_BOOST 100 STAT_TOUGHNESS -1 0
+    effect          ET_BOOST 100 STAT_EVASION 1 0
+    effect          ET_BOOST 100 STAT_SPEED 2 0
+
+@mutation MUT_FUR 9
+    gainVerb        growing
+    name            fur
+    description     Your_body_is_covered_in_a_thick_coat_of_fur.
+    slot            MUT_SLOT_SKIN
+
+@mutation MUT_SCALES 10
+    gainVerb        growing
+    name            scales
+    description     Your_body_is_covered_in_armouring_scales.
+    slot            MUT_SLOT_SKIN
+    effect          ET_BOOST 100 STAT_EVASION 1 0
+
+@mutation MUT_FEATHERS 11
+    gainVerb        growing
+    name            feathers
+    description     Beautiful_feathered_plumage_covers_your_body._It_looks_nice,_but_isn't_particularly_useful.
+    slot            MUT_SLOT_SKIN
+
+@mutation MUT_BASHING_TAIL 12
+    gainVerb        growing_a
+    name            bashing_tail
+    description     A_large,_heavy_tail_you_can_swing_at_your_enemies_when_you_strike._Not_very_accurate,_but_hits_all_adjacent_foes.
+    slot            MUT_SLOT_TAIL
+    effect          ET_GIVE_ABILITY 100 ABILITY_WHIRLWIND_TAIL 0 0
+
+@mutation MUT_WHIP_TAIL 13
+    gainVerb        growing_a
+    name            whip_tail
+    description     A_long_whiplike_tail._You_can_easily_slash_your_enemies_with_it_when_you_strike,_but_it_doesn't_do_much_damage.
+    slot            MUT_SLOT_TAIL
+    effect          ET_GIVE_ABILITY 100 ABILITY_TAILWHIP 0 0
+
+@mutation MUT_DECORATIVE_TAIL 14
+    gainVerb        growing_a
+    name            decorative_tail
+    description     A_short_non-prehensile_tail._The_only_thing_it_can_do_is_make_your_pants_fit_poorly.
+    slot            MUT_SLOT_TAIL
+
+@mutation MUT_GORING_HORNS 15
+    gainVerb        growing
+    name            goring_horns
+    description     Large,_pointed_horns_you_can_gore_your_enemies_with_when_you_strike.
+    slot            MUT_SLOT_HORNS
+    effect          ET_GIVE_ABILITY 100 ABILITY_GORE 0 0
+
+@mutation MUT_DECORATIVE_HORNS 6
+    gainVerb        growing
+    name            decorative_horns
+    description     Small,_non-functional_horns._They_are_cute_if_you_like_that_kind_of_thing.
+    slot            MUT_SLOT_HORNS
+
+@mutation MUT_RAMMING_HORNS 16
+    gainVerb        growing
+    name            ramming_horns
+    description     Large,_curled_horns_suitable_for_charging_into_foes.
+    slot            MUT_SLOT_HORNS
+    effect          ET_GIVE_ABILITY 100 ABILITY_HORNCHARGE 0 0
+
+@mutation MUT_SMALL 17
+    name            small_size
+    description     You're_small,_like_a_gnome_or_kobold._It_leaves_you_rather_fragile,_but_also_harder_to_hit.
+    slot            MUT_SLOT_SIZE
+    effect          ET_BOOST 100 STAT_EVASION 3 0
+    effect          ET_BOOST 100 STAT_TOUGHNESS -2 0
+
+@mutation MUT_LARGE 18
+    name            large_size
+    description     You're_[font=italic]big[/font]._Massively_so._It_makes_you_an_easy_target,_but_also_makes_you_quite_sturdy.
+    slot            MUT_SLOT_SIZE
+    effect          ET_BOOST 100 STAT_EVASION -2 0
+    effect          ET_BOOST 100 STAT_TOUGHNESS 3 0
+
+@mutation MUT_FIRE_BREATH 19
+    name            fire_breath
+    description     A_gentle_fire_burns_in_your_throat,_ready_to_burn_your_enemies_at_your_command.
+    effect          ET_GIVE_ABILITY 100 ABILITY_FIRE_BREATH 0 0
+    slot            MUT_SLOT_BREATH
+
+@mutation MUT_ICE_BULLETS 20
+    name            ice_bullets
+    description     You've_gained_the_ability_to_spit_a_barrage_of_cold_icy_bullets_at_your_foes.
+    effect          ET_GIVE_ABILITY 100 ABILITY_ICE_PELLETS 0 0
+    slot            MUT_SLOT_BREATH
+
+@mutation MUT_POISON_MIST 21
+    name            poison_mist
+    description     The_ultimate_in_bad_breath,_you_can_exhale_a_cloud_of_poison_gas.
+    effect          ET_GIVE_ABILITY 100 ABILITY_POISON_MIST 0 0
+    slot            MUT_SLOT_BREATH
+
+@mutation MUT_REGENERATION 22
+    name            regeneration
+    description     Much_like_the_trolls_of_legend,_you_constantly_(if_slowly)_heal_your_wounds.
+    slot            MUT_SLOT_NONE
+    effect          ET_GIVE_ABILITY 100 ABILITY_REGENERATION 0 0

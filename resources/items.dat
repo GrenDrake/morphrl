@@ -10,11 +10,90 @@
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
-# Item defs
+# The objective of the game
+@item ITM_ETHEREAL_ORE 16
+    glyph           *
+    name            ethereal_ore
+    description     A_soft,_gently_glowing_rock._It_squishes_disquietingly_in_your_hands.
+    colour          127 127 127
+    type            IT_JUNK
+    bulk            2
+    isVictoryArtifact
+
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Unarmed attacks (for mutations)
+@item ITM_SHARP_CLAWS 12
+    glyph           /
+    name            sharp_claws
+    description     Short_sharp_claws_on_your_hands.
+    colour          127 127 127
+    type            IT_WEAPON
+    bulk            0
+    damage          3 7
+    effect          ET_BOOST 100 STAT_TO_HIT 3 0
+
+@item ITM_TALONS 13
+    glyph           /
+    name            talons
+    description     Long_talons_on_your_hands.
+    colour          127 127 127
+    type            IT_WEAPON
+    bulk            0
+    damage          7 13
+    effect          ET_BOOST 100 STAT_TO_HIT 1 0
+
+@item ITM_POISON_CLAWS 14
+    glyph           /
+    name            poison_claws
+    description     Poisoned_claws_on_your_hands.
+    colour          127 127 127
+    type            IT_WEAPON
+    bulk            0
+    damage          2 6
+    effect          ET_BOOST 100 STAT_TO_HIT 3 0
+    effect          ET_ON_HIT 25 EFFECT_APPLY_STATUS STATUS_POISON 0
+
+@item ITM_WHIPTAIL 24
+    name            tail
+    type            IT_WEAPON
+    damage          5 10
+    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+
+@item ITM_CLUBTAIL 25
+    name            tail
+    type            IT_WEAPON
+    damage          10 15
+    effect          ET_BOOST 100 STAT_TO_HIT -2 0
+
+@item ITM_GORING_HORNS 26
+    name            horns
+    type            IT_WEAPON
+    damage          7 13
+    effect          ET_BOOST 100 STAT_TO_HIT -1 0
+
+@item ITM_RAMMING_HORNS 27
+    name            horns
+    type            IT_WEAPON
+    damage          15 20
+    effect          ET_BOOST 100 STAT_TO_HIT -4 0
+
+@item ITM_FIRE_BREATH 28
+    name            fire
+    type            IT_WEAPON
+    damage          6 12
+
+@item ITM_ICE_PELLETS 29
+    name            ice_pellet
+    type            IT_WEAPON
+    damage          6 12
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# General item defs
 @item ITM_SWORD 0
     glyph           /
-    name            sword
-    description     This_is_a_very_long_description_intended_for_testing_purposes_and_should_not_be_taken_serious_despite_it_covering_several_lines_of_text_and_being_remarkable_in_every_way_except_in_that_it_is_unremarkable._Please_do_not_read_this_text,_or_otherwise_become_aware_of_its_existance_and_do_not_do_anything_interesting_with_it.
+    name            longsword
+    description     This_longsword_is_a_worn_but_servicable_blade.
     colour          127 127 127
     type            IT_WEAPON
     bulk            2
@@ -37,8 +116,26 @@
     colour          255 0 0
     type            IT_CONSUMABLE
     consumeChance   100
-    effect          ET_ON_USE 100 EFFECT_HEALING 20 0
+    effect          ET_ON_USE 100 EFFECT_HEALING 5 15
     effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
+
+@item ITM_POTION_ENERGY 23
+    glyph           !
+    name            potion_of_energy
+    colour          0 0 255
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_ADJ_ENERGY 5 15
+    effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
+
+@item ITM_POTION_GREATER_HEALING 17
+    glyph           !
+    name            potion_of_restoration
+    colour          255 0 0
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_HEALING 15 30
+    effect          ET_ON_USE 12 EFFECT_MUTATE 1 0
 
 @item ITM_POTION_RAGE 10
     glyph           !
@@ -48,13 +145,21 @@
     consumeChance   100
     effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_RAGE 0
 
-@item ITM_POTION_POISON 11
+@item ITM_POTION_HASTE 22
     glyph           !
-    name            potion_of_poison
-    colour          255 127 127
+    name            potion_of_haste
+    colour          127 255 127
     type            IT_CONSUMABLE
     consumeChance   100
-    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_POISON 0
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_HASTE 0
+
+@item ITM_POTION_PURITY 15
+    glyph           !
+    name            potion_of_purity
+    colour          127 127 127
+    type            IT_CONSUMABLE
+    consumeChance   100
+    effect          ET_ON_USE 100 EFFECT_PURIFY 1 0
 
 @item ITM_POTION_LESSER_REGEN 9
     glyph           !
@@ -87,7 +192,7 @@
     name            talisman_of_health
     colour          63 127 63
     type            IT_TALISMAN
-    effect          ET_BOOST 100 STAT_HEALTH 5 0
+    effect          ET_BOOST 100 STAT_HEALTH 10 0
 
 @item ITM_TALIS_ENERGY 8
     glyph           "
@@ -96,11 +201,26 @@
     type            IT_TALISMAN
     effect          ET_BOOST 100 STAT_ENERGY 5 0
 
-@item - 6
-    glyph           %
-    name            brick
-    colour          127 127 127
-    type            IT_JUNK
+@item ITM_TALIS_ACCURACY 19
+    glyph           "
+    name            talisman_of_accuracy
+    colour          63 63 127
+    type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+
+@item ITM_TALIS_UNBURDENING 20
+    glyph           "
+    name            talisman_of_unburdening
+    colour          63 63 127
+    type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_BULK_MAX 2 0
+
+@item ITM_TALIS_HARMING 21
+    glyph           "
+    name            talisman_of_harming
+    colour          63 63 127
+    type            IT_TALISMAN
+    effect          ET_BOOST 100 STAT_DAMAGE_BONUS 2 0
 
 @item ITM_WAND_HEALING 7
     glyph           \
@@ -108,4 +228,4 @@
     colour          255 127 127
     consumeChance   25
     type            IT_CONSUMABLE
-    effect          ET_ON_USE 100 EFFECT_HEALING 20 0
+    effect          ET_ON_USE 100 EFFECT_HEALING 2 12

@@ -41,8 +41,8 @@ void doMessageLog(World &world) {
         terminal_refresh();
 
         int key = terminal_read();
-        if (key == TK_UP) if (topMessage > 0) --topMessage;
-        if (key == TK_DOWN) ++topMessage;
+        if (key == TK_DOWN || key == TK_KP_2) if (topMessage > 0) --topMessage;
+        if (key == TK_UP || key == TK_KP_8) ++topMessage;
         if (key == TK_ESCAPE || key == TK_CLOSE || key == TK_L) return;
         if (key == TK_HOME) topMessage = world.messages.size() - 1;
         if (key == TK_END) topMessage = 0;

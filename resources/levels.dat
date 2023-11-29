@@ -8,23 +8,45 @@
     actor           0 45 ACTOR_GOBLIN
     actor           0 45 ACTOR_KOBOLD
     actor           0 10 ACTOR_HOBGOBLIN
-    itemCount       80
-    item            0 10 ITM_DAGGER
-    item            0 10 ITM_SWORD
-    item            0 10 ITM_POTION_LESSER_HEALING
-    item            0  7 ITM_POTION_LESSER_REGEN
-    item            0 10 ITM_POTION_LESSER_MUTATION
-    item            0 10 ITM_TALIS_ENERGY
-    item            0 10 ITM_TALIS_ENERGY
-    item            0 10 ITM_TALIS_EVASION
-    item            0 13 ITM_WAND_HEALING
+    itemCount       40
+    item            0  8 ITM_POTION_LESSER_HEALING
+    item            0  3 ITM_POTION_GREATER_HEALING
+    item            0  8 ITM_POTION_ENERGY
+    item            0  3 ITM_POTION_LESSER_REGEN
+    item            0  8 ITM_POTION_LESSER_MUTATION
+    item            0  7 ITM_POTION_RAGE
+    item            0  7 ITM_POTION_PURITY
+    item            0  7 ITM_POTION_HASTE
+    item            0  7 ITM_WAND_HEALING
+    item            0  7 ITM_TALIS_HEALTH
+    item            0  7 ITM_TALIS_ENERGY
+    item            0  7 ITM_TALIS_EVASION
+    item            0  7 ITM_TALIS_ACCURACY
+    item            0  7 ITM_TALIS_UNBURDENING
+    item            0  7 ITM_TALIS_HARMING
 
 @dungeon - 45
     name the_Halls_Of_Change
     actorCount      40
     actor           0 45 ACTOR_SKELETON
     actor           0 45 ACTOR_ZOMBIE
-    actor           0 10 ACTOR_CHAOSBEAST
+    actor           0 10 ACTOR_ORC
+    itemCount       40
+    item            0  7 ITM_POTION_LESSER_HEALING
+    item            0  4 ITM_POTION_GREATER_HEALING
+    item            0  7 ITM_POTION_ENERGY
+    item            0  3 ITM_POTION_LESSER_REGEN
+    item            0  9 ITM_POTION_LESSER_MUTATION
+    item            0  7 ITM_POTION_RAGE
+    item            0  7 ITM_POTION_PURITY
+    item            0  7 ITM_POTION_HASTE
+    item            0  7 ITM_WAND_HEALING
+    item            0  7 ITM_TALIS_HEALTH
+    item            0  7 ITM_TALIS_ENERGY
+    item            0  7 ITM_TALIS_EVASION
+    item            0  7 ITM_TALIS_ACCURACY
+    item            0  7 ITM_TALIS_UNBURDENING
+    item            0  7 ITM_TALIS_HARMING
 
 @dungeon - 46
     actorCount      40
@@ -32,6 +54,22 @@
     actor           0 45 ACTOR_CHAOSBEAST
     actor           0 10 ACTOR_TROLL
     name the_Dark_Depths
+    itemCount       40
+    item            0  6 ITM_POTION_LESSER_HEALING
+    item            0  5 ITM_POTION_GREATER_HEALING
+    item            0  6 ITM_POTION_ENERGY
+    item            0  3 ITM_POTION_LESSER_REGEN
+    item            0 10 ITM_POTION_LESSER_MUTATION
+    item            0  7 ITM_POTION_RAGE
+    item            0  7 ITM_POTION_PURITY
+    item            0  7 ITM_POTION_HASTE
+    item            0  7 ITM_WAND_HEALING
+    item            0  7 ITM_TALIS_HEALTH
+    item            0  7 ITM_TALIS_ENERGY
+    item            0  7 ITM_TALIS_EVASION
+    item            0  7 ITM_TALIS_ACCURACY
+    item            0  7 ITM_TALIS_UNBURDENING
+    item            0  7 ITM_TALIS_HARMING
 
 @dungeon - 47
     name the_Forgotten_Mines
@@ -40,5 +78,5 @@
     actor           0 60 ACTOR_CHAOSBEAST
     actor           0 20 ACTOR_DEMON
     actor           0 20 ACTOR_TROLL
-    itemCount       25
+    itemCount       5
     item            0 100 ITM_ETHEREAL_ORE

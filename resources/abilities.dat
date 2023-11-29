@@ -1,0 +1,69 @@
+
+@ability ABILITY_FLIGHT 1
+    name            flight
+    description     You_can_fly!_Shame_you're_delving_through_a_dungeon.
+    areaType        AR_PASSIVE
+
+@ability ABILITY_FIRE_BREATH 2
+    name            fire_breath
+    description     You_can_breath_fire_in_a_wide_cone.
+    energyCost      8
+    maxRange        8
+    areaType        AR_CONE
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_FIRE_BREATH 0
+
+@ability ABILITY_ICE_PELLETS 3
+    name            ice_pellets
+    description     You_can_fire_a_series_of_icy_pellets_in_a_straight_line
+    energyCost      8
+    maxRange        16
+    areaType        AR_LINE
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_ICE_PELLETS 0
+
+@ability ABILITY_POISON_MIST 4
+    name            poison_mist
+    description     You_can_spit_a_toxic_glob_that_will_create_a_shortlived_burst_of_poison_wherever_it_lands.
+    energyCost      8
+    maxRange        4
+    areaType        AR_BURST
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_POISON 0
+
+@ability ABILITY_REGENERATION 5
+    name            regeneration
+    description     With_an_act_of_will,_you_can_cause_yourself_to_heal_rapidly_for_a_short_time.
+    energyCost      15
+    areaType        AR_NONE
+    effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_LESSER_REGEN 0
+
+@ability ABILITY_WHIRLWIND_TAIL 6
+    name            whirlwind_tailstrike
+    description     Spin_around,_bludgeoning_all_adjacent_foes_with_your_tail.
+    energyCost      6
+    areaType        AR_BURST
+    maxRange        2
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_CLUBTAIL 0
+
+@ability ABILITY_TAILWHIP 7
+    name            tailwhip
+    description     Slash_your_enemies_with_the_end_of_your_tail.
+    energyCost      6
+    areaType        AR_BURST
+    maxRange        2
+    speedMult       50
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_WHIPTAIL 0
+
+@ability ABILITY_GORE 8
+    name            gore
+    description     Gore_an_enemy_with_your_horns.
+    energyCost      6
+    areaType        AR_CONE
+    maxRange        2
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_GORING_HORNS 0
+
+@ability ABILITY_HORNCHARGE 9
+    name            horn_charge
+    description     Charge_into_your_enemies_using_your_horns.
+    energyCost      6
+    areaType        AR_CONE
+    maxRange        2
+    effect          ET_ON_USE 100 EFFECT_ATTACK ITM_RAMMING_HORNS 0

@@ -1,0 +1,36 @@
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Status effect defs
+
+@status STATUS_LESSER_REGEN 0
+    name            regeneration
+    description     Causes_the_subject_to_slowly_recover_health_over_time.
+    minDuration     4
+    maxDuration     7
+    resistDC        9999
+    effect          ET_ON_TICK 100 EFFECT_HEALING 1 10
+
+@status STATUS_RAGE 1
+    name            rage
+    description     Gives_the_subject_enhanced_strength,_but_reduces_their_agility.
+    minDuration     8
+    maxDuration     16
+    resistDC        9999
+    effect          ET_BOOST 100 STAT_STRENGTH 2 0
+    effect          ET_BOOST 100 STAT_AGILITY -1 0
+
+@status STATUS_POISON 2
+    name            poison
+    description     Causes_the_subject_to_slowly_take_damage.
+    minDuration     2
+    maxDuration     6
+    resistDC        15
+    effect          ET_ON_TICK 100 EFFECT_DAMAGE 3 6
+
+@status STATUS_HASTE 3
+    name            haste
+    description     Causes_the_subject_to_move_at_a_quicker_rate.
+    minDuration     8
+    maxDuration     16
+    resistDC        9999
+    effect          ET_BOOST 100 STAT_SPEED 2 0
+
