@@ -16,7 +16,7 @@ Dungeon* World::getDungeon(int depth) {
     // otherwise existing level not found, create new
     const DungeonData &dungeonData = getDungeonData(depth);
     if (dungeonData.ident == BAD_VALUE) {
-        std::cerr << "Failed to find dungeon for depth " << depth << '\n';
+        logMessage(LOG_ERROR, "Failed to find dungeon for depth " + std::to_string(depth));
         return nullptr;
     }
     int iteration = -1;
@@ -35,7 +35,7 @@ Dungeon* World::getDungeon(int depth) {
         if (startPos.x < 0) startPos = downStair;
         if (startPos.x < 0) startPos = upStair;
         if (startPos.x < 0) {
-            std::cerr << "ERROR  Failed to find entrance, or up or down stair\n";
+            logMessage(LOG_ERROR, "Failed to find entrance, or up or down stair");
             continue;
         }
         newMap->calcDistances(startPos);
@@ -43,7 +43,7 @@ Dungeon* World::getDungeon(int depth) {
         if ( (entrance.x >= 0 && newMap->distanceAt(entrance) < 0) ||
              (upStair.x >= 0 && newMap->distanceAt(upStair) < 0) ||
              (downStair.x >= 0 && newMap->distanceAt(downStair) < 0) ) {
-            std::cerr << "ERROR  map connectivity failed\n";
+            logMessage(LOG_ERROR, "map connectivity failed");
             continue;
         }
 
@@ -82,23 +82,23 @@ bool World::movePlayerToDepth(int newDepth, int enterFrom) {
                 const TileData &td = getTileData(tile->floor);
                 if (!td.isPassable || tile->actor) startPosition.x = -1;
             } while (iterations > 0 && startPosition.x < 0);
-        } else std::cerr << "ERROR  Failed to find entrance room\n";
+        } else logMessage(LOG_ERROR, "Failed to find entrance room");
     } else if (enterFrom == DE_UPSTAIRS) {
         startPosition = map->firstOfTile(TILE_STAIR_DOWN);
     } else if (enterFrom == DE_DOWNSTAIRS) {
         startPosition = map->firstOfTile(TILE_STAIR_UP);
     } else {
-        std::cerr << "ERROR  unknown dungeon enterFrom value " << enterFrom << '\n';
+        logMessage(LOG_ERROR, "unknown dungeon enterFrom value " + std::to_string(enterFrom));
         return false;
     }
 
     if (startPosition.x < 0) {
-        std::cerr << "ERROR  failed to find valid start position.\n";
+        logMessage(LOG_ERROR, "failed to find valid start position.");
         startPosition.x = MAP_WIDTH / 2;
         startPosition.y = MAP_HEIGHT / 2;
         return false;
     }
-    std::cerr << "    initial position @ " << startPosition << '\n';
+    logMessage(LOG_INFO, "initial position @ " + startPosition.toString());
     map->addActor(player, startPosition);
     map->resetSpeedCounter();
     map->doActorFOV(player);

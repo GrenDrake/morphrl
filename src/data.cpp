@@ -186,13 +186,14 @@ unsigned getDungeonEntranceIdent() {
 std::string readFile(const std::string &filename) {
     PHYSFS_File *fp = PHYSFS_openRead(filename.c_str());
     if (!fp) {
-        std::cerr << "Failed to read file " << filename << ": ";
-        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        std::string errorMessage = "Failed to read file " + filename + ": ";
+        errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        logMessage(LOG_ERROR, errorMessage);
         return "";
     }
     auto length = PHYSFS_fileLength(fp);
     if (length == -1) {
-        std::cerr << "File " << filename << " is of indeterminate length.\n";
+        logMessage(LOG_ERROR, "File " + filename + " is of indeterminate length");
         PHYSFS_close(fp);
         return "";
     }
@@ -202,8 +203,9 @@ std::string readFile(const std::string &filename) {
     std::string result(buffer);
     delete[] buffer;
     if (length != bytesRead) {
-        std::cerr << "Unexpected file length " << filename << ": ";
-        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        std::string errorMessage = "Unexpected file length " + filename + ": ";
+        errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        logMessage(LOG_ERROR, errorMessage);
     }
     PHYSFS_close(fp);
     return result;
@@ -213,13 +215,14 @@ std::vector<unsigned char> readFileAsBinary(const std::string &filename) {
     std::vector<unsigned char> result;
     PHYSFS_File *fp = PHYSFS_openRead(filename.c_str());
     if (!fp) {
-        std::cerr << "Failed to read file " << filename << ": ";
-        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        std::string errorMessage = "Failed to read file " + filename + ": ";
+        errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        logMessage(LOG_ERROR, errorMessage);
         return result;
     }
     auto length = PHYSFS_fileLength(fp);
     if (length == -1) {
-        std::cerr << "File " << filename << " is of indeterminate length.\n";
+        logMessage(LOG_ERROR, "File " + filename + " is of indeterminate length.");
         PHYSFS_close(fp);
         return result;
     }
@@ -229,8 +232,9 @@ std::vector<unsigned char> readFileAsBinary(const std::string &filename) {
         auto readCount = PHYSFS_readBytes(fp, &theByte, 1);
         if (PHYSFS_eof(fp)) break;
         if (readCount != 1) {
-            std::cerr << "Read error in " << filename << ": ";
-            std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+            std::string errorMessage = "Read error in " + filename + ": ";
+            errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+            logMessage(LOG_ERROR, errorMessage);
         }
         result.push_back(theByte);
     }
@@ -849,7 +853,7 @@ bool loadAllData() {
 
     if (rawData.hasErrors()) {
         for (const ErrorMessage &msg : rawData.errors) {
-            std::cerr << msg.origin.toString() << "  " << msg.message << '\n';
+            logMessage(LOG_ERROR, msg.origin.toString() + "  " + msg.message);
         }
         return false;
     }
@@ -893,17 +897,17 @@ bool loadAllData() {
     sortDataEntries(mutationData);
     sortDataEntries(dungeonData);
 
-    std::cerr << "LOADED " << tileData.size() << " tiles (next ident: " << maxTile+1 << ")\n";
-    std::cerr << "LOADED " << itemData.size() << " items (next ident: " << maxItem+1 << ")\n";
-    std::cerr << "LOADED " << actorData.size() << " actors (next ident: " << maxActor+1 << ")\n";
-    std::cerr << "LOADED " << statusData.size() << " status effects (next ident: " << maxStatus+1 << ")\n";
-    std::cerr << "LOADED " << abilityData.size() << " abilities (next ident: " << maxAbility+1 << ")\n";
-    std::cerr << "LOADED " << mutationData.size() << " mutations (next ident: " << maxMutation+1 << ")\n";
-    std::cerr << "LOADED " << dungeonData.size() << " dungeon levels (next ident: " << maxDungeon+1 << ")\n";
+    logMessage(LOG_INFO, "LOADED " + std::to_string(tileData.size())     + " tiles (next ident: "          + std::to_string(maxTile+1)     + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(itemData.size())     + " items (next ident: "          + std::to_string(maxItem+1)     + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(actorData.size())    + " actors (next ident: "         + std::to_string(maxActor+1)    + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(statusData.size())   + " status effects (next ident: " + std::to_string(maxStatus+1)   + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(abilityData.size())  + " abilities (next ident: "      + std::to_string(maxAbility+1)  + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(mutationData.size()) + " mutations (next ident: "      + std::to_string(maxMutation+1) + ")");
+    logMessage(LOG_INFO, "LOADED " + std::to_string(dungeonData.size())  + " dungeon levels (next ident: " + std::to_string(maxDungeon+1)  + ")");
 
     if (rawData.hasErrors()) {
         for (const ErrorMessage &msg : rawData.errors) {
-            std::cerr << msg.origin.toString() << "  " << msg.message << '\n';
+            logMessage(LOG_ERROR, msg.origin.toString() + "  " + msg.message);
         }
         return false;
     } else {

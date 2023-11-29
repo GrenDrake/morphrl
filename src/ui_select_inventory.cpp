@@ -102,7 +102,7 @@ void doInventory(World &world, bool showFloor) {
 
     MapTile *floorTile = world.map->at(world.player->position);
     if (!floorTile) {
-        std::cerr << "ERROR: player standing on non-existant floor tile\n";
+        logMessage(LOG_ERROR, "player standing on non-existant floor tile");
         return;
     }
     const int maxBulk = world.player->getStat(STAT_BULK_MAX);

@@ -24,7 +24,7 @@ void showDocument(const std::string &filename) {
 
 void showDocument(Document *document) {
     if (!document || (document->lines.empty())) {
-        std::cerr << "Tried to show empty document.\n";
+        logMessage(LOG_ERROR, "Tried to show empty document");
         return;
     }
 
@@ -99,9 +99,11 @@ Document* loadDocument(const std::string &filename) {
             if (parts[0] == "@image") {
                 // @image resources/story1.png 0 60
                 if (parts.size() != 4) {
-                    std::cerr << filename << ':' << lineNumber;
-                    std::cerr << " bad argument count for @image (found ";
-                    std::cerr << parts.size() << " expected 4)\n";
+                    std::string errorMessage;
+                    errorMessage += filename + ':' + std::to_string(lineNumber);
+                    errorMessage += " bad argument count for @image (found ";
+                    errorMessage += std::to_string(parts.size()) + " expected 4)";
+                    logMessage(LOG_ERROR, errorMessage);
                 } else {
                     DocumentImage image;
                     image.filename = parts[1];
@@ -111,8 +113,9 @@ Document* loadDocument(const std::string &filename) {
                     doc->images.push_back(image);
                 }
             } else {
-                std::cerr << filename << ':' << lineNumber;
-                std::cerr << "  unknown directive " << parts[0] << '\n';
+                std::string errorMessage = filename + ":" + std::to_string(lineNumber);
+                errorMessage += "  unknown directive " + parts[0];
+                logMessage(LOG_ERROR, errorMessage);
             }
         } else doc->lines.push_back(line);
     }

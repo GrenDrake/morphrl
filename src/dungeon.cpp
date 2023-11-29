@@ -570,7 +570,7 @@ std::vector<Coord> Dungeon::getEffectArea(const Coord &origin, const Coord &targ
             }
             break;
         default:
-            std::cerr << "Unhandled areaType in getEffectArea\n";
+            logMessage(LOG_ERROR, "Unhandled areaType in getEffectArea");
     }
 
     if (areaType == AR_CONE || areaType == AR_BURST) {

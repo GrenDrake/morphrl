@@ -218,7 +218,7 @@ void gameloop(World &world) {
                 ++counter;
             }
         } else {
-            std::cerr << "Unsupported UIMode " << static_cast<int>(uiMode) << " in display\n";
+            logMessage(LOG_ERROR, "Unsupported UIMode " + std::to_string(static_cast<int>(uiMode)) + " in display");
         }
         terminal_clear_area(0, 0, 80, 20);
 
@@ -557,11 +557,11 @@ void gameloop(World &world) {
                         world.addMessage("Carved tunnel.");
                         break; }
                     default:
-                        std::cerr << "Unknown UI action " << uiModeAction << '\n';
+                        logMessage(LOG_ERROR, "Unknown UI action " + std::to_string(uiModeAction));
                 }
             }
         } else {
-            std::cerr << "unhandled UIMode " << static_cast<int>(uiMode) << " in input \n";
+            logMessage(LOG_ERROR, "unhandled UIMode " + std::to_string(static_cast<int>(uiMode)) + " in input");
         }
     }
 

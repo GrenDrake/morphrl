@@ -33,8 +33,9 @@ Image* loadImage(const std::string &filename) {
     image->pixels = stbi_load_from_memory(filedata.data(), filedata.size(), &image->w, &image->h, &channels_in_file, 3);
     // image->pixels = stbi_load(filename.c_str(), &image->w, &image->h, &channels_in_file, 3);
     if (!image->pixels) {
-        std::cerr << "Failed to load image " << filename << ": ";
-        std::cerr << stbi_failure_reason() << '\n';
+        std::string errorMessage = "Failed to load image " + filename + ": ";
+        errorMessage += stbi_failure_reason();
+        logMessage(LOG_ERROR, errorMessage);
         delete image;
         return nullptr;
     }

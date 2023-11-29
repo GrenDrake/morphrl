@@ -85,7 +85,7 @@ void tryMovePlayer(World &world, Direction dir) {
 void tryPlayerTakeItem(World &world) {
     MapTile *tile = world.map->at(world.player->position);
     if (!tile) {
-        std::cerr << "Tried to take item while player outside map.\n";
+        logMessage(LOG_ERROR, "Tried to take item while player outside map.");
         return;
     }
 

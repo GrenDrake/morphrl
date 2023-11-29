@@ -18,12 +18,12 @@ World* createGame(uint64_t gameSeed) {
     World *world = new World;
     if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
-    std::cerr << "NEW GAME with seed: " << world->gameSeed << "\n";
+    logMessage(LOG_INFO, "NEW GAME with seed: " + std::to_string(world->gameSeed));
     world->player = Actor::create(getActorData(0));
     world->player->isPlayer = true;
     world->player->reset();
     if (!world->movePlayerToDepth(getDungeonEntranceIdent(), DE_ENTRANCE)) {
-        std::cerr << "ERROR world generation failed\n";
+        logMessage(LOG_INFO, "world generation failed");
         uint64_t newSeed = world->gameSeed + 1;
         delete world;
         return createGame(newSeed);
@@ -56,14 +56,18 @@ int main(int argc, char *argv[]) {
     PHYSFS_init(argv[0]);
     const char *writeDir = PHYSFS_getPrefDir("grendrake", "morphrl");
     if (!writeDir) {
-        std::cerr << "failed to find suitable location for writing files: ";
-        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        std::string errorMessage = "failed to find suitable location for writing files: ";
+        errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        errorMessage += ".\n";
+        logMessage(LOG_ERROR, errorMessage);
         return 1;
     }
-    std::cerr << "Write directory: " << writeDir << "\n\n";
+    std::cerr << "Write directory: " << writeDir << '\n';
     if (PHYSFS_setWriteDir(writeDir) == 0) {
-        std::cerr << "failed to set write directory: ";
-        std::cerr << PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()) << ".\n";
+        std::string errorMessage = "failed to set write directory: " +
+        errorMessage += PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode());
+        errorMessage += ".\n";
+        logMessage(LOG_ERROR, errorMessage);
         return 1;
     }
     PHYSFS_mount(writeDir, "/saves", 1);

@@ -139,7 +139,11 @@ double Coord::distanceTo(const Coord &to) const {
     return sqrt(dx*dx + dy*dy);
 }
 
+std::string Coord::toString() const {
+    return "(" + std::to_string(x) + "," + std::to_string(y) + ")";
+}
+
 std::ostream& operator<<(std::ostream &out, const Coord &where) {
-    out << "(" + std::to_string(where.x) + "," + std::to_string(where.y) + ")";
+    out << where.toString();
     return out;
 }

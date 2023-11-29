@@ -6,7 +6,7 @@
 
 std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) {
     if (!user) {
-        std::cerr << "Tried to trigger effect with no user.\n";
+        logMessage(LOG_ERROR, "Tried to trigger effect with no user.");
         return "";
     }
     if (!target) target = user;
@@ -64,7 +64,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             if (target->hasStatus(effect.effectStrength)) return ""; // prevent stacking status effects
             const StatusData &statusData = getStatusData(effect.effectStrength);
             if (statusData.ident == BAD_VALUE) {
-                std::cerr << "ERROR: Tried to apply invalid status " << effect.effectStrength << '\n';
+                logMessage(LOG_ERROR, "ERROR: Tried to apply invalid status " + std::to_string(effect.effectStrength));
                 return "";
             } else {
                 std::string message;
@@ -105,7 +105,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             }
             break; }
         default:
-            std::cerr << "ERROR: Unhandled effect " << effect.effectId << ".\n";
+            logMessage(LOG_ERROR, "ERROR: Unhandled effect " + std::to_string(effect.effectId));
     }
     return "";
 }

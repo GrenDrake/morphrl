@@ -150,8 +150,9 @@ void addDoorToRoom(Dungeon &d, Room &room) {
         // we can't find a valid door placement, so fill the room instead
         d.fillRect(room.x, room.y, room.w, room.h, 1);
         room.isFilled = true;
-        // std::cerr << "(failed to place door for room at " << room.x;
-        // std::cerr << ',' << room.y << ")\n";
+        std::string errorMessage = "(failed to place door for room at ";
+        errorMessage += std::to_string(room.x) + "," + std::to_string(room.y) + ")";
+        logMessage(LOG_WARN, errorMessage);
     }
 }
 
@@ -298,12 +299,12 @@ void addStairs(Dungeon &d) {
             room.type = RT_STAIR;
             Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
             d.floorAt(stairPos, TILE_STAIR_DOWN);
-            std::cerr << "    downstair @ " << stairPos << '\n';
+            logMessage(LOG_INFO, "downstair @ " + stairPos.toString());
             isGood = true;
         }
 
         if (!isGood) {
-            std::cerr << "Failed placing down stairs.\n";
+            logMessage(LOG_ERROR, "Failed placing down stairs.");
         }
     }
 
@@ -316,12 +317,12 @@ void addStairs(Dungeon &d) {
             room.type = RT_STAIR;
             Coord stairPos(room.x + room.w / 2, room.y + room.h / 2);
             d.floorAt(stairPos, TILE_STAIR_UP);
-            std::cerr << "    upstair @ " << stairPos << '\n';
+            logMessage(LOG_INFO, "upstair @ " + stairPos.toString());
             isGood = true;
         }
 
         if (!isGood) {
-            std::cerr << "Failed placing up stairs.\n";
+            logMessage(LOG_ERROR, "Failed placing up stairs.");
         }
     }
 }
@@ -434,7 +435,7 @@ void spawnItems(Dungeon &d) {
 }
 
 void doMapgen(Dungeon &d) {
-    std::cerr << "MAPGEN for " << d.depth() << '\n';
+    logMessage(LOG_INFO, "MAPGEN for " + std::to_string(d.depth()));
     // if we're on the ground floor, create the entrance room
     if (d.data.hasEntrance) addEntranceHall(d);
     buildRooms(d);

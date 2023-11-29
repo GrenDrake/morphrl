@@ -14,6 +14,11 @@ class World;
 
 const unsigned BAD_VALUE = 4294967295;
 
+const int LOG_INFO = 0;
+const int LOG_WARN = 1;
+const int LOG_ERROR = 2;
+const int LOG_DEBUG = 3;
+
 const int MAP_WIDTH = 63;
 const int MAP_HEIGHT = 47;
 const int MAX_TALISMANS_WORN = 3;
@@ -109,6 +114,7 @@ struct Coord {
     Coord shift(Direction d, int amount = 1) const;
     Direction directionTo(const Coord &to) const;
     double distanceTo(const Coord &to) const;
+    std::string toString() const;
 
     int x, y;
 };
@@ -518,6 +524,8 @@ void spawnActors(Dungeon &d, bool forRefresh);
 
 void ui_alertBox(const std::string &title, const std::string &message);
 bool ui_getString(const std::string &title, const std::string &message, std::string &result);
+
+void logMessage(int logLevel, std::string message);
 
 extern RNG globalRNG;
 
