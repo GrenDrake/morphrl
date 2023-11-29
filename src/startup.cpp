@@ -84,8 +84,8 @@ int main(int argc, char *argv[]) {
 #endif
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
-    const std::string versionString = "Development Release 1";
-    const int versionX = 79 - versionString.size();
+    const std::string versionString = "Version: Alpha-1";
+    const int versionX = (79 - versionString.size()) / 2;
     Image *logo = loadImage("logo.png");
     bool done = false;
     int selection = 0;
@@ -98,7 +98,6 @@ int main(int argc, char *argv[]) {
         terminal_bkcolor(bgColor);
         terminal_clear();
         terminal_print(25, 11, "[font=italic]Delving the Mutagenic Dungeon");
-        terminal_print(versionX, 24, ("[font=italic]" + versionString).c_str());
         terminal_print(8, 16, "Start new game");
         mouseRegions.push_back(UIRect{8, 16, 20, 1, 0});
         terminal_print(8, 17, "Start game from seed");
@@ -119,7 +118,11 @@ int main(int argc, char *argv[]) {
 #endif
         terminal_print(5, 16+selection, "->");
         terminal_color(fgColorDark);
-        terminal_print(31, 12, "Pre-Alpha Release");
+        terminal_print(versionX, 12, versionString.c_str());
+#ifdef DEBUG
+        terminal_color(color_from_argb(255, 255, 0, 0));
+        terminal_print(33, 13, "DEBUG VERSION");
+#endif
         drawImage(0, 0, logo);
         terminal_refresh();
 
