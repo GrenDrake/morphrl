@@ -115,3 +115,89 @@ void tryPlayerChangeFloor(World &world) {
         world.addMessage("No stairs here!");
     }
 }
+
+
+
+void debug_addThing(World &world, int thingType) {
+    std::string result;
+    std::string thingTypeStr = "spawn";
+    switch(thingType) {
+        case TT_ITEM: thingTypeStr = "item"; break;
+        case TT_MUTATION: thingTypeStr = "mutation"; break;
+        case TT_STATUS_EFFECT: thingTypeStr = "status effect"; break;
+    }
+    if (!ui_getString("Add Item", "Enter " + thingTypeStr + " ident", result) || result.empty()) return;
+
+    unsigned ident = 0;
+    if (!strToInt(result, ident)) {
+        ui_alertBox("Error", "Malformed ident number.");
+        return;
+    }
+
+    switch(thingType) {
+        case TT_ITEM: {
+            const ItemData &itemData = getItemData(ident);
+            if (itemData.ident == BAD_VALUE) {
+                ui_alertBox("Error", "Unknown item ident.");
+            } else {
+                Item *item = new Item(itemData);
+                world.player->addItem(item);
+                world.addMessage("[color=cyan]DEBUG[/color] give item " + itemData.name);
+            }
+            return; }
+        case TT_MUTATION: {
+            const MutationData &mutationData = getMutationData(ident);
+            if (mutationData.ident == BAD_VALUE) {
+                ui_alertBox("Error", "Unknown mutation ident.");
+            } else {
+                MutationItem *mutation = new MutationItem(mutationData);
+                world.player->applyMutation(mutation);
+                world.addMessage("[color=cyan]DEBUG[/color] give mutation " + mutationData.name);
+            }
+            return; }
+        case TT_STATUS_EFFECT: {
+            const StatusData &statusData = getStatusData(ident);
+            if (statusData.ident == BAD_VALUE) {
+                ui_alertBox("Error", "Unknown status effect ident.");
+            } else {
+                StatusItem *statusEffect = new StatusItem(statusData);
+                world.player->applyStatus(statusEffect);
+                world.addMessage("[color=cyan]DEBUG[/color] give status effect " + statusData.name);
+            }
+            return; }
+        default:
+            world.addMessage("[color=red]ERROR[/color]  Unknown spawn type " + std::to_string(thingType));
+    }
+}
+
+void debug_doTeleport(World &world) {
+    std::string result;
+    if (ui_getString("Teleport", "Enter coordinate pair", result) && !result.empty()) {
+        auto parts = explodeOnWhitespace(result);
+        int x, y;
+        if (parts.size() != 2 || !strToInt(parts[0], x) || !strToInt(parts[1], y)) {
+            ui_alertBox("Error", "Malformed coordinates.");
+        } else if (!world.map->isValidPosition(Coord(x,y))) {
+            ui_alertBox("Error", "Coordinates not on map.");
+        } else {
+            world.map->moveActor(world.player, Coord(x,y));
+            world.map->doActorFOV(world.player);
+            world.addMessage("[color=cyan]DEBUG[/color] teleported player player to " + std::to_string(x) + "," + std::to_string(y));
+        }
+    }
+}
+
+void debug_killNeighbours(World &world) {
+    Direction d = Direction::North;
+    int count = 0;
+    do {
+        Actor *actor = world.map->actorAt(world.player->position.shift(d));
+        if (actor) {
+            ++count;
+            actor->takeDamage(99999);
+        }
+        d = rotate45(d);
+    } while (d != Direction::North);
+    world.addMessage("[color=cyan]DEBUG[/color] Killed " + std::to_string(count) + " actors");
+    world.tick();
+}

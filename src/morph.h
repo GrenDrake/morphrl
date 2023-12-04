@@ -75,6 +75,9 @@ const int STAT_DAMAGE_BONUS = 9;
 const int STAT_BULK         = 10;
 const int STAT_ALL_COUNT    = 11;
 
+const int TT_ITEM = 0;
+const int TT_MUTATION = 1;
+const int TT_STATUS_EFFECT = 2;
 
 const int EFFECT_HEALING    = 0; // instant healing - strength = percent healed
 const int EFFECT_DAMAGE     = 1; // take damage - strength = amount
