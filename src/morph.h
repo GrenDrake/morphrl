@@ -524,6 +524,7 @@ void fovCalcBurst(Dungeon *dungeon, const Coord &origin, int maxRange);
 std::vector<Coord> calcLine(const Dungeon &map, const Coord &start, const Coord &end, bool stopOpaque, bool stopSolid);
 void doMapgen(Dungeon &d);
 void spawnActors(Dungeon &d, bool forRefresh);
+void activateItem(World &world, Item *item, Actor *user);
 
 void ui_alertBox(const std::string &title, const std::string &message);
 bool ui_getString(const std::string &title, const std::string &message, std::string &result);
