@@ -36,6 +36,9 @@ void showActorInfo(World &world, const Actor *actor) {
         std::string healthLine = "Health: [color=red]" + std::to_string(percentOf(actor->health, actor->getStat(STAT_HEALTH))) + "[/color]%";
         terminal_print(0, nextY, healthLine.c_str());
         ++nextY;
+        std::string levelLine = "Level: [color=cyan]" + std::to_string(actor->level) + "[/color]";
+        terminal_print(0, nextY, levelLine.c_str());
+        ++nextY;
 
         if (!actor->statusEffects.empty()) {
             ++nextY;
