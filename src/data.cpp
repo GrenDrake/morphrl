@@ -702,6 +702,7 @@ std::vector<DataDef> tilePropData{
     { "glyph",          1 },
     { "name",           1 },
     { "colour",         3 },
+    { "interactTo",     1 },
     { "isOpaque",       0 },
     { "isPassable",     0 },
     { "isUpStair",      0 },
@@ -718,6 +719,7 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
     resultData.name = "unknown";
     resultData.glyph = '?';
     resultData.r = 255; resultData.g = 255; resultData.b = 255;
+    resultData.interactTo = 0;
     resultData.isOpaque = false;
     resultData.isPassable = false;
     resultData.isUpStair = false;
@@ -743,6 +745,8 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
                 resultData.r = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.g = dataAsInt(rawData, prop.origin, prop.value[1]);
                 resultData.b = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "interactTo") {
+                resultData.interactTo = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "isOpaque") {
                 resultData.isOpaque = true;
             } else if (prop.name == "isPassable") {

@@ -16,6 +16,7 @@ void tryMeleeAttack(World &world, Direction dir);
 void tryMovePlayer(World &world, Direction dir);
 void tryPlayerTakeItem(World &world);
 void tryPlayerChangeFloor(World &world);
+void tryPlayerInteractTile(World &world, Direction dir);
 
 void debug_addThing(World &world, int thingType);
 void debug_doTeleport(World &world);
@@ -145,6 +146,7 @@ enum class UIMode {
 };
 const int UI_DEBUG_TUNNEL = 10000;
 const int UI_USE_ABILITY  = 10001;
+const int UI_INTERACT_TILE  = 10002;
 void gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
@@ -348,6 +350,11 @@ void gameloop(World &world) {
 
             if (key == TK_L)        doMessageLog(world);
             if (key == TK_G)        tryPlayerTakeItem(world);
+            if (key == TK_O) {
+                uiMode = UIMode::ChooseDirection;
+                uiModeString = "Interact where?";
+                uiModeAction = UI_INTERACT_TILE;
+            }
             if (key == TK_COMMA)    tryPlayerChangeFloor(world);
             if (key == TK_PERIOD)   tryPlayerChangeFloor(world);
 
@@ -486,6 +493,10 @@ void gameloop(World &world) {
                         world.map->floorAt(where, TILE_FLOOR);
                         world.addMessage("Carved tunnel.");
                         break; }
+                    case UI_INTERACT_TILE: {
+                        tryPlayerInteractTile(world, theDir);
+                        break;
+                    }
                     default:
                         logMessage(LOG_ERROR, "Unknown UI action " + std::to_string(uiModeAction));
                 }

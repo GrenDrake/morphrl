@@ -120,7 +120,7 @@ void Dungeon::calcDistances(const Coord &fromWhere) {
             if (!tileB) continue;
             if (tileB->distanceValue >= 0) continue;
             const TileData &td = getTileData(tileB->floor);
-            if (!td.isPassable) continue;
+            if (!td.isPassable && td.ident != TILE_CLOSED_DOOR) continue;
             tileB->distanceValue = tileA->distanceValue + 1;
             worklist.push_back(adj);
         } while (dir != Direction::North);

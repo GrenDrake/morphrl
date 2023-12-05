@@ -54,10 +54,24 @@ void tryMeleeAttack(World &world, Direction dir) {
     world.tick();
 }
 
+void tryPlayerInteractTile(World &world, Direction dir) {
+    const Coord targetPosition = world.player->position.shift(dir);
+    const TileData &tileData = getTileData(world.map->floorAt(targetPosition));
+    if (tileData.interactTo != 0) {
+        world.map->floorAt(targetPosition, tileData.interactTo);
+        world.player->advanceSpeedCounter();
+        world.tick();
+    } else {
+        world.addMessage("Nothing to interact with.");
+    }
+}
+
 void tryMovePlayer(World &world, Direction dir) {
+    const Coord playerPosition = world.player->position;
+
     bool isOverBurdened = world.player->isOverBurdened();
     if (!isOverBurdened && world.map->tryActorStep(world.player, dir)) {
-        const MapTile *tile = world.map->at(world.player->position);
+        const MapTile *tile = world.map->at(playerPosition);
         if (tile && tile->floor == TILE_GRASS && world.player->hasVictoryArtifact()) {
             world.addMessage("[color=green]VICTORY![/color] You have escaped the mutagenic dungeons with the ethereal ore!");
             world.gameState = GameState::Victory;
@@ -75,8 +89,10 @@ void tryMovePlayer(World &world, Direction dir) {
         return;
     }
 
-    Actor *actor = world.map->actorAt(world.player->position.shift(dir));
+    const TileData &tileData = getTileData(world.map->floorAt(playerPosition.shift(dir)));
+    Actor *actor = world.map->actorAt(playerPosition.shift(dir));
     if (actor) tryMeleeAttack(world, dir);
+    else if (tileData.interactTo != 0) tryPlayerInteractTile(world, dir);
     else if (isOverBurdened) {
         world.addMessage("You are too over-burdened to move!");
     }

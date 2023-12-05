@@ -35,11 +35,12 @@ const int TILE_UNASSIGNED = 0;
 const int TILE_WALL = 1;
 const int TILE_FLOOR = 2;
 const int TILE_MARKER = 3;
-const int TILE_DOOR = 4;
+const int TILE_CLOSED_DOOR = 4;
 const int TILE_WATER = 5;
 const int TILE_STAIR_DOWN = 6;
 const int TILE_STAIR_UP = 7;
 const int TILE_GRASS = 8;
+const int TILE_OPEN_DOOR = 4;
 
 const int AR_NONE = 0;
 const int AR_TARGET = 1;
@@ -210,6 +211,7 @@ struct TileData {
     unsigned ident;
     int glyph;
     std::string name;
+    unsigned interactTo;
     bool isPassable;
     bool isOpaque;
     int r, g, b;

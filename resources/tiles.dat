@@ -24,12 +24,19 @@
     colour          255 0 255
     isPassable
 
-@tile TILE_DOOR 4
+@tile TILE_CLOSED_DOOR 4
     glyph           +
     name            door
     colour          165 42 42
-    isPassable
+    interactTo      TILE_OPEN_DOOR
     isOpaque
+
+@tile TILE_OPEN_DOOR 9
+    glyph           /
+    name            door
+    colour          165 42 42
+    interactTo      TILE_CLOSED_DOOR
+    isPassable
 
 @tile TILE_WATER 5
     glyph           ~

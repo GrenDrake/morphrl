@@ -23,6 +23,10 @@ Dungeon* World::getDungeon(int depth) {
     auto oldSeed = globalRNG.getState();
     while (1) {
         ++iteration;
+        if (iteration > 50) {
+            logMessage(LOG_ERROR, "Unable to generate dungeon for depth " + std::to_string(depth));
+            return nullptr;
+        }
         Dungeon *newMap = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
         if (!newMap) return nullptr;
         globalRNG.seed(gameSeed + dungeonData.ident + iteration);

@@ -80,7 +80,7 @@ void buildMaze(Dungeon &d) {
             tile = d.at(here.shift(wd));
             if (tile) {
                 if (globalRNG.upto(1000) < MAZE_DOOR_CHANCE) {
-                    tile->floor = TILE_DOOR;
+                    tile->floor = TILE_CLOSED_DOOR;
                 } else {
                     tile->floor = TILE_FLOOR;
                 }
@@ -142,7 +142,7 @@ void addDoorToRoom(Dungeon &d, Room &room) {
         }
         int targetFloor = d.floorAt(p.shift(dir));
         if (targetFloor == TILE_FLOOR || targetFloor == TILE_GRASS) {
-            d.floorAt(p, TILE_DOOR);
+            d.floorAt(p, TILE_CLOSED_DOOR);
             isValid = true;
         }
     } while (iterations > 0 && !isValid);
@@ -212,7 +212,7 @@ void trimDeadEnds(Dungeon &d) {
                     Direction workdir = dir;
                     do {
                         if (workdir != opening && d.floorAt(here.shift(workdir, 2)) == TILE_FLOOR) {
-                            d.floorAt(here.shift(workdir), TILE_DOOR);
+                            d.floorAt(here.shift(workdir), TILE_CLOSED_DOOR);
                             break;
                         }
                         workdir = rotate90(workdir);
@@ -368,7 +368,7 @@ void addExtraDoors(Dungeon &d) {
         } else isGood = false;
     } while (!isGood && iterations > 0);
     if (!isGood) return;
-    d.floorAt(where, TILE_DOOR);
+    d.floorAt(where, TILE_CLOSED_DOOR);
 }
 
 void spawnActors(Dungeon &d, bool forRefresh) {
