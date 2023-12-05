@@ -108,7 +108,9 @@ void doCharInfo(World &world) {
                 }
 
                 terminal_color(textColour);
-                if (selection >= STAT_BASE_COUNT) {
+                if (world.player->isDead()) {
+                    terminal_print(0, 20, "You cannot improve stats after dying.");
+                } else if (selection >= STAT_BASE_COUNT) {
                     terminal_print(0, 20, "You cannot improve this stat by leveling.");
                 } else if (world.player->advancementPoints == 0) {
                     terminal_print(0, 20, "You haven't gained enough experience to improve this stat.");
@@ -275,7 +277,7 @@ void doCharInfo(World &world) {
         }
 
         if (mode == 0 && (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER)) {
-            if (selection >= STAT_BASE_COUNT || player->advancementPoints < 1) continue;
+            if (player->isDead() || selection >= STAT_BASE_COUNT || player->advancementPoints < 1) continue;
             --player->advancementPoints;
             ++player->statLevels[selection];
         }

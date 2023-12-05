@@ -281,6 +281,7 @@ void gameloop(World &world) {
         if (uiMode == UIMode::PlayerDead) {
             if (key == TK_ESCAPE)   break;
             if (key == TK_L)        doMessageLog(world);
+            if (key == TK_C)        doCharInfo(world);
             if (key == TK_I)        doInventory(world, false);
             if (key == TK_X) {
                 uiMode = UIMode::ExamineTile;
@@ -295,6 +296,27 @@ void gameloop(World &world) {
                 world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
             }
 #endif
+        } else if (uiMode == UIMode::ExamineTile) {
+            if (key == TK_MOUSE_LEFT) {
+                int mx = terminal_state(TK_MOUSE_X);
+                int my = terminal_state(TK_MOUSE_Y);
+                if (my < 19) {
+                    cursorPos.x = mx + offsetX;
+                    cursorPos.y = my + offsetY;
+                }
+            }
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
+                uiMode = UIMode::Normal;
+                const MapTile *tile = world.map->at(cursorPos);
+                if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
+            }
+            Direction theDir = keyToDirection(key);
+            if (theDir != Direction::Unknown) {
+                cursorPos = cursorPos.shift(theDir);
+            }
         } else if (uiMode == UIMode::PickFromList) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
@@ -338,6 +360,57 @@ void gameloop(World &world) {
                     }
                 }
             }
+        } else if (uiMode == UIMode::ChooseTarget) {
+            if (key == TK_MOUSE_LEFT) {
+                int mx = terminal_state(TK_MOUSE_X);
+                int my = terminal_state(TK_MOUSE_Y);
+                if (my < 19) {
+                    cursorPos.x = mx + offsetX;
+                    cursorPos.y = my + offsetY;
+                    targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
+                }
+            }
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
+                uiMode = UIMode::Normal;
+                // DO THE THING
+                if (uiModeAction == UI_USE_ABILITY) {
+                    const AbilityData &abilityData = getAbilityData(uiModeParam);
+                    world.map->activateAbility(world, uiModeParam, cursorPos, targetArea);
+                    world.player->advanceSpeedCounter(abilityData.speedMult);
+                    world.tick();
+                } else {
+                    world.addMessage("ERROR unhandled ui action in UIMode::ChooseTarget");
+                }
+            }
+            Direction theDir = keyToDirection(key);
+            if (theDir != Direction::Unknown) {
+                cursorPos = cursorPos.shift(theDir);
+                targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
+            }
+        } else if (uiMode == UIMode::ChooseDirection) {
+            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
+                uiMode = UIMode::Normal;
+            }
+            Direction theDir = keyToDirection(key);
+            if (theDir != Direction::Unknown) {
+                uiMode = UIMode::Normal;
+                switch(uiModeAction) {
+                    case UI_DEBUG_TUNNEL: {
+                        Coord where = world.player->position.shift(theDir);
+                        world.map->floorAt(where, TILE_FLOOR);
+                        world.addMessage("Carved tunnel.");
+                        break; }
+                    case UI_INTERACT_TILE: {
+                        tryPlayerInteractTile(world, theDir);
+                        break;
+                    }
+                    default:
+                        logMessage(LOG_ERROR, "Unknown UI action " + std::to_string(uiModeAction));
+                }
+            }
         } else if (uiMode == UIMode::Normal) {
             if (key == TK_ESCAPE)   break;
             Direction theDir = keyToDirection(key);
@@ -361,7 +434,7 @@ void gameloop(World &world) {
             if (key == TK_MOUSE_RIGHT) {
                     int mx = terminal_state(TK_MOUSE_X);
                     int my = terminal_state(TK_MOUSE_Y);
-                    if (mx < 60 && my < 20) {
+                    if (my < 19) {
                         Coord where(mx + offsetX, my + offsetY);
                         world.addMessage(previewMapSpace(world, where));
                     }
@@ -426,81 +499,6 @@ void gameloop(World &world) {
                 world.addMessage("[color=cyan]DEBUG[/color] granted XP points");
             }
 #endif
-        } else if (uiMode == UIMode::ExamineTile) {
-            if (key == TK_MOUSE_LEFT) {
-                int mx = terminal_state(TK_MOUSE_X);
-                int my = terminal_state(TK_MOUSE_Y);
-                if (mx < 60 && my < 20) {
-                    cursorPos.x = mx + offsetX;
-                    cursorPos.y = my + offsetY;
-                }
-            }
-            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
-            }
-            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
-            }
-            if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
-                uiMode = UIMode::Normal;
-                const MapTile *tile = world.map->at(cursorPos);
-                if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
-            }
-            Direction theDir = keyToDirection(key);
-            if (theDir != Direction::Unknown) {
-                cursorPos = cursorPos.shift(theDir);
-            }
-        } else if (uiMode == UIMode::ChooseTarget) {
-            if (key == TK_MOUSE_LEFT) {
-                int mx = terminal_state(TK_MOUSE_X);
-                int my = terminal_state(TK_MOUSE_Y);
-                if (mx < 60 && my < 20) {
-                    cursorPos.x = mx + offsetX;
-                    cursorPos.y = my + offsetY;
-                    targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
-                }
-            }
-            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
-            }
-            if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
-                uiMode = UIMode::Normal;
-                // DO THE THING
-                if (uiModeAction == UI_USE_ABILITY) {
-                    const AbilityData &abilityData = getAbilityData(uiModeParam);
-                    world.map->activateAbility(world, uiModeParam, cursorPos, targetArea);
-                    world.player->advanceSpeedCounter(abilityData.speedMult);
-                    world.tick();
-                } else {
-                    world.addMessage("ERROR unhandled ui action in UIMode::ChooseTarget");
-                }
-            }
-            Direction theDir = keyToDirection(key);
-            if (theDir != Direction::Unknown) {
-                cursorPos = cursorPos.shift(theDir);
-                targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
-            }
-        } else if (uiMode == UIMode::ChooseDirection) {
-            if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
-            }
-            Direction theDir = keyToDirection(key);
-            if (theDir != Direction::Unknown) {
-                uiMode = UIMode::Normal;
-                switch(uiModeAction) {
-                    case UI_DEBUG_TUNNEL: {
-                        Coord where = world.player->position.shift(theDir);
-                        world.map->floorAt(where, TILE_FLOOR);
-                        world.addMessage("Carved tunnel.");
-                        break; }
-                    case UI_INTERACT_TILE: {
-                        tryPlayerInteractTile(world, theDir);
-                        break;
-                    }
-                    default:
-                        logMessage(LOG_ERROR, "Unknown UI action " + std::to_string(uiModeAction));
-                }
-            }
         } else {
             logMessage(LOG_ERROR, "unhandled UIMode " + std::to_string(static_cast<int>(uiMode)) + " in input");
         }
