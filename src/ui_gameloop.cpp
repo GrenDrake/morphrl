@@ -349,6 +349,13 @@ void gameloop(World &world) {
                         world.map->activateAbility(world, data.ident, world.player->position, targetArea);
                         world.player->advanceSpeedCounter(data.speedMult);
                         world.tick();
+                    } else if (data.areaType == AR_CONE) {
+                        targetAreaRange = data.maxRange;
+                        targetAreaType = data.areaType;
+                        uiModeParam = ident;
+                        uiMode = UIMode::ChooseDirection;
+                        uiModeString = "Choose direction for " + data.name + ".";
+                        targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
                     } else {
                         cursorPos = world.player->position;
                         targetAreaRange = data.maxRange;
@@ -402,6 +409,13 @@ void gameloop(World &world) {
                         Coord where = world.player->position.shift(theDir);
                         world.map->floorAt(where, TILE_FLOOR);
                         world.addMessage("Carved tunnel.");
+                        break; }
+                    case UI_USE_ABILITY: {
+                        const AbilityData &abilityData = getAbilityData(uiModeParam);
+                        targetArea = world.map->getEffectArea(world.player->position, world.player->position.shift(theDir), targetAreaType, targetAreaRange, false, false);
+                        world.map->activateAbility(world, uiModeParam, cursorPos, targetArea);
+                        world.player->advanceSpeedCounter(abilityData.speedMult);
+                        world.tick();
                         break; }
                     case UI_INTERACT_TILE: {
                         tryPlayerInteractTile(world, theDir);
