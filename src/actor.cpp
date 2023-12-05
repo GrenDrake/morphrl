@@ -192,9 +192,16 @@ int Actor::getStat(int statNumber) const {
     return bonus += getStatBase(statNumber);
 }
 
-void Actor::takeDamage(int amount) {
+void Actor::takeDamage(int amount, Actor *fromWho) {
     health -= amount;
-    if (health < 0) health = 0;
+    if (health <= 0) {
+        health = 0;
+        if (fromWho) {
+            int levelDiff = level - fromWho->level;
+            int xpGain = 10 + levelDiff * 2;
+            if (xpGain > 0) fromWho->giveXP(xpGain);
+        }
+    }
     int maxHealth = getStat(STAT_HEALTH);
     if (health > maxHealth) health = maxHealth;
 }
@@ -374,14 +381,11 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
         data.damage += damageBonus;
         if (data.damage < 1) data.damage = 1;
-        target->takeDamage(data.damage);
+        target->takeDamage(data.damage, this);
         data.effectsMessage = triggerOnHitEffects(target);
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
-            int levelDiff = target->level - level;
-            int xpGain = 10 + levelDiff * 2;
-            if (xpGain > 0) giveXP(xpGain);
         }
     }
     return data;

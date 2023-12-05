@@ -271,7 +271,7 @@ struct Actor {
     int getStatBase(int statNumber) const;
     int getStat(int statNumber) const;
     // AttackResult makeAttack(Actor *target);
-    void takeDamage(int amount);
+    void takeDamage(int amount, Actor *fromWho);
     void spendEnergy(int amount);
     void giveXP(int amount);
 

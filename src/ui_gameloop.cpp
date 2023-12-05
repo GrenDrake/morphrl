@@ -286,7 +286,7 @@ void gameloop(World &world) {
             }
 #ifdef DEBUG
             if (key == TK_F1) {
-                world.player->takeDamage(-99999);
+                world.player->takeDamage(-99999, nullptr);
                 world.player->spendEnergy(-99999);
                 uiMode = UIMode::Normal;
                 shownDeathMessage = false;
@@ -393,7 +393,7 @@ void gameloop(World &world) {
 
 #ifdef DEBUG
             if (key == TK_F1) {
-                world.player->takeDamage(-99999);
+                world.player->takeDamage(-99999, nullptr);
                 world.player->spendEnergy(-99999);
                 world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
             } else if (key == TK_F2)    debug_doTeleport(world);

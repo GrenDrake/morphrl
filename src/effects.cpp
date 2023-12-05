@@ -19,7 +19,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             int range = max - min;
             int amount = globalRNG.upto(range) + min;
             if (amount < 1) amount = 1;
-            target->takeDamage(-amount);
+            target->takeDamage(-amount, user);
             return "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] received [color=green]" + std::to_string(amount) + "[/color] healing. ";
             }
         case EFFECT_ADJ_ENERGY: {
@@ -36,7 +36,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             int min = effect.effectStrength;
             int range = max - min;
             int amount = globalRNG.upto(range) + min;
-            target->takeDamage(amount);
+            target->takeDamage(amount, user);
             std::string message = "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] took [color=red]"
                     + std::to_string(amount) + "[/color] damage. ";
             if (target->isDead()) {

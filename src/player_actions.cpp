@@ -194,7 +194,7 @@ void debug_killNeighbours(World &world) {
         Actor *actor = world.map->actorAt(world.player->position.shift(d));
         if (actor) {
             ++count;
-            actor->takeDamage(99999);
+            actor->takeDamage(99999, nullptr);
         }
         d = rotate45(d);
     } while (d != Direction::North);
