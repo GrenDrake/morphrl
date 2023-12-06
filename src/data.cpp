@@ -553,6 +553,9 @@ std::vector<DataDef> abilityPropData{
     { "areaType",       1 },
     { "maxRange",       1 },
     { "speedMult",      1 },
+    { "effectColour",   3 },
+    { "effectGlyph",    1 },
+    { "noEffectAnim",   0 },
     { "effect",         5 },
 };
 bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
@@ -567,6 +570,11 @@ bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
     resultData.maxRange = 10;
     resultData.areaType = AR_NONE;
     resultData.speedMult = 100;
+    resultData.effectR = 255;
+    resultData.effectG = 0;
+    resultData.effectB = 255;
+    resultData.effectGlyph = '?';
+    resultData.noEffectAnim = false;
 
     resultData.ident = rawAbility->ident;
     for (const DataProp &prop : rawAbility->props) {
@@ -590,6 +598,16 @@ bool processAbilityData(RawData &rawData, const DataTemp *rawAbility) {
                 resultData.maxRange = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "speedMult") {
                 resultData.speedMult = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "effectColour") {
+                resultData.effectR = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.effectG = dataAsInt(rawData, prop.origin, prop.value[1]);
+                resultData.effectB = dataAsInt(rawData, prop.origin, prop.value[2]);
+            } else if (prop.name == "effectGlyph") {
+                if (prop.value[0].size() != 1) {
+                    rawData.addError(prop.origin, "glyph must be single character");
+                } else resultData.effectGlyph = prop.value[0][0];
+            } else if (prop.name == "noEffectAnim") {
+                resultData.noEffectAnim = true;
             } else if (prop.name == "effect") {
                 EffectData effectData;
                 effectData.trigger = dataAsInt(rawData, prop.origin, prop.value[0]);

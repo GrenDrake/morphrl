@@ -93,6 +93,9 @@ std::ostream& operator<<(std::ostream &out, Direction d) {
 bool Coord::operator==(const Coord &rhs) const {
     return x == rhs.x && y == rhs.y;
 }
+bool Coord::operator!=(const Coord &rhs) const {
+    return !operator==(rhs);
+}
 
 Coord Coord::shift(Direction d, int amount) const {
     switch(d) {

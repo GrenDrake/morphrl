@@ -446,6 +446,8 @@ unsigned Dungeon::getHighestSpeedCounter() const {
 void Dungeon::tick(World &world) {
     const unsigned refreshFrequency = 35;
     static unsigned turnCount = 0;
+    if (!overlayTiles.empty()) return;
+
     while (1) {
         if (turnCount >= refreshFrequency) {
             turnCount = 0;
@@ -522,6 +524,7 @@ void Dungeon::tick(World &world) {
                 tryActorStepApprox(actor, dirToPlayer);
             }
         } else {
+            Coord oldPos = actor->position;
             if (actor->playerLastSeenPosition.x >= 0) {
                 Direction dirToPlayer = actor->position.directionTo(actor->playerLastSeenPosition);
                 bool result = tryActorStepApprox(actor, dirToPlayer);
@@ -530,6 +533,8 @@ void Dungeon::tick(World &world) {
                 Direction dir = randomDirection();
                 tryActorStepApprox(actor, dir);
             }
+            Coord newPos = actor->position;
+            if (oldPos != newPos && (isSeen(oldPos) || isSeen(newPos))) return;
         }
     }
 }
@@ -589,6 +594,13 @@ std::vector<Coord> Dungeon::getEffectArea(const Coord &origin, const Coord &targ
     return result;
 }
 
+bool Dungeon::inOverlay(const Coord &where) const {
+    for (const Coord &pos : overlayTiles) {
+        if (pos == where) return true;
+    }
+    return false;
+}
+
 void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorPos, const std::vector<Coord> &targetArea) {
     const AbilityData &data = getAbilityData(ident);
     if (data.ident == BAD_VALUE) {
@@ -608,6 +620,13 @@ void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorP
             message += triggerEffect(effect, world.player, world.player);
         }
     } else {
+        if (!data.noEffectAnim) {
+            overlayTiles = targetArea;
+            overlayR = data.effectR;
+            overlayG = data.effectG;
+            overlayB = data.effectB;
+            overlayGlyph = data.effectGlyph;
+        }
         for (const Coord &pos : targetArea) {
             Actor *actor = actorAt(pos);
             if (!actor) continue;

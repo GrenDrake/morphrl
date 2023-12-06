@@ -115,6 +115,7 @@ struct Coord {
     Coord(int x, int y) : x(x), y(y) { }
 
     bool operator==(const Coord &rhs) const;
+    bool operator!=(const Coord &rhs) const;
     Coord shift(Direction d, int amount = 1) const;
     Direction directionTo(const Coord &to) const;
     double distanceTo(const Coord &to) const;
@@ -164,6 +165,9 @@ struct AbilityData {
     int areaType;
     int maxRange;
     int speedMult;
+    int effectR, effectG, effectB;
+    int effectGlyph;
+    bool noEffectAnim;
     std::vector<EffectData> effects;
 };
 
@@ -412,8 +416,12 @@ public:
 
     void clearFovCalc();
     std::vector<Coord> getEffectArea(const Coord &origin, const Coord &target, int areaType, int maxRange, bool includeWalls, bool includeOrigin);
+    bool inOverlay(const Coord &where) const;
     void activateAbility(World &world, unsigned ident, const Coord &cursorPos, const std::vector<Coord> &targetArea);
 
+    std::vector<Coord> overlayTiles;
+    int overlayR, overlayG, overlayB;
+    int overlayGlyph;
     const DungeonData &data;
 private:
     int mDepth;

@@ -10,6 +10,8 @@
     energyCost      8
     maxRange        8
     areaType        AR_CONE
+    effectColour    255 127 127 
+    effectGlyph     *
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_FIRE_BREATH 0
 
 @ability ABILITY_ICE_PELLETS 3
@@ -18,6 +20,8 @@
     energyCost      8
     maxRange        16
     areaType        AR_LINE
+    effectColour    196 196 196
+    effectGlyph     *
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_ICE_PELLETS 0
 
 @ability ABILITY_POISON_MIST 4
@@ -26,6 +30,8 @@
     energyCost      8
     maxRange        4
     areaType        AR_BURST
+    effectColour    127 255 127 
+    effectGlyph     %
     effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_POISON 0
 
 @ability ABILITY_REGENERATION 5
@@ -41,6 +47,8 @@
     energyCost      6
     areaType        AR_BURST
     maxRange        2
+    effectColour    255 127 127 
+    effectGlyph     *
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_CLUBTAIL 0
 
 @ability ABILITY_TAILWHIP 7
@@ -50,6 +58,8 @@
     areaType        AR_BURST
     maxRange        2
     speedMult       50
+    effectColour    255 127 127 
+    effectGlyph     *
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_WHIPTAIL 0
 
 @ability ABILITY_GORE 8
@@ -58,6 +68,7 @@
     energyCost      6
     areaType        AR_CONE
     maxRange        2
+    noEffectAnim
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_GORING_HORNS 0
 
 @ability ABILITY_HORNCHARGE 9
@@ -66,4 +77,5 @@
     energyCost      6
     areaType        AR_CONE
     maxRange        2
+    noEffectAnim
     effect          ET_ON_USE 100 EFFECT_ATTACK ITM_RAMMING_HORNS 0

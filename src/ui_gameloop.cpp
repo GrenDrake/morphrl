@@ -1,3 +1,4 @@
+#include <ctime>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -165,6 +166,7 @@ void gameloop(World &world) {
     int targetAreaType = AR_NONE;
     int targetAreaRange = 0;
     std::vector<ListItem> uiListOfThings;
+    clock_t timer = 0;
     while (1) {
         if (world.gameState == GameState::Victory) {
             showDocument("ending.txt");
@@ -247,6 +249,10 @@ void gameloop(World &world) {
                     if (here == cursorPos) {
                         terminal_bkcolor(cursorColour);
                     } else if (vectorContains(targetArea, here)) terminal_bkcolor(targetLineColour);
+                } else if (world.map->inOverlay(here)) {
+                    terminal_color(color_from_argb(255, world.map->overlayR, world.map->overlayG, world.map->overlayB));
+                    terminal_put(x, y, world.map->overlayGlyph);
+                    continue;
                 }
 
                 terminal_put(x, y, glyph);
@@ -270,13 +276,30 @@ void gameloop(World &world) {
         // (debug) position data
         terminal_printf(61, 0, "(%d, %d) Lv%d", world.player->position.x, world.player->position.y, world.map->depth());
         terminal_printf(61, 1, "Turn: %u / %u", world.currentTurn, world.player->speedCounter);
+        clock_t newTimer = clock();
+        unsigned timeTaken = (newTimer - timer) * 1000 / CLOCKS_PER_SEC;
+        timer = newTimer;
+        terminal_printf(61, 2, "Tick time: %u", timeTaken);
 #endif
 
         terminal_refresh();
 
+        if (!world.map->overlayTiles.empty()) {
+            terminal_delay(300);
+            world.map->overlayTiles.clear();
+            continue;
+        }
+        if (!world.player->isDead() && !world.map->getNextActor()->isPlayer) {
+            world.tick();
+            continue;
+        }
+
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // INPUT HANDLING
         int key = terminal_read();
+#ifdef DEBUG
+        timer = clock();
+#endif
         if (key == TK_CLOSE)    break;
         if (uiMode == UIMode::PlayerDead) {
             if (key == TK_ESCAPE)   break;
