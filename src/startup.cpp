@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
 #endif
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
-    const std::string versionString = "Version: Alpha-1";
+    const std::string versionString = "Version: Alpha-2";
     const int versionX = (79 - versionString.size()) / 2;
     Image *logo = loadImage("logo.png");
     bool done = false;
