@@ -75,15 +75,23 @@ int main(int argc, char *argv[]) {
         return 1;
     }
     PHYSFS_mount(writeDir, "/saves", 1);
+    PHYSFS_mount(PHYSFS_getBaseDir(), "/root", 1);
+    ConfigData configData;
+    loadConfigData("game.cfg", configData);
     PHYSFS_mount("resources", "/", 1);
     PHYSFS_mount("gamedata.dat", "/", 1);
     if (!loadAllData()) return 1;
 
+    int fontSize = 24;
+    if (configData.isInt("fontSize")) {
+        fontSize = configData.getIntValue("fontSize");
+    }
+
     terminal_open();
     terminal_set("window.title='MorphRL';");
     terminal_set("input.filter = [keyboard, mouse];");
-    terminal_set("font: DejaVuSansMono.ttf, size=24;");
-    terminal_set("italic font: DejaVuSansMono-Oblique.ttf, size=24;");
+    terminal_setf("font: DejaVuSansMono.ttf, size=%d;", fontSize);
+    terminal_setf("italic font: DejaVuSansMono-Oblique.ttf, size=%d;", fontSize);
 
 #ifdef DEBUG
     const int menuItemCount = 7;

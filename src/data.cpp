@@ -8,14 +8,6 @@
 #include "morph.h"
 
 
-struct Origin {
-    Origin();
-    Origin(const std::string &filename, unsigned lineNumber);
-    std::string toString() const;
-
-    std::string filename;
-    unsigned lineNumber;
-};
 
 struct ErrorMessage {
     Origin origin;

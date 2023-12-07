@@ -124,6 +124,31 @@ struct Coord {
     int x, y;
 };
 
+struct Origin {
+    Origin();
+    Origin(const std::string &filename, unsigned lineNumber);
+    std::string toString() const;
+
+    std::string filename;
+    unsigned lineNumber;
+};
+
+struct ConfigValue {
+    std::string name;
+    std::string value;
+    bool isInt;
+    int asInt;
+};
+struct ConfigData {
+    std::vector<ConfigValue> values;
+
+    const ConfigValue& getRawValue(const std::string &name) const;
+    bool hasValue(const std::string &name) const;
+    bool isInt(const std::string &name) const;
+    const std::string& getValue(const std::string &name) const;
+    int getIntValue(const std::string &name) const;
+};
+
 struct EffectData {
     int trigger;        // BOOST, GIVE_ABILITY, ON_HIT, ON_USE, ON_TICK
     int effectChance;
@@ -540,6 +565,7 @@ void ui_alertBox(const std::string &title, const std::string &message);
 bool ui_getString(const std::string &title, const std::string &message, std::string &result);
 
 void logMessage(int logLevel, std::string message);
+bool loadConfigData(const std::string &filename, ConfigData &configData);
 
 extern RNG globalRNG;
 
