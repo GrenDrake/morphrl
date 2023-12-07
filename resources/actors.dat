@@ -54,21 +54,22 @@
     mutation        0 100 MUT_SHARP_CLAWS
     mutation        0 100 MUT_DECORATIVE_HORNS
 
-@actor ACTOR_HOBGOBLIN 3
-    glyph           h
-    name            hobgoblin
-    description     The_larger,_more_dangerous_kin_of_goblins,_hobgoblins_still_retain_the_twisted_features_are_their_weaker_kin,_but_lack_the_frailty._This_has_resulted_in_them_becoming_the_leaders_of_goblin_society,_keeping_order_through_violence._Even_in_the_best_of_circumstances,_they_are_not_known_for_their_pleasant_personalities.
-    artfile         hobgoblin.png
-    baseLevel       2
+@actor ACTOR_DIRERAT 10
+    glyph           r
+    name            dire_rat
+    description     Large_mutant_rats_that_have_gained_slavering_fangs,_massive_talons,_and_the_occasional_extra_limbs.
+    artfile         direrat.png
+    baseLevel       1
     colour          255 127 127
-    base_strength   1
-    base_agility    0
+    base_strength   -2
+    base_agility    -1
     base_speed      0
-    base_toughness  1
-    item            0 100 ITM_POTION_LESSER_HEALING
-    item            0 100 ITM_SWORD
-    item            0 50 ITM_TALIS_EVASION
-    item            0 50 ITM_TALIS_HEALTH
+    base_toughness  -2
+    mutation        0 100 MUT_DECORATIVE_TAIL
+    mutation        0 100 MUT_TALONS
+    mutation        0 25 MUT_DECORATIVE_HORNS
+    mutation        0 8 MUT_BAT_WINGS
+    mutation        0 8 MUT_BIRD_WINGS
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
@@ -102,7 +103,21 @@
     item            1 33 ITM_SWORD
     item            1 33 ITM_DAGGER
 
-# reuses orc as rare enemy
+@actor ACTOR_HOBGOBLIN 3
+    glyph           h
+    name            hobgoblin
+    description     The_larger,_more_dangerous_kin_of_goblins,_hobgoblins_still_retain_the_twisted_features_are_their_weaker_kin,_but_lack_the_frailty._This_has_resulted_in_them_becoming_the_leaders_of_goblin_society,_keeping_order_through_violence._Even_in_the_best_of_circumstances,_they_are_not_known_for_their_pleasant_personalities.
+    artfile         hobgoblin.png
+    baseLevel       2
+    colour          255 127 127
+    base_strength   1
+    base_agility    0
+    base_speed      0
+    base_toughness  1
+    item            0 100 ITM_POTION_LESSER_HEALING
+    item            0 100 ITM_SWORD
+    item            0 50 ITM_TALIS_EVASION
+    item            0 50 ITM_TALIS_HEALTH
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Level 3

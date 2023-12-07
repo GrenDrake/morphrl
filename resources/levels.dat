@@ -5,9 +5,9 @@
     hasEntrance
     noUpStairs
     actorCount      40
-    actor           0 45 ACTOR_GOBLIN
-    actor           0 45 ACTOR_KOBOLD
-    actor           0 10 ACTOR_HOBGOBLIN
+    actor           0 33 ACTOR_GOBLIN
+    actor           0 33 ACTOR_KOBOLD
+    actor           0 33 ACTOR_DIRERAT
     itemCount       40
     item            0  8 ITM_POTION_LESSER_HEALING
     item            0  3 ITM_POTION_GREATER_HEALING
@@ -30,7 +30,7 @@
     actorCount      40
     actor           0 45 ACTOR_SKELETON
     actor           0 45 ACTOR_ZOMBIE
-    actor           0 10 ACTOR_ORC
+    actor           0 10 ACTOR_HOBGOBLIN
     itemCount       40
     item            0  7 ITM_POTION_LESSER_HEALING
     item            0  4 ITM_POTION_GREATER_HEALING
