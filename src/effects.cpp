@@ -57,8 +57,9 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             }
             Item *weapon = new Item(itemData);
             AttackData result = user->meleeAttackWithWeapon(target, weapon);
+            const std::string &resultMsg = buildCombatMessage(user, target, result, configData.getBoolValue("show_combat_math"));
             delete weapon;
-            return buildCombatMessage(user, target, result, true);
+            return resultMsg;
             break; }
         case EFFECT_APPLY_STATUS: {
             if (target->hasStatus(effect.effectStrength)) return ""; // prevent stacking status effects
