@@ -147,7 +147,7 @@ struct ConfigData {
     bool isInt(const std::string &name) const;
     const std::string& getValue(const std::string &name, const std::string &defaultValue = "") const;
     int getIntValue(const std::string &name, int defaultValue = -1) const;
-    bool getBoolValue(const std::string &name, bool defaultValue);
+    bool getBoolValue(const std::string &name, bool defaultValue = false) const;
 };
 
 struct EffectData {
@@ -268,6 +268,7 @@ struct AttackData {
     int toHit;
     int evasion;
     int damage;
+    int damageMin, damageMax, damageBonus;
     const Item *weapon;
     std::vector<Item*> drops;
     std::string effectsMessage;

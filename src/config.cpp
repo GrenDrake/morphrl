@@ -40,7 +40,7 @@ int ConfigData::getIntValue(const std::string &name, int defaultValue) const {
     return defaultValue;
 }
 
-bool ConfigData::getBoolValue(const std::string &name, bool defaultValue) {
+bool ConfigData::getBoolValue(const std::string &name, bool defaultValue) const {
     const ConfigValue &v = getRawValue(name);
     if (v.name.empty()) return defaultValue;
     if (v.isInt) return v.asInt;

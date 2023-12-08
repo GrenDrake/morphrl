@@ -19,14 +19,20 @@ std::string buildCombatMessage(Actor *attacker, Actor *victim, const AttackData 
     s << "[/color]. ";
 
     if (showCalc) {
-        s << "[[attack " << attackData.roll << '+' << attackData.toHit;
-        s << " vs evasion " << attackData.evasion << "]] ";
+        s << "[[d20(" << attackData.roll << ") + " << attackData.toHit;
+        s << " vs " << attackData.evasion << "]] ";
     }
 
     if (attackData.roll + attackData.toHit > attackData.evasion) {
         if (victim->isPlayer) s << "You take [color=red]";
         else s << ucFirst(victim->getName(true)) << " takes [color=red]";
-        s << attackData.damage << "[/color] damage. ";
+        s << attackData.damage << "[/color] ";
+        if (showCalc) {
+            s << "[[" << (attackData.damage - attackData.damageBonus) << '(' << attackData.damageMin;
+            s << '-' << attackData.damageMax << ") + " << attackData.damageBonus;
+            s << "]] ";
+        }
+        s << "damage. ";
         s << attackData.effectsMessage;
         if (victim->isDead()) {
             s << (victim->isPlayer ? "You" : "They");
@@ -49,7 +55,7 @@ void tryMeleeAttack(World &world, Direction dir) {
     }
 
     AttackData attackData = world.player->meleeAttack(actor);
-    world.addMessage(buildCombatMessage(world.player, actor, attackData, world.showCombatMath));
+    world.addMessage(buildCombatMessage(world.player, actor, attackData, world.configData.getBoolValue("show_combat_math", false)));
     world.player->advanceSpeedCounter();
     world.tick();
 }

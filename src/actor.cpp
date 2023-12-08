@@ -378,6 +378,9 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     if (data.roll + data.toHit > data.evasion) {
         int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
         if (damageRange < 1) damageRange = 1;
+        data.damageMin = data.weapon->data.minDamage;
+        data.damageMax = data.weapon->data.maxDamage;
+        data.damageBonus = getStat(STAT_STRENGTH) + damageBonus;
         data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
         data.damage += damageBonus;
         if (data.damage < 1) data.damage = 1;
