@@ -66,7 +66,7 @@
     base_speed      0
     base_toughness  -2
     mutation        0 100 MUT_DECORATIVE_TAIL
-    mutation        0 100 MUT_TALONS
+    mutation        0 100 MUT_SHARP_CLAWS
     mutation        0 25 MUT_DECORATIVE_HORNS
     mutation        0 8 MUT_BAT_WINGS
     mutation        0 8 MUT_BIRD_WINGS
