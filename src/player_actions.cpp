@@ -71,7 +71,7 @@ void tryMovePlayer(World &world, Direction dir) {
 
     bool isOverBurdened = world.player->isOverBurdened();
     if (!isOverBurdened && world.map->tryActorStep(world.player, dir)) {
-        const MapTile *tile = world.map->at(playerPosition);
+        const MapTile *tile = world.map->at(world.player->position);
         if (tile && tile->floor == TILE_GRASS && world.player->hasVictoryArtifact()) {
             world.addMessage("[color=green]VICTORY![/color] You have escaped the mutagenic dungeons with the ethereal ore!");
             world.gameState = GameState::Victory;
