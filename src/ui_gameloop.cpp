@@ -156,6 +156,7 @@ void gameloop(World &world) {
     const color_t healthColour = color_from_argb(255, 255, 127, 127);
     const color_t energyColour = color_from_argb(255, 127, 127, 255);
 
+    const unsigned animDelay = world.configData.getIntValue("animation_delay", 300);
     std::string uiModeString;
     int uiModeAction = 0;
     UIMode uiMode = UIMode::Normal;
@@ -285,7 +286,7 @@ void gameloop(World &world) {
         terminal_refresh();
 
         if (!world.map->overlayTiles.empty()) {
-            terminal_delay(300);
+            terminal_delay(animDelay);
             world.map->overlayTiles.clear();
             continue;
         }

@@ -14,12 +14,12 @@ void doDebugCodex();
 
 RNG globalRNG;
 
-World* createGame(uint64_t gameSeed, unsigned iteration) {
+World* createGame(const ConfigData &configData, uint64_t gameSeed, unsigned iteration) {
     if (iteration > 50) {
         logMessage(LOG_ERROR, " world generation experienced catastraphic failure");
         return nullptr;
     }
-    World *world = new World;
+    World *world = new World(configData);
     if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
     logMessage(LOG_INFO, "NEW GAME with seed: " + std::to_string(world->gameSeed));
@@ -30,7 +30,7 @@ World* createGame(uint64_t gameSeed, unsigned iteration) {
         logMessage(LOG_INFO, "world generation failed");
         uint64_t newSeed = world->gameSeed + 1;
         delete world;
-        return createGame(newSeed, iteration + 1);
+        return createGame(configData, newSeed, iteration + 1);
     }
     world->addMessage("Welcome to [color=yellow]MorphRL[/color]!");
     return world;
@@ -82,12 +82,11 @@ int main(int argc, char *argv[]) {
     PHYSFS_mount("gamedata.dat", "/", 1);
     if (!loadAllData()) return 1;
 
-    int fontSize = 24;
-    if (configData.isInt("fontSize")) {
-        fontSize = configData.getIntValue("fontSize");
-    }
+    int fontSize = configData.getIntValue("fontsize", 24);
+
 
     terminal_open();
+    if (configData.getBoolValue("fullscreen", false)) terminal_set("window.fullscreen = true");
     terminal_set("window.title='MorphRL';");
     terminal_set("input.filter = [keyboard, mouse];");
     terminal_setf("font: DejaVuSansMono.ttf, size=%d;", fontSize);
@@ -180,7 +179,7 @@ int main(int argc, char *argv[]) {
                     if (world) {
                         delete world;
                     }
-                    world = createGame(newGameSeed, 0);
+                    world = createGame(configData, newGameSeed, 0);
                     if (!world) {
                         ui_alertBox("Error", "Could not create game world.");
                     } else {

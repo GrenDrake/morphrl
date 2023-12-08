@@ -30,12 +30,22 @@ bool ConfigData::isInt(const std::string &name) const {
     return !v.name.empty() && v.isInt;
 }
 
-const std::string& ConfigData::getValue(const std::string &name) const {
-    return getRawValue(name).value;
+const std::string& ConfigData::getValue(const std::string &name, const std::string &defaultValue) const {
+    if (hasValue(name)) return getRawValue(name).value;
+    return defaultValue;
 }
 
-int ConfigData::getIntValue(const std::string &name) const {
-    return getRawValue(name).asInt;
+int ConfigData::getIntValue(const std::string &name, int defaultValue) const {
+    if (isInt(name)) return getRawValue(name).asInt;
+    return defaultValue;
+}
+
+bool ConfigData::getBoolValue(const std::string &name, bool defaultValue) {
+    const ConfigValue &v = getRawValue(name);
+    if (v.name.empty()) return defaultValue;
+    if (v.isInt) return v.asInt;
+    if (v.value == "true" || v.value == "TRUE") return true;
+    return false;
 }
 
 

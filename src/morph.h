@@ -145,8 +145,9 @@ struct ConfigData {
     const ConfigValue& getRawValue(const std::string &name) const;
     bool hasValue(const std::string &name) const;
     bool isInt(const std::string &name) const;
-    const std::string& getValue(const std::string &name) const;
-    int getIntValue(const std::string &name) const;
+    const std::string& getValue(const std::string &name, const std::string &defaultValue = "") const;
+    int getIntValue(const std::string &name, int defaultValue = -1) const;
+    bool getBoolValue(const std::string &name, bool defaultValue);
 };
 
 struct EffectData {
@@ -466,7 +467,7 @@ enum class GameState {
 };
 class World {
 public:
-    World();
+    World(const ConfigData &configData);
     ~World();
 
     Actor *player;
@@ -478,6 +479,7 @@ public:
     uint64_t gameSeed;
     bool showCombatMath;
     GameState gameState;
+    const ConfigData &configData;
 
     Dungeon* getDungeon(int depth);
     bool movePlayerToDepth(int newDepth, int enterFrom);
