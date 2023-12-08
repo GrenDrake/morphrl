@@ -14,12 +14,12 @@ void doDebugCodex();
 
 RNG globalRNG;
 
-World* createGame(const ConfigData &configData, uint64_t gameSeed, unsigned iteration) {
+World* createGame(uint64_t gameSeed, unsigned iteration) {
     if (iteration > 50) {
         logMessage(LOG_ERROR, " world generation experienced catastraphic failure");
         return nullptr;
     }
-    World *world = new World(configData);
+    World *world = new World;
     if (gameSeed == 0)  world->gameSeed = globalRNG.next32();
     else                world->gameSeed = gameSeed;
     logMessage(LOG_INFO, "NEW GAME with seed: " + std::to_string(world->gameSeed));
@@ -30,7 +30,7 @@ World* createGame(const ConfigData &configData, uint64_t gameSeed, unsigned iter
         logMessage(LOG_INFO, "world generation failed");
         uint64_t newSeed = world->gameSeed + 1;
         delete world;
-        return createGame(configData, newSeed, iteration + 1);
+        return createGame(newSeed, iteration + 1);
     }
     world->addMessage("Welcome to [color=yellow]MorphRL[/color]!");
     return world;
@@ -76,8 +76,7 @@ int main(int argc, char *argv[]) {
     }
     PHYSFS_mount(writeDir, "/saves", 1);
     PHYSFS_mount(PHYSFS_getBaseDir(), "/root", 1);
-    ConfigData configData;
-    loadConfigData("game.cfg", configData);
+    loadConfigData("game.cfg");
     PHYSFS_mount("resources", "/", 1);
     PHYSFS_mount("gamedata.dat", "/", 1);
     if (!loadAllData()) return 1;
@@ -179,7 +178,7 @@ int main(int argc, char *argv[]) {
                     if (world) {
                         delete world;
                     }
-                    world = createGame(configData, newGameSeed, 0);
+                    world = createGame(newGameSeed, 0);
                     if (!world) {
                         ui_alertBox("Error", "Could not create game world.");
                     } else {

@@ -1,9 +1,9 @@
 #include <iostream>
 #include "morph.h"
 
-World::World(const ConfigData &configData)
+World::World()
 : map(nullptr), currentTurn(0), disableFOV(false), showCombatMath(true),
-  gameState(GameState::Normal), configData(configData)
+  gameState(GameState::Normal)
 { }
 
 World::~World() {

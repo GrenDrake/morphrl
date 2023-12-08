@@ -55,7 +55,7 @@ void tryMeleeAttack(World &world, Direction dir) {
     }
 
     AttackData attackData = world.player->meleeAttack(actor);
-    world.addMessage(buildCombatMessage(world.player, actor, attackData, world.configData.getBoolValue("show_combat_math", false)));
+    world.addMessage(buildCombatMessage(world.player, actor, attackData, configData.getBoolValue("show_combat_math", false)));
     world.player->advanceSpeedCounter();
     world.tick();
 }

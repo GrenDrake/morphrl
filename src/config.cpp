@@ -13,6 +13,8 @@ struct ErrorMessage {
     std::string message;
 };
 
+ConfigData configData;
+
 const ConfigValue BAD_CONFIG_VALUE{ "" };
 const ConfigValue& ConfigData::getRawValue(const std::string &name) const {
     for (const ConfigValue &v : values) {
@@ -49,7 +51,7 @@ bool ConfigData::getBoolValue(const std::string &name, bool defaultValue) const 
 }
 
 
-bool loadConfigData(const std::string &filename, ConfigData &configData) {
+bool loadConfigData(const std::string &filename) {
     std::string fileContent = readFile("/root/" + filename);
     if (fileContent.empty()) return false;
     std::stringstream inf(fileContent);

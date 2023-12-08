@@ -468,7 +468,7 @@ enum class GameState {
 };
 class World {
 public:
-    World(const ConfigData &configData);
+    World();
     ~World();
 
     Actor *player;
@@ -480,7 +480,6 @@ public:
     uint64_t gameSeed;
     bool showCombatMath;
     GameState gameState;
-    const ConfigData &configData;
 
     Dungeon* getDungeon(int depth);
     bool movePlayerToDepth(int newDepth, int enterFrom);
@@ -568,8 +567,9 @@ void ui_alertBox(const std::string &title, const std::string &message);
 bool ui_getString(const std::string &title, const std::string &message, std::string &result);
 
 void logMessage(int logLevel, std::string message);
-bool loadConfigData(const std::string &filename, ConfigData &configData);
+bool loadConfigData(const std::string &filename);
 
+extern ConfigData configData;
 extern RNG globalRNG;
 
 #endif // MORPH_H

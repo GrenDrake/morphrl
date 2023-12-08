@@ -517,7 +517,7 @@ void Dungeon::tick(World &world) {
             double dist = actor->position.distanceTo(world.player->position);
             if (dist < 2) {
                 AttackData attackData = actor->meleeAttack(world.player);
-                world.addMessage(buildCombatMessage(actor, world.player, attackData, world.configData.getBoolValue("show_combat_math", false)));
+                world.addMessage(buildCombatMessage(actor, world.player, attackData, configData.getBoolValue("show_combat_math", false)));
             } else {
                 actor->playerLastSeenPosition = world.player->position;
                 Direction dirToPlayer = actor->position.directionTo(world.player->position);
