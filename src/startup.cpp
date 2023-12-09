@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
         terminal_refresh();
 
         int key = terminal_read();
-        if (key == TK_ESCAPE || key == TK_Q || key == TK_CLOSE) {
+        if (key == TK_Q || key == TK_CLOSE) {
             break;
         }
         if (key == TK_HOME) selection = 0;
