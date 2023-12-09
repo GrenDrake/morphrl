@@ -1,6 +1,6 @@
 
 
-Current
+alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.
  * [feature] adds (very) basic animations to abilities
  * [feature] allow viewing PC stats after death (but not advancing them)
