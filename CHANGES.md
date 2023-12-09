@@ -8,7 +8,7 @@ alpha-2 (Dec 9, 2023)
  * [feature] show current level when examining actors on the map
  * [balance] moves hobgoblins to second floor, displacing orcs to the third, and adds dire rats to the first level
  * [improvement] hitting ESCAPE no longer quits the game when at the main menu
- * [improvement] adds configuation option to show or hide combat math
+ * [improvement] adds configuration option to show or hide combat math
  * [improvement] combat math display now includes the damage calculation
  * [improvement] adds config file that allows for specifying display settings before starting game
  * [improvement] use "choose direction" interface for cone effects rather than "choose target"
