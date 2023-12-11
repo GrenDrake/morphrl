@@ -142,7 +142,6 @@ void doDebugCodex() {
 
         terminal_color(textColour);
         terminal_bkcolor(backColour);
-        int nextY = 2;
         switch(mode) {
             case 0: // actors
                 displayEntriesWithGlyph(actorData, topLine, selected);
