@@ -1,5 +1,6 @@
 
 current
+ * [improvement] display name of status effect when taking damage from it
  * [bugfix] actors that die from status effect now properly grant XP to their killer
 
 alpha-2 (Dec 9, 2023)

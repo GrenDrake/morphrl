@@ -474,6 +474,7 @@ void Dungeon::tick(World &world) {
                 if (effect.trigger != ET_ON_TICK) continue;
                 std::string resultString = triggerEffect(effect, status->fromWho, actor);
                 if (!resultString.empty()) {
+                    msg << ucFirst(actor->getName()) << " is effected by " << status->data.name << ". ";
                     msg << resultString;
                 }
             }
