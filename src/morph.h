@@ -7,6 +7,7 @@
 
 #include "random.h"
 
+class Actor;
 class Dungeon;
 class Item;
 class World;
@@ -279,6 +280,7 @@ struct StatusItem {
     StatusItem(const StatusData &data);
 
     const StatusData &data;
+    Actor *fromWho;
     unsigned duration;      // the number of times this status effect has triggered
 };
 

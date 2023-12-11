@@ -81,6 +81,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
                     }
                 }
                 StatusItem *statusItem = new StatusItem(statusData);
+                statusItem->fromWho = user;
                 target->applyStatus(statusItem);
                 if (target->isPlayer) message = "[color=yellow]You[/color] are";
                 else message = "[color=yellow]" + ucFirst(target->getName(true)) + "[/color] is";

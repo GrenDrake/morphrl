@@ -1,4 +1,6 @@
 
+current
+ * [bugfix] actors that die from status effect now properly grant XP to their killer
 
 alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.

@@ -472,7 +472,7 @@ void Dungeon::tick(World &world) {
 
             for (const EffectData &effect : status->data.effects) {
                 if (effect.trigger != ET_ON_TICK) continue;
-                std::string resultString = triggerEffect(effect, actor, nullptr);
+                std::string resultString = triggerEffect(effect, status->fromWho, actor);
                 if (!resultString.empty()) {
                     msg << resultString;
                 }
