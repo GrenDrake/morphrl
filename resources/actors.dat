@@ -7,7 +7,8 @@
     description     You_are_an_adventurer_sent_out_from_the_city_of_Sanctuary_to_obtain_the_ethereal_ore_required_to_reinforce_the_barrier_around_the_city,_thus_protecting_it_from_the_horrors_of_the_post-Great_War_world._You_began_your_quest_as_human,_but_the_nature_of_the_world_beyond_the_barrier_means_you’re_unlikely_to_end_it_that_way.
     colour          127 255 127
     base_strength   0
-    base_agility    0
+    base_evasion    0
+    base_accuracy   0
     base_speed      0
     base_toughness  0
     item            0 100 ITM_POTION_LESSER_HEALING
@@ -25,7 +26,8 @@
     baseLevel       1
     colour          255 127 127
     base_strength   -1
-    base_agility    -1
+    base_accuracy   -2
+    base_evasion    1
     base_speed      0
     base_toughness  -2
     item            0 25 ITM_POTION_LESSER_HEALING
@@ -42,7 +44,8 @@
     baseLevel       1
     colour          255 127 127
     base_strength   -1
-    base_agility    -1
+    base_accuracy   -1
+    base_evasion    0
     base_speed      1
     base_toughness  -1
     item            0 25 ITM_POTION_LESSER_HEALING
@@ -62,7 +65,8 @@
     baseLevel       1
     colour          255 127 127
     base_strength   -2
-    base_agility    -1
+    base_accuracy   -3
+    base_evasion    1
     base_speed      0
     base_toughness  -2
     mutation        0 100 MUT_DECORATIVE_TAIL
@@ -83,7 +87,8 @@
     baseLevel       2
     colour          255 127 127
     base_strength   1
-    base_agility    1
+    base_accuracy   1
+    base_evasion    0
     base_speed      -2
     base_toughness  2
     item            1 33 ITM_SWORD
@@ -97,7 +102,8 @@
     baseLevel       2
     colour          255 127 127
     base_strength   2
-    base_agility    -4
+    base_accuracy   -3
+    base_evasion    -4
     base_speed      -2
     base_toughness  4
     item            1 33 ITM_SWORD
@@ -111,7 +117,8 @@
     baseLevel       2
     colour          255 127 127
     base_strength   1
-    base_agility    0
+    base_accuracy   0
+    base_evasion    0
     base_speed      0
     base_toughness  1
     item            0 100 ITM_POTION_LESSER_HEALING
@@ -130,7 +137,8 @@
     baseLevel       3
     colour          255 127 127
     base_strength   2
-    base_agility    1
+    base_accuracy   1
+    base_evasion    0
     base_speed      0
     base_toughness  1
     item            0 50 ITM_POTION_LESSER_HEALING
@@ -147,7 +155,8 @@
     baseLevel       3
     colour          255 127 127
     base_strength   1
-    base_agility    2
+    base_accuracy   2
+    base_evasion    1
     base_speed      0
     base_toughness  1
     mutation        0 100 MUT_QUADRUPED
@@ -175,7 +184,8 @@
     baseLevel       4
     colour          255 127 127
     base_strength   7
-    base_agility    -2
+    base_accuracy   -2
+    base_evasion    -2
     base_speed      -2
     base_toughness  3
     item            1 16 ITM_SWORD
@@ -198,7 +208,8 @@
     baseLevel       5
     colour          255 127 127
     base_strength   5
-    base_agility    2
+    base_accuracy   2
+    base_evasion    2
     base_speed      0
     base_toughness  2
     item            1 33 ITM_SWORD

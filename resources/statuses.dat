@@ -11,12 +11,12 @@
 
 @status STATUS_RAGE 1
     name            rage
-    description     Gives_the_subject_enhanced_strength,_but_reduces_their_agility.
+    description     Gives_the_subject_enhanced_strength,_but_reduces_their_accuracy.
     minDuration     8
     maxDuration     16
     resistDC        9999
     effect          ET_BOOST 100 STAT_STRENGTH 2 0
-    effect          ET_BOOST 100 STAT_AGILITY -1 0
+    effect          ET_BOOST 100 STAT_ACCURACY -1 0
 
 @status STATUS_POISON 2
     name            poison

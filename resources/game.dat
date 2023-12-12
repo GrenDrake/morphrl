@@ -14,15 +14,14 @@
 
 # actor stats
 @define STAT_STRENGTH       0
-@define STAT_AGILITY        1
-@define STAT_SPEED          2
-@define STAT_TOUGHNESS      3
-@define STAT_TO_HIT         4
-@define STAT_EVASION        5
-@define STAT_BULK_MAX       6
-@define STAT_HEALTH         7
-@define STAT_ENERGY         8
-@define STAT_DAMAGE_BONUS   9
+@define STAT_ACCURACY       1
+@define STAT_EVASION        2
+@define STAT_SPEED          3
+@define STAT_TOUGHNESS      4
+@define STAT_BULK_MAX       5
+@define STAT_HEALTH         6
+@define STAT_ENERGY         7
+@define STAT_DAMAGE_BONUS   8
 
 # effect effects
 @define EFFECT_HEALING      0

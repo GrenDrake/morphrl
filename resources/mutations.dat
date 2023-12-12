@@ -42,7 +42,7 @@
     description     You_stand_on_all_fours._You're_agile,_but_poorly_equipped_for_delicate_tasks.
     slot            MUT_SLOT_SHAPE
     effect          ET_BOOST 100 STAT_EVASION 3 0
-    effect          ET_BOOST 100 STAT_TO_HIT -2 0
+    effect          ET_BOOST 100 STAT_ACCURACY -2 0
     effect          ET_BOOST 100 STAT_BULK_MAX 5 0
 
 @mutation MUT_THEROPOD 8

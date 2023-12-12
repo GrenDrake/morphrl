@@ -31,7 +31,7 @@
     type            IT_WEAPON
     bulk            0
     damage          3 7
-    effect          ET_BOOST 100 STAT_TO_HIT 3 0
+    effect          ET_BOOST 100 STAT_ACCURACY 3 0
 
 @item ITM_TALONS 13
     glyph           /
@@ -41,7 +41,7 @@
     type            IT_WEAPON
     bulk            0
     damage          7 13
-    effect          ET_BOOST 100 STAT_TO_HIT 1 0
+    effect          ET_BOOST 100 STAT_ACCURACY 1 0
 
 @item ITM_POISON_CLAWS 14
     glyph           /
@@ -51,32 +51,32 @@
     type            IT_WEAPON
     bulk            0
     damage          2 6
-    effect          ET_BOOST 100 STAT_TO_HIT 3 0
+    effect          ET_BOOST 100 STAT_ACCURACY 3 0
     effect          ET_ON_HIT 25 EFFECT_APPLY_STATUS STATUS_POISON 0
 
 @item ITM_WHIPTAIL 24
     name            tail
     type            IT_WEAPON
     damage          5 10
-    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+    effect          ET_BOOST 100 STAT_ACCURACY 2 0
 
 @item ITM_CLUBTAIL 25
     name            tail
     type            IT_WEAPON
     damage          10 15
-    effect          ET_BOOST 100 STAT_TO_HIT -2 0
+    effect          ET_BOOST 100 STAT_ACCURACY -2 0
 
 @item ITM_GORING_HORNS 26
     name            horns
     type            IT_WEAPON
     damage          7 13
-    effect          ET_BOOST 100 STAT_TO_HIT -1 0
+    effect          ET_BOOST 100 STAT_ACCURACY -1 0
 
 @item ITM_RAMMING_HORNS 27
     name            horns
     type            IT_WEAPON
     damage          15 20
-    effect          ET_BOOST 100 STAT_TO_HIT -4 0
+    effect          ET_BOOST 100 STAT_ACCURACY -4 0
 
 @item ITM_FIRE_BREATH 28
     name            fire
@@ -98,7 +98,7 @@
     type            IT_WEAPON
     bulk            2
     damage          7 13
-    effect          ET_BOOST 100 STAT_TO_HIT -1 0
+    effect          ET_BOOST 100 STAT_ACCURACY -1 0
 
 @item ITM_DAGGER 1
     glyph           /
@@ -108,7 +108,7 @@
     type            IT_WEAPON
     bulk            1
     damage          3 7
-    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+    effect          ET_BOOST 100 STAT_ACCURACY 2 0
 
 @item ITM_POTION_LESSER_HEALING 2
     glyph           !
@@ -206,7 +206,7 @@
     name            talisman_of_accuracy
     colour          63 63 127
     type            IT_TALISMAN
-    effect          ET_BOOST 100 STAT_TO_HIT 2 0
+    effect          ET_BOOST 100 STAT_ACCURACY 2 0
 
 @item ITM_TALIS_UNBURDENING 20
     glyph           "

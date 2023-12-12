@@ -84,12 +84,12 @@ void doCharInfo(World &world) {
                 nextY = 6;
                 ++nextY;
                 unsigned selectionY = selection;
-                if (selection >= STAT_TO_HIT) ++selectionY;
+                // if (selection >= STAT_TO_HIT) ++selectionY;
                 if (selection >= STAT_BULK_MAX) ++selectionY;
 
                 terminal_put(1, nextY + selectionY, '*');
                 for (unsigned i = 0; i < STAT_BULK; ++i) {
-                    if (i == STAT_TO_HIT) ++nextY;
+                    // if (i == STAT_TO_HIT) ++nextY;
                     if (i == STAT_BULK_MAX) ++nextY;
                     if (i == selection) {
                         terminal_bkcolor(textColour);

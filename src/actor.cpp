@@ -158,13 +158,12 @@ int Actor::getStatBase(int statNumber) const {
     switch(statNumber) {
         case STAT_STRENGTH:
         case STAT_SPEED:
-        case STAT_AGILITY:
+        case STAT_ACCURACY:
         case STAT_TOUGHNESS:    return data.baseStats[statNumber];
+        case STAT_EVASION:      return 10 + data.baseStats[statNumber];
 
         case STAT_HEALTH:       return 20 + getStat(STAT_TOUGHNESS) * 4;
         case STAT_ENERGY:       return 20 + getStat(STAT_TOUGHNESS) * 2;
-        case STAT_TO_HIT:       return getStat(STAT_AGILITY);
-        case STAT_EVASION:      return 10 + getStat(STAT_AGILITY);
         case STAT_BULK_MAX:     return 10 + getStat(STAT_STRENGTH) * 2;
         case STAT_BULK: {
             int total = 0;
@@ -360,7 +359,7 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
     }
 
     data.roll = 1 + globalRNG.upto(20);
-    data.toHit = getStat(STAT_TO_HIT);
+    data.toHit = getStat(STAT_ACCURACY);
     data.evasion = target->getStat(STAT_EVASION);
     int damageBonus = getStat(STAT_DAMAGE_BONUS);
 
@@ -368,10 +367,10 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         // attacking with specific weapon (for ability-based attacks, etc.)
         const Item *actualWeapon = getCurrentWeapon();
         // remove normal weapon stats
-        data.toHit -= actualWeapon->getStatBonus(STAT_TO_HIT);
+        data.toHit -= actualWeapon->getStatBonus(STAT_ACCURACY);
         damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS);
         // add special weapon stats
-        data.toHit += weapon->getStatBonus(STAT_TO_HIT);
+        data.toHit += weapon->getStatBonus(STAT_ACCURACY);
         damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS);
     }
 
@@ -481,12 +480,11 @@ std::string statName(int statNumber) {
     switch(statNumber) {
         case STAT_STRENGTH:     return "strength";
         case STAT_SPEED:        return "speed";
-        case STAT_AGILITY:      return "agility";
+        case STAT_EVASION:      return "evasion";
+        case STAT_ACCURACY:     return "accuracy";
         case STAT_TOUGHNESS:    return "toughness";
         case STAT_HEALTH:       return "max health";
         case STAT_ENERGY:       return "max energy";
-        case STAT_TO_HIT:       return "to hit bonus";
-        case STAT_EVASION:      return "evasion";
         case STAT_BULK_MAX:     return "max bulk";
         case STAT_DAMAGE_BONUS: return "damage bonus";
         case STAT_BULK:         return "bulk";
