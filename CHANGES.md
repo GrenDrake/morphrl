@@ -1,5 +1,7 @@
 
 current
+ * [feature] play now begins on a static opening level
+ * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [bugfix] actors that die from status effect now properly grant XP to their killer
 

@@ -2,7 +2,7 @@
 # Dungeon level defs
 @dungeon - 43
     name the_Wizard's_Tower
-    initialPosition 2 2
+    initialPosition 4 9
     fromFile
 
 @dungeon - 44
