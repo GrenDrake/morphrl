@@ -1,9 +1,12 @@
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
 # Dungeon level defs
+@dungeon - 43
+    name the_Wizard's_Tower
+    initialPosition 2 2
+    fromFile
+
 @dungeon - 44
     name the_Upper_Levels
-    hasEntrance
-    noUpStairs
     actorCount      40
     actor           0 33 ACTOR_GOBLIN
     actor           0 33 ACTOR_KOBOLD

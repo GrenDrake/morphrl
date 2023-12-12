@@ -1,3 +1,4 @@
+#include <map>
 #include <deque>
 #include <iostream>
 #include <sstream>
@@ -638,6 +639,67 @@ void Dungeon::activateAbility(World &world, unsigned ident, const Coord &cursorP
         }
     }
     world.addMessage(message);
+}
+
+bool Dungeon::loadMapFromFile(const std::string &filename) {
+    std::string mapFileStr = readFile(filename);
+    if (mapFileStr.empty()) return false;
+
+    // clear any existing map data
+    unsigned mapDataSize = mWidth * mHeight;
+    for (Actor *actor : mActors) delete actor;
+    mActors.clear();
+    mRooms.clear();
+    for (unsigned i = 0; i < mapDataSize; ++i) {
+        for (Item *item : mData[i].items) delete item;
+        mData[i].items.clear();
+        mData[i].actor = nullptr;
+        mData[i].floor = TILE_UNASSIGNED;
+    }
+
+    std::map<int, int> tileMap{
+        { '#', TILE_WALL },
+        { '.', TILE_FLOOR },
+        { ',', TILE_GRASS },
+        { '>', TILE_STAIR_DOWN },
+        { '~', TILE_WATER },
+        { '%', TILE_NOTHING },
+        { '/', TILE_OPEN_DOOR },
+        { '+', TILE_CLOSED_DOOR },
+    };
+
+    // load the map from the file
+    std::stringstream mapFile(mapFileStr);
+    std::string line;
+    unsigned mapPos = 0;
+    while (std::getline(mapFile, line)) {
+        if (line.empty()) continue; // skip blank lines
+        if (line[0] == '@') {
+            // process directive
+            // none are actually implemented, but this is where they'll go
+        } else {
+            for (char c : line) {
+                if (c == '\n' || c == '\r' || c == '\t') continue;
+                if (mapPos >= mapDataSize) {
+                    logMessage(LOG_ERROR, filename + " contains excess map data");
+                    break;
+                }
+                auto iter = tileMap.find(c);
+                if (iter == tileMap.end()) {
+                    logMessage(LOG_ERROR, filename + " has unrecognized map symbol " + c);
+                } else {
+                    mData[mapPos].floor = iter->second;
+                    ++mapPos;
+                }
+            }
+        }
+    }
+
+    if (mapPos < mapDataSize) {
+        logMessage(LOG_ERROR, filename + " contains insufficent map data");
+    }
+
+    return true;
 }
 
 std::string makeItemList(const std::vector<Item*> &itemList, unsigned maxList) {

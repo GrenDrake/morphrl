@@ -31,25 +31,29 @@ Dungeon* World::getDungeon(int depth) {
         Dungeon *newMap = new Dungeon(dungeonData, MAP_WIDTH, MAP_HEIGHT);
         if (!newMap) return nullptr;
         globalRNG.seed(gameSeed + dungeonData.ident + iteration);
-        doMapgen(*newMap);
-        // verify map connectivity
-        Coord entrance = newMap->firstOfTile(TILE_GRASS);
-        Coord downStair = newMap->firstOfTile(TILE_STAIR_DOWN);
-        Coord upStair = newMap->firstOfTile(TILE_STAIR_UP);
-        Coord startPos = entrance;
-        if (startPos.x < 0) startPos = downStair;
-        if (startPos.x < 0) startPos = upStair;
-        if (startPos.x < 0) {
-            logMessage(LOG_ERROR, "Failed to find entrance, or up or down stair");
-            continue;
-        }
-        newMap->calcDistances(startPos);
-        // ensure all exits are accessable
-        if ( (entrance.x >= 0 && newMap->distanceAt(entrance) < 0) ||
-             (upStair.x >= 0 && newMap->distanceAt(upStair) < 0) ||
-             (downStair.x >= 0 && newMap->distanceAt(downStair) < 0) ) {
-            logMessage(LOG_ERROR, "map connectivity failed");
-            continue;
+        if (newMap->data.fromFile) {
+            newMap->loadMapFromFile("map_" + std::to_string(dungeonData.ident) + ".map");
+        } else {
+            doMapgen(*newMap);
+            // verify map connectivity
+            Coord entrance = newMap->firstOfTile(TILE_GRASS);
+            Coord downStair = newMap->firstOfTile(TILE_STAIR_DOWN);
+            Coord upStair = newMap->firstOfTile(TILE_STAIR_UP);
+            Coord startPos = entrance;
+            if (startPos.x < 0) startPos = downStair;
+            if (startPos.x < 0) startPos = upStair;
+            if (startPos.x < 0) {
+                logMessage(LOG_ERROR, "Failed to find entrance, or up or down stair");
+                continue;
+            }
+            newMap->calcDistances(startPos);
+            // ensure all exits are accessable
+            if ( (entrance.x >= 0 && newMap->distanceAt(entrance) < 0) ||
+                 (upStair.x >= 0 && newMap->distanceAt(upStair) < 0) ||
+                 (downStair.x >= 0 && newMap->distanceAt(downStair) < 0) ) {
+                logMessage(LOG_ERROR, "map connectivity failed");
+                continue;
+            }
         }
 
         globalRNG.seed(oldSeed);
@@ -73,21 +77,7 @@ bool World::movePlayerToDepth(int newDepth, int enterFrom) {
     // move player to start position
     Coord startPosition(-1, -1);
     if (enterFrom == DE_ENTRANCE) {
-        const Room &startRoom = map->getRoomByType(RT_ENTRANCE);
-        if (startRoom.type == RT_ENTRANCE) {
-            int iterations = 1000;
-            do {
-                --iterations;
-                startPosition = startRoom.getPointWithin();
-                if (!map->isValidPosition(startPosition)) {
-                    startPosition.x = -1;
-                    continue;
-                }
-                const MapTile *tile = map->at(startPosition);
-                const TileData &td = getTileData(tile->floor);
-                if (!td.isPassable || tile->actor) startPosition.x = -1;
-            } while (iterations > 0 && startPosition.x < 0);
-        } else logMessage(LOG_ERROR, "Failed to find entrance room");
+        startPosition = map->data.initialPosition;
     } else if (enterFrom == DE_UPSTAIRS) {
         startPosition = map->firstOfTile(TILE_STAIR_DOWN);
     } else if (enterFrom == DE_DOWNSTAIRS) {

@@ -41,7 +41,8 @@ const int TILE_WATER = 5;
 const int TILE_STAIR_DOWN = 6;
 const int TILE_STAIR_UP = 7;
 const int TILE_GRASS = 8;
-const int TILE_OPEN_DOOR = 4;
+const int TILE_OPEN_DOOR = 9;
+const int TILE_NOTHING = 10;
 
 const int AR_NONE = 0;
 const int AR_TARGET = 1;
@@ -248,17 +249,17 @@ struct TileData {
     int r, g, b;
     bool isUpStair;
     bool isDownStair;
-    bool preventActorSpawns;
 };
 
 struct DungeonData {
     unsigned ident; // doubles as dungeon depth
     std::string name;
-    bool hasEntrance;
     bool hasUpStairs;
     bool hasDownStairs;
+    bool fromFile;
     unsigned actorCount;
     unsigned itemCount;
+    Coord initialPosition;
     std::vector<SpawnLine> actorSpawns;
     std::vector<SpawnLine> itemSpawns;
 };
@@ -390,6 +391,8 @@ public:
     int depth() const { return mDepth; };
     int width() const { return mWidth; };
     int height() const { return mHeight; };
+
+    bool loadMapFromFile(const std::string &filename);
 
     void clear();
     void clearDistances();

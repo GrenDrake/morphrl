@@ -35,7 +35,7 @@ std::string previewMapSpace(World &world, const Coord &where) {
     if (tile) {
         std::stringstream s;
         const TileData &td = getTileData(tile->floor);
-        if (!tile->everSeen) {
+        if (!tile->everSeen || tile->floor == TILE_NOTHING) {
             return youveNeverSeenThatSpace;
         } else if (tile->isSeen) {
             s << "You see: [color=yellow]" << td.name << "[/color]";

@@ -41,7 +41,7 @@
 @tile TILE_WATER 5
     glyph           ~
     name            water
-    colour          127 196 127
+    colour          63 63 196
 
 @tile TILE_DOWN_STAIRS 6
     glyph           >
@@ -62,4 +62,9 @@
     name            grass
     colour          196 255 196
     isPassable
-    preventActorSpawns
+
+@tile TILE_NOTHING 10
+    glyph           #
+    name            nothing
+    colour          0 0 0
+    isOpaque

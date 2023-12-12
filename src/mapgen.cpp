@@ -437,7 +437,7 @@ void spawnItems(Dungeon &d) {
 void doMapgen(Dungeon &d) {
     logMessage(LOG_INFO, "MAPGEN for " + std::to_string(d.depth()));
     // if we're on the ground floor, create the entrance room
-    if (d.data.hasEntrance) addEntranceHall(d);
+    // if (d.data.hasEntrance) addEntranceHall(d);
     buildRooms(d);
     addStairs(d);
     buildMaze(d);

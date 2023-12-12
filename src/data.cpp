@@ -169,7 +169,7 @@ const DungeonData& getDungeonData(unsigned ident) {
 }
 unsigned getDungeonEntranceIdent() {
     for (const DungeonData &data : dungeonData) {
-        if (data.hasEntrance) return data.ident;
+        if (data.initialPosition.x >= 0) return data.ident;
     }
     return BAD_VALUE;
 }
@@ -717,7 +717,6 @@ std::vector<DataDef> tilePropData{
     { "isPassable",     0 },
     { "isUpStair",      0 },
     { "isDownStair",    0 },
-    { "preventActorSpawns", 0 },
 };
 bool processTileData(RawData &rawData, const DataTemp *rawTile) {
     if (!rawTile || rawTile->typeName != "@tile") {
@@ -734,7 +733,6 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
     resultData.isPassable = false;
     resultData.isUpStair = false;
     resultData.isDownStair = false;
-    resultData.preventActorSpawns = false;
     resultData.ident = rawTile->ident;
     for (const DataProp &prop : rawTile->props) {
         const DataDef &dataDef = getDataDef(tilePropData, prop.name);
@@ -765,8 +763,6 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
                 resultData.isUpStair = true;
             } else if (prop.name == "isDownStair") {
                 resultData.isDownStair = true;
-            } else if (prop.name == "preventActorSpawns") {
-                resultData.preventActorSpawns = true;
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
             }
@@ -785,9 +781,10 @@ bool processTileData(RawData &rawData, const DataTemp *rawTile) {
 
 std::vector<DataDef> dungeonPropData{
     { "name",           1 },
-    { "hasEntrance",    0 },
+    { "initialPosition",2 },
     { "noUpStairs",     0 },
     { "noDownStairs",   0 },
+    { "fromFile",       0 },
     { "actorCount",     1 },
     { "actor",          3 },
     { "itemCount",      1 },
@@ -801,10 +798,12 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
 
     DungeonData resultData;
     resultData.name = "unknown";
-    resultData.hasEntrance = false;
+    resultData.fromFile = false;
     resultData.hasUpStairs = true;
     resultData.hasDownStairs = true;
     resultData.ident = rawDungeon->ident;
+    resultData.initialPosition.x = -1;
+    resultData.initialPosition.y = -1;
     resultData.actorCount = 0;
     resultData.itemCount = 0;
     for (const DataProp &prop : rawDungeon->props) {
@@ -818,8 +817,11 @@ bool processDungeonData(RawData &rawData, const DataTemp *rawDungeon) {
         } else {
             if (prop.name == "name") {
                 resultData.name = convertUnderscores(prop.value[0]);
-            } else if (prop.name == "hasEntrance") {
-                resultData.hasEntrance = true;
+            } else if (prop.name == "initialPosition") {
+                resultData.initialPosition.x = dataAsInt(rawData, prop.origin, prop.value[0]);
+                resultData.initialPosition.y = dataAsInt(rawData, prop.origin, prop.value[1]);
+            } else if (prop.name == "fromFile") {
+                resultData.fromFile = true;
             } else if (prop.name == "noUpStairs") {
                 resultData.hasUpStairs = false;
             } else if (prop.name == "noDownStairs") {
