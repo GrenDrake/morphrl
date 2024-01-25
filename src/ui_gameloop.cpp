@@ -152,6 +152,7 @@ void gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
     const color_t targetLineColour = color_from_argb(255, 63, 63, 63);
+    const color_t alertTextColour = color_from_argb(255, 192, 63, 63);
     const color_t textColour = color_from_argb(255, 192, 192, 192);
     const color_t healthColour = color_from_argb(255, 255, 127, 127);
     const color_t energyColour = color_from_argb(255, 127, 127, 255);
@@ -267,8 +268,12 @@ void gameloop(World &world) {
                                + std::to_string(world.player->getStat(STAT_ENERGY));
         drawStatBar( 4, 19, world.player->health, world.player->getStat(STAT_HEALTH), healthColour);
         drawStatBar(23, 19, world.player->energy, world.player->getStat(STAT_ENERGY), energyColour);
-        terminal_color(textColour);
         terminal_bkcolor(black);
+        if (world.player->isOverBurdened()) {
+            terminal_color(alertTextColour);
+            terminal_print(41, 19, "* OVER-BURDENED *");
+        }
+        terminal_color(textColour);
         terminal_print(15, 19, healthLine.c_str());
         terminal_print(34, 19, energyLine.c_str());
         terminal_print(79 - world.map->data.name.size(), 19, ucFirst(world.map->data.name).c_str());
