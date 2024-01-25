@@ -12,6 +12,7 @@
 @define ET_ON_TICK          4
 @define ET_UNARMED_ATTACK   5
 @define ET_NO_MUTATION      6
+@define ET_STUN             7
 
 # actor stats
 @define STAT_STRENGTH       0
@@ -32,6 +33,7 @@
 @define EFFECT_ADJ_ENERGY   4
 @define EFFECT_ATTACK       5
 @define EFFECT_APPLY_STATUS 6
+@define EFFECT_PUSHBACK     7
 
 # ability effect ranges
 @define AR_NONE             0

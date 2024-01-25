@@ -34,3 +34,12 @@
     resistDC        9999
     effect          ET_BOOST 100 STAT_SPEED 2 0
 
+
+@status STATUS_STUNNED 4
+    name            stunned
+    description     Briefly_prevents_the_subject_from_acting.
+    minDuration     1
+    maxDuration     2
+    resistDC        9999
+    effect          ET_STUN 100 0 0 0
+

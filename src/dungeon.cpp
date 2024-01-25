@@ -464,6 +464,7 @@ void Dungeon::tick(World &world) {
         Actor *actor = getNextActor();
         actor->verify();
 
+        bool isStunned = false;
         std::stringstream msg;
         auto statusIter = actor->statusEffects.begin();
         while (statusIter != actor->statusEffects.end()) {
@@ -472,6 +473,11 @@ void Dungeon::tick(World &world) {
             if (status->duration <= 1) continue; // don't apply status conditions on the first turn they're received
 
             for (const EffectData &effect : status->data.effects) {
+                if (effect.trigger == ET_STUN) {
+                    isStunned = true;
+                    msg << ucFirst(actor->getName()) << " is stunned and cannot act! ";
+                    continue;
+                }
                 if (effect.trigger != ET_ON_TICK) continue;
                 std::string resultString = triggerEffect(effect, status->fromWho, actor);
                 if (!resultString.empty()) {
@@ -506,12 +512,16 @@ void Dungeon::tick(World &world) {
         if (!text.empty()) world.addMessage(text);
 
         actor->verify();
+        if (isStunned) {
+            actor->advanceSpeedCounter();
+            continue;
+        }
         if (actor->health <= 0) continue; // in case the actor died from an on-tick effect
         if (actor->isPlayer) {
             ++turnCount;
             clearDeadActors();
             return; // skip player
-        } else
+        }
 
         actor->advanceSpeedCounter();
         const MapTile *tile = at(actor->position);

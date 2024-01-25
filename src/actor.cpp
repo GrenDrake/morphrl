@@ -324,9 +324,9 @@ const Item* Actor::getCurrentWeapon() const {
     return newWeapon;
 }
 
-std::string Actor::triggerOnHitEffects(Actor *target) {
+std::string Actor::triggerOnHitEffects(Actor *target, const Item *weapon) {
     std::string result;
-    const Item *weapon = getCurrentWeapon();
+    if (!weapon) weapon = getCurrentWeapon();
     if (weapon && !weapon->isEquipped) {
         for (const EffectData &data : weapon->data.effects) {
             if (data.trigger == ET_ON_HIT) {
@@ -384,7 +384,7 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         data.damage += damageBonus;
         if (data.damage < 1) data.damage = 1;
         target->takeDamage(data.damage, this);
-        data.effectsMessage = triggerOnHitEffects(target);
+        data.effectsMessage = triggerOnHitEffects(target, data.weapon);
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();

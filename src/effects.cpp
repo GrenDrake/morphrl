@@ -106,6 +106,15 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
                 return "";
             }
             break; }
+        case EFFECT_PUSHBACK: {
+            Direction d = user->position.directionTo(target->position);
+            if (target->onMap->tryActorStepApprox(target, d)) {
+                std::string message;
+                message = "[color=yellow]" + ucFirst(target->getName(true));
+                message += "[/color] is pushed back! ";
+                return message;
+            } else return "";
+            break; }
         default:
             logMessage(LOG_ERROR, "ERROR: Unhandled effect " + std::to_string(effect.effectId));
     }
@@ -176,6 +185,9 @@ std::string EffectData::toString() const {
         case EFFECT_APPLY_STATUS: {
             const StatusData &statusData = getStatusData(effectStrength);
             text += "apply [color=yellow]" + statusData.name + "[/color]";
+            break; }
+        case EFFECT_PUSHBACK: {
+            text += "push the target away";
             break; }
         default:
             text += "Unhandled effectId " + std::to_string(effectId);

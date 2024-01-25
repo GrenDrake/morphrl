@@ -61,6 +61,7 @@ const int ET_ON_USE = 3;        // triggers a special effect when the item is us
 const int ET_ON_TICK = 4;       // triggers a special effect at the end of the actor's turn, every turn
 const int ET_UNARMED_ATTACK = 5;
 const int ET_NO_MUTATION = 6;
+const int ET_STUN = 7;
 
 const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
@@ -89,6 +90,7 @@ const int EFFECT_PURIFY     = 3; // purify mutation - strength = # to remove
 const int EFFECT_ADJ_ENERGY = 4;
 const int EFFECT_ATTACK     = 5;
 const int EFFECT_APPLY_STATUS = 6;
+const int EFFECT_PUSHBACK = 7;
 
 const int XP_PER_LEVEL      = 100;
 
@@ -322,7 +324,7 @@ struct Actor {
     int getTalismanCount() const;
     bool hasVictoryArtifact() const;
     const Item* getCurrentWeapon() const;
-    std::string triggerOnHitEffects(Actor *target);
+    std::string triggerOnHitEffects(Actor *target, const Item *weapon);
     AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
     AttackData meleeAttack(Actor *target);
     void advanceSpeedCounter(int multiplier = 100);

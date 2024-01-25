@@ -76,6 +76,8 @@
     name            horns
     type            IT_WEAPON
     damage          15 20
+    effect          ET_ON_HIT 100 EFFECT_PUSHBACK 0 0
+    effect          ET_ON_HIT 100 EFFECT_APPLY_STATUS STATUS_STUNNED 0
     effect          ET_BOOST 100 STAT_ACCURACY -4 0
 
 @item ITM_FIRE_BREATH 28

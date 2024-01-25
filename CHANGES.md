@@ -2,12 +2,14 @@
 current
  * [feature] play now begins on a static opening level
  * [feature] mutations can now result in losing gained anatomy (e.g. mutating to have no wings)
+ * [feature] adds pushback and stunned effects; the ramming horns gain both
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)
  * [improvement] multi-use consumables now have a visible number of remaining uses rather than a random chance to be used up
  * [improvement] displays warning on main game screen when over-burdened
  * [bugfix] actors that die from status effect now properly grant XP to their killer
+ * [bugfix] special ability attacks now properly trigger on_hit effects
 
 alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.
