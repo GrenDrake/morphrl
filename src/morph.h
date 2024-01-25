@@ -236,7 +236,8 @@ struct ItemData {
     Type type;
     int bulk;
     int minDamage, maxDamage;
-    int consumeChance;
+    std::string chargesName, chargesNamePlural;
+    int maxCharges;
     bool isVictoryArtifact;
     std::vector<EffectData> effects;
 };
@@ -362,6 +363,7 @@ struct Item {
     const ItemData &data;
     Coord position;
     bool isEquipped;
+    int chargesLeft;
 };
 
 struct MapTile {

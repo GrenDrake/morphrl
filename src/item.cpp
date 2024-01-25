@@ -2,8 +2,13 @@
 #include "morph.h"
 
 Item::Item(const ItemData &data)
-: data(data), position(-1, -1), isEquipped(false)
-{ }
+: data(data), position(-1, -1), isEquipped(false), chargesLeft(0)
+{
+    if (data.maxCharges > 0) {
+        chargesLeft = globalRNG.upto(data.maxCharges);
+        if (chargesLeft <= 0) chargesLeft = 1;
+    }
+}
 
 std::string Item::getName(bool definitive) const {
     if (definitive) return "the " + data.name;
@@ -45,12 +50,10 @@ void activateItem(World &world, Item *item, Actor *user) {
     if (!didEffect) {
         msg += "Nothing happens. ";
     }
-    int roll = globalRNG.upto(100);
-    if (item->data.consumeChance > roll) {
+    if (item->data.maxCharges > 0) --item->chargesLeft;
+    if (item->chargesLeft <= 0) {
         user->removeItem(item);
-        if (item->data.consumeChance < 100) {
-            msg += "[color=yellow]" + ucFirst(item->getName(true)) + "[/color] was used up.";
-        }
+        msg += "[color=yellow]" + ucFirst(item->getName(true)) + "[/color] was used up.";
         delete item;
     }
     world.addMessage(msg);

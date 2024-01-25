@@ -162,6 +162,13 @@ void doInventory(World &world, bool showFloor) {
                                           selectedItem->data.minDamage, selectedItem->data.maxDamage);
                 ++yPos;
             }
+            if (selectedItem->chargesLeft > 0 && selectedItem->data.maxCharges > 1) {
+                std::string chargesLine;
+                chargesLine = "Remaining " + selectedItem->data.chargesName;
+                chargesLine += ": " + std::to_string(selectedItem->chargesLeft);
+                terminal_print(41, yPos, chargesLine.c_str());
+                yPos += 2;
+            }
             for (unsigned i = 0; i < 10 && i < selectedItem->data.effects.size(); ++i) {
                 terminal_print(41, yPos + i, selectedItem->data.effects[i].toString().c_str());
             }

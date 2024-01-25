@@ -650,7 +650,8 @@ std::vector<DataDef> itemPropData{
     { "bulk",           1 },
     { "damage",         2 },
     { "effect",         5 },
-    { "consumeChance",  1 },
+    { "maxCharges",     1 },
+    { "chargesName",    1 },
     { "isVictoryArtifact", 0 },
 };
 bool processItemData(RawData &rawData, const DataTemp *rawItem) {
@@ -667,7 +668,9 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
     resultData.bulk = 1;
     resultData.minDamage = 0;
     resultData.maxDamage = 0;
-    resultData.consumeChance = 0;
+    resultData.maxCharges = 0;
+    resultData.chargesName = "use";
+    resultData.chargesNamePlural = "uses";
     resultData.isVictoryArtifact = false;
 
     resultData.ident = rawItem->ident;
@@ -699,8 +702,10 @@ bool processItemData(RawData &rawData, const DataTemp *rawItem) {
             } else if (prop.name == "damage") {
                 resultData.minDamage = dataAsInt(rawData, prop.origin, prop.value[0]);
                 resultData.maxDamage = dataAsInt(rawData, prop.origin, prop.value[1]);
-            } else if (prop.name == "consumeChance") {
-                resultData.consumeChance = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "maxCharges") {
+                resultData.maxCharges = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "chargesName") {
+                resultData.chargesName = prop.value[0];
             } else if (prop.name == "isVictoryArtifact") {
                 resultData.isVictoryArtifact = true;
             } else if (prop.name == "effect") {

@@ -115,7 +115,7 @@
     name            potion_of_healing
     colour          255 0 0
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_HEALING 5 15
     effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
 
@@ -124,7 +124,7 @@
     name            potion_of_energy
     colour          0 0 255
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_ADJ_ENERGY 5 15
     effect          ET_ON_USE 25 EFFECT_MUTATE 1 0
 
@@ -133,7 +133,7 @@
     name            potion_of_restoration
     colour          255 0 0
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_HEALING 15 30
     effect          ET_ON_USE 12 EFFECT_MUTATE 1 0
 
@@ -142,7 +142,7 @@
     name            potion_of_rage
     colour          255 127 127
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_RAGE 0
 
 @item ITM_POTION_HASTE 22
@@ -150,7 +150,7 @@
     name            potion_of_haste
     colour          127 255 127
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_HASTE 0
 
 @item ITM_POTION_PURITY 15
@@ -158,7 +158,7 @@
     name            potion_of_purity
     colour          127 127 127
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_PURIFY 1 0
 
 @item ITM_POTION_LESSER_REGEN 9
@@ -166,14 +166,14 @@
     name            potion_of_regeneration
     colour          255 0 0
     type            IT_CONSUMABLE
-    consumeChance   100
+    maxCharges      1
     effect          ET_ON_USE 100 EFFECT_APPLY_STATUS STATUS_LESSER_REGEN 0
 
 @item ITM_POTION_LESSER_MUTATION 3
     glyph           !
     name            potion_of_mutation
     colour          127 127 255
-    consumeChance   100
+    maxCharges      1
     type            IT_CONSUMABLE
     effect          ET_ON_USE 100 EFFECT_MUTATE 1 0
     effect          ET_ON_USE 50 EFFECT_MUTATE 1 0
@@ -226,6 +226,7 @@
     glyph           \
     name            wand_of_healing
     colour          255 127 127
-    consumeChance   25
+    maxCharges      25
+    chargesName     charges
     type            IT_CONSUMABLE
     effect          ET_ON_USE 100 EFFECT_HEALING 2 12

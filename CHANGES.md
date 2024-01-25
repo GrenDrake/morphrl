@@ -5,6 +5,7 @@ current
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)
+ * [improvement] multi-use consumables now have a visible number of remaining uses rather than a random chance to be used up
  * [bugfix] actors that die from status effect now properly grant XP to their killer
 
 alpha-2 (Dec 9, 2023)
