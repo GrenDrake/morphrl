@@ -98,7 +98,7 @@ std::string triggerEffect(const EffectData &effect, Actor *user, Actor *target) 
             delete which;
             return message; }
         case EFFECT_MUTATE: {
-            const MutationData &data = getRandomMutationData();
+            const MutationData &data = getRandomMutationData(target);
             if (!target->hasMutation(data.ident)) {
                 target->applyMutation(new MutationItem(data));
                 return "[color=yellow]You[/color] mutate, " + data.gainVerb + " [color=yellow]" + data.name + "[/color]! ";

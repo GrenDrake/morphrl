@@ -1,8 +1,10 @@
 
 current
  * [feature] play now begins on a static opening level
+ * [feature] mutations can now result in losing gained anatomy (e.g. mutating to have no wings)
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
+ * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)
  * [bugfix] actors that die from status effect now properly grant XP to their killer
 
 alpha-2 (Dec 9, 2023)

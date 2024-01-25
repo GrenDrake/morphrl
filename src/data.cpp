@@ -75,6 +75,14 @@ DungeonData BAD_DUNGEON{BAD_VALUE, "invalid"};
 std::vector<DungeonData> dungeonData;
 
 
+bool MutationData::isNonMutation() const {
+    for (const EffectData &ed : effects) {
+        if (ed.trigger == ET_NO_MUTATION) return true;
+    }
+    return false;
+}
+
+
 Origin::Origin()
 : filename("(internal)", 0)
 { }
@@ -141,10 +149,17 @@ const AbilityData& getAbilityData(unsigned ident) {
     return BAD_ABILITY;
 }
 
-const MutationData& getRandomMutationData() {
+const MutationData& getRandomMutationData(Actor *forWho) {
     if (mutationData.empty()) return BAD_MUTATION;
-    unsigned i = globalRNG.upto(mutationData.size());
-    return mutationData[i];
+    while (1) {
+        unsigned i = globalRNG.upto(mutationData.size());
+        const MutationData &data = mutationData[i];
+        if (forWho) {
+            if (forWho->hasMutation(data.ident)) continue;
+            if (data.isNonMutation() && forWho->mutationForSlot(data.slot) == nullptr) continue;
+        }
+        return data;
+    }
 }
 
 const StatusData& getStatusData(unsigned ident) {

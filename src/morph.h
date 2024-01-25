@@ -60,6 +60,7 @@ const int ET_ON_HIT = 2;        // triggers a special effect every time the acto
 const int ET_ON_USE = 3;        // triggers a special effect when the item is used from the inventory (item may be destroyed)
 const int ET_ON_TICK = 4;       // triggers a special effect at the end of the actor's turn, every turn
 const int ET_UNARMED_ATTACK = 5;
+const int ET_NO_MUTATION = 6;
 
 const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
@@ -182,6 +183,8 @@ struct MutationData {
     unsigned slot;          // what part of the body is mutated? (arms, tail,
                             // etc.) or 0 for "minor" muations that do not require a slot
     std::vector<EffectData> effects;
+
+    bool isNonMutation() const;
 };
 
 
@@ -549,7 +552,7 @@ std::string readFile(const std::string &filename);
 std::vector<unsigned char> readFileAsBinary(const std::string &filename);
 const ActorData& getActorData(unsigned ident);
 const ItemData& getItemData(unsigned ident);
-const MutationData& getRandomMutationData();
+const MutationData& getRandomMutationData(Actor *forWho);
 const AbilityData& getAbilityData(unsigned ident);
 const MutationData& getMutationData(unsigned ident);
 const StatusData& getStatusData(unsigned ident);

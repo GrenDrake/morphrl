@@ -11,6 +11,7 @@
 @define ET_ON_USE           3
 @define ET_ON_TICK          4
 @define ET_UNARMED_ATTACK   5
+@define ET_NO_MUTATION      6
 
 # actor stats
 @define STAT_STRENGTH       0
@@ -50,6 +51,7 @@
 @define MUT_SLOT_HORNS      6
 @define MUT_SLOT_SIZE       7
 @define MUT_SLOT_BREATH     7
+@define MUT_SLOT_LEGS       8
 
 # include sub-files
 @include abilities.dat

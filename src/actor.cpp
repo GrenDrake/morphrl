@@ -435,8 +435,10 @@ void Actor::applyMutation(MutationItem *mutation) {
         if (old) removeMutation(old);
         delete old;
     }
-    mutations.push_back(mutation);
-    std::sort(mutations.begin(), mutations.end(), mutationSort);
+    if (!mutation->data.isNonMutation()) {
+        mutations.push_back(mutation);
+        std::sort(mutations.begin(), mutations.end(), mutationSort);
+    }
 }
 
 void Actor::removeMutation(MutationItem *mutation) {

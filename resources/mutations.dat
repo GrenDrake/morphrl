@@ -15,6 +15,13 @@
     effect          ET_GIVE_ABILITY 100 ABILITY_FLIGHT 0 0
     slot            MUT_SLOT_WINGS
 
+@mutation MUT_NO_WINGS 23
+    gainVerb        losing
+    name            your_wings
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_WINGS
+
 @mutation MUT_SHARP_CLAWS 3
     gainVerb        growing
     name            sharp_claws
@@ -36,6 +43,13 @@
     slot            MUT_SLOT_CLAWS
     effect          ET_UNARMED_ATTACK 100 ITM_POISON_CLAWS 0 0
 
+@mutation MUT_NO_CLAWS 24
+    gainVerb        losing
+    name            your_claws
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_CLAWS
+
 @mutation MUT_QUADRUPED 7
     gainVerb        becoming_a
     name            quadruped
@@ -54,6 +68,14 @@
     effect          ET_BOOST 100 STAT_EVASION 1 0
     effect          ET_BOOST 100 STAT_SPEED 2 0
 
+@mutation MUT_HUMANOID 25
+    gainVerb        becoming
+    name            humanoid
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_SHAPE
+
+
 @mutation MUT_FUR 9
     gainVerb        growing
     name            fur
@@ -71,6 +93,13 @@
     gainVerb        growing
     name            feathers
     description     Beautiful_feathered_plumage_covers_your_body._It_looks_nice,_but_isn't_particularly_useful.
+    slot            MUT_SLOT_SKIN
+
+@mutation MUT_SKIN 26
+    gainVerb        gaining
+    name            regular_skin
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
     slot            MUT_SLOT_SKIN
 
 @mutation MUT_BASHING_TAIL 12
@@ -93,6 +122,13 @@
     description     A_short_non-prehensile_tail._The_only_thing_it_can_do_is_make_your_pants_fit_poorly.
     slot            MUT_SLOT_TAIL
 
+@mutation MUT_NO_TAIL 29
+    gainVerb        losing
+    name            your_tail
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_TAIL
+
 @mutation MUT_GORING_HORNS 15
     gainVerb        growing
     name            goring_horns
@@ -113,6 +149,13 @@
     slot            MUT_SLOT_HORNS
     effect          ET_GIVE_ABILITY 100 ABILITY_HORNCHARGE 0 0
 
+@mutation MUT_NO_HORNS 27
+    gainVerb        losing
+    name            your_horns
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_HORNS
+
 @mutation MUT_SMALL 17
     name            small_size
     description     You're_small,_like_a_gnome_or_kobold._It_leaves_you_rather_fragile,_but_also_harder_to_hit.
@@ -126,6 +169,12 @@
     slot            MUT_SLOT_SIZE
     effect          ET_BOOST 100 STAT_EVASION -2 0
     effect          ET_BOOST 100 STAT_TOUGHNESS 3 0
+
+@mutation MUT_MEDIUM 28
+    name            medium_size
+    description     (internal)_this_should_never_be_visible
+    effect          ET_NO_MUTATION 100 0 0 0
+    slot            MUT_SLOT_SIZE
 
 @mutation MUT_FIRE_BREATH 19
     name            fire_breath
@@ -150,3 +199,24 @@
     description     Much_like_the_trolls_of_legend,_you_constantly_(if_slowly)_heal_your_wounds.
     slot            MUT_SLOT_NONE
     effect          ET_GIVE_ABILITY 100 ABILITY_REGENERATION 0 0
+
+@mutation MUT_DIGITIGRADE_LEGS 30
+    gainVerb        growing
+    name            digitigrade_legs
+    description     Like_many_animals,_you_stand_on_your_toes,_your_legs_like_springs_ready_to_thrust_you_forward.
+    slot            MUT_SLOT_LEGS
+    effect          ET_BOOST 100 STAT_SPEED 1 0
+
+@mutation MUT_UNGULATE_LEGS 31
+    gainVerb        growing
+    name            ungulate_legs
+    description     You_stand_on_hooves,_ready_to_burst_into_a_sprint_at_a_moments_notice.
+    slot            MUT_SLOT_LEGS
+    effect          ET_BOOST 100 STAT_SPEED 1 0
+
+@mutation MUT_PLANTIGRADE_LEGS 32
+    gainVerb        growing
+    name            plantigrade_legs
+    description     (internal)_this_should_never_be_visible
+    slot            MUT_SLOT_LEGS
+    effect          ET_NO_MUTATION 100 0 0 0
