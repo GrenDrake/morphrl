@@ -273,6 +273,18 @@ void Dungeon::doActorFOV(Actor *actor) {
     handlePlayerFOV(this, actor);
 }
 
+bool Dungeon::hostileIsVisible() const {
+    for (int y = 0; y < mHeight; ++y) {
+        for (int x = 0; x < mWidth; ++x) {
+            Coord here(x, y);
+            if (!isSeen(here)) continue;
+            const Actor *who = actorAt(here);
+            if (!who || who->isPlayer) continue;
+            return true;
+        }
+    }
+    return false;
+}
 
 bool Dungeon::addActor(Actor *who, const Coord &where) {
     if (!who) return false;
@@ -464,6 +476,8 @@ void Dungeon::tick(World &world) {
         Actor *actor = getNextActor();
         actor->verify();
 
+        ++actor->turnsSinceCombatAction;
+        if (actor->turnsSinceCombatAction > 5) actor->takeDamage(-1, actor);
         bool isStunned = false;
         std::stringstream msg;
         auto statusIter = actor->statusEffects.begin();

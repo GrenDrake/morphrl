@@ -60,6 +60,30 @@ void tryMeleeAttack(World &world, Direction dir) {
     world.tick();
 }
 
+void restUntilHealed(World &world) {
+    bool isHealed = world.player->health >= world.player->getStat(STAT_HEALTH);
+    bool isRested = world.player->energy >= world.player->getStat(STAT_ENERGY);
+    if (isHealed && isRested) {
+        world.addMessage("You're already fully rested!");
+        return;
+    }
+
+    bool hostiles = world.map->hostileIsVisible();
+    if (hostiles) {
+        world.addMessage("It would not be safe to do that now.");
+        return;
+    }
+
+    do {
+        world.player->advanceSpeedCounter();
+        world.tick();
+        isHealed = world.player->health >= world.player->getStat(STAT_HEALTH);
+        isRested = world.player->energy >= world.player->getStat(STAT_ENERGY);
+        hostiles = world.map->hostileIsVisible();
+    } while ((!isHealed || !isRested) && !hostiles);
+    if (hostiles) world.addMessage("You are interrupted!");
+}
+
 void tryPlayerInteractTile(World &world, Direction dir) {
     const Coord targetPosition = world.player->position.shift(dir);
     const TileData &tileData = getTileData(world.map->floorAt(targetPosition));

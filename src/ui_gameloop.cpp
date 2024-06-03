@@ -14,6 +14,7 @@ void doMessageLog(World &world);
 void doCharInfo(World &world);
 
 void tryMeleeAttack(World &world, Direction dir);
+void restUntilHealed(World &world);
 void tryMovePlayer(World &world, Direction dir);
 void tryPlayerTakeItem(World &world);
 void tryPlayerChangeFloor(World &world);
@@ -286,6 +287,7 @@ void gameloop(World &world) {
         unsigned timeTaken = (newTimer - timer) * 1000 / CLOCKS_PER_SEC;
         timer = newTimer;
         terminal_printf(61, 2, "Tick time: %u", timeTaken);
+        terminal_printf(61, 2, "Since Combat: %u", world.player->turnsSinceCombatAction);
 #endif
 
         terminal_refresh();
@@ -466,6 +468,7 @@ void gameloop(World &world) {
 
             if (key == TK_L)        doMessageLog(world);
             if (key == TK_G)        tryPlayerTakeItem(world);
+            if (key == TK_R)        restUntilHealed(world);
             if (key == TK_O) {
                 uiMode = UIMode::ChooseDirection;
                 uiModeString = "Interact where?";

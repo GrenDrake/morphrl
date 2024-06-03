@@ -70,7 +70,7 @@ Actor* Actor::create(const ActorData &data) {
 Actor::Actor(const ActorData &data, unsigned myIdent)
 : data(data), ident(myIdent), position(-1, -1),
   isPlayer(false), level(0), xp(0), advancementPoints(0), playerLastSeenPosition(-1, -1),
-  speedCounter(0), onMap(nullptr)
+  speedCounter(0), onMap(nullptr), turnsSinceCombatAction(0)
 {
     level = data.baseLevel;
     for (int i = 0; i < STAT_BASE_COUNT; ++i) {
@@ -192,6 +192,7 @@ int Actor::getStat(int statNumber) const {
 }
 
 void Actor::takeDamage(int amount, Actor *fromWho) {
+    if (amount > 0) turnsSinceCombatAction = 0;
     health -= amount;
     if (health <= 0) {
         health = 0;
@@ -358,6 +359,8 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
         return data;
     }
 
+    turnsSinceCombatAction = 0;
+    target->turnsSinceCombatAction = 0;
     data.roll = 1 + globalRNG.upto(20);
     data.toHit = getStat(STAT_ACCURACY);
     data.evasion = target->getStat(STAT_EVASION);

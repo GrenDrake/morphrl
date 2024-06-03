@@ -351,6 +351,7 @@ struct Actor {
     std::vector<StatusItem*> statusEffects;
     std::vector<MutationItem*> mutations;
     Dungeon *onMap;
+    unsigned turnsSinceCombatAction;
 
 private:
     Actor(const ActorData &data, unsigned myIdent);
@@ -426,6 +427,7 @@ public:
     void setSeen(const Coord &where);
     void clearIsSeen();
     void doActorFOV(Actor *actor);
+    bool hostileIsVisible() const;
 
     bool addActor(Actor *who, const Coord &where);
     bool moveActor(Actor *who, const Coord &where);
