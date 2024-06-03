@@ -12,11 +12,12 @@ will not be able to resume it.
 Movement through the dungeon is straight-forward. You character is represented
 by the [color=#7FFF7F]@[/color] symbol and you can move around using the numeric keypad. The arrow
 keys also work, but do not allow for diagonal movement.
-Many rooms and corridors are separated by doors; you       Floor -> [color=#FFFFFF]..[color=#A52A2A]+[/color] <- door
-canmove freely through these, but they’ll block your         you -> [color=#7FFF7F]@[color=#FFFFFF].[color=#7F7F7F]#[/color] <- wall
-line-of-sight until you step into them. When you’re       goblin -> [color=#FF7F7F]g[color=#FFFFFF].[color=#7F7F7F]/[/color] <- item
-standing on a staircase (‘[color=yellow]<[/color]’ or ‘[color=yellow]>[/color]’), you can press    up stairs -> [color=#FFFFFF]<..[/color]
-the period or comma keys to climb up and down them.
+Many rooms and corridors are separated by doors; trying    Floor -> [color=#FFFFFF]..[color=#A52A2A]+[/color] <- door
+to move into a door will open it. You can also open          you -> [color=#7FFF7F]@[color=#FFFFFF].[color=#7F7F7F]#[/color] <- wall
+and close adjacent doors using the ‘[color=yellow]o[/color]’ key. When you      goblin -> [color=#FF7F7F]g[color=#FFFFFF].[color=#7F7F7F]/[/color] <- item
+are standing on a staircase (‘[color=yellow]<[/color]’ or ‘[color=yellow]>[/color]’), you can      up stairs -> [color=#FFFFFF]<..[/color]
+press the period or comma keys to climb up and down
+them.
 
 You can access your character sheet with the ‘[color=yellow]c[/color]’ key and view and use your
 inventory with ‘[color=yellow]i[/color]’. You can see a log of all past messages by pressing ‘[color=yellow]l[/color]’. If
@@ -26,7 +27,10 @@ occupying any given space.
 Engaging in combat with the monsters of the dungeon (represented by the letters
 of the alphabet) is performed by trying to move into their space. This will
 automatically cause you to perform a melee attack. But be careful! The monsters
-are going to try and do the same thing to you.
+are going to try and do the same thing to you. Once you've defeated all the
+monsters in sight, you can rest until you're healed with ‘[color=yellow]r[/color]’, but make sure
+you're somewhere safe! Monsters can still stumble until you while you're
+resting.
 
 Various items can be found throughout the dungeon; they’re typically
 represented by non-alphanumeric symbols. The majority of these will be useful
