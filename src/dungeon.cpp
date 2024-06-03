@@ -416,6 +416,16 @@ Room& Dungeon::getRoom(int index) {
     return mRooms[index];
 }
 
+Room& Dungeon::getRoom(const Coord &where) {
+    for (Room &room : mRooms) {
+        if (where.x < room.x || where.y < room.y) continue;
+        if (where.x >= room.x + room.w) continue;
+        if (where.y >= room.y + room.h) continue;
+        return room;
+    }
+    return BAD_ROOM;
+}
+
 void Dungeon::clearDeadActors() {
     auto iter = mActors.begin();
     while (iter != mActors.end()) {

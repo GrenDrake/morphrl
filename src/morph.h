@@ -448,6 +448,7 @@ public:
     const Room& getRoomByType(int roomType) const;
     // const Room& getRoom(int index) const;
     Room& getRoom(int index);
+    Room& getRoom(const Coord &where);
 
     void clearDeadActors();
     Actor* getNextActor();

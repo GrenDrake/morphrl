@@ -387,6 +387,8 @@ void spawnActors(Dungeon &d, bool forRefresh) {
             c = d.randomOfTile(TILE_FLOOR);
             if (d.actorAt(c) != nullptr) continue;
             if (forRefresh && d.isSeen(c)) continue;
+            const Room &inRoom = d.getRoom(c);
+            if (inRoom.type == RT_STAIR) continue;
             isGood = true;
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
