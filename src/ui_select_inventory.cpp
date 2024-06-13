@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -85,6 +86,7 @@ void doInventory(World &world, bool showFloor) {
                                          "/" + std::to_string(world.player->getStat(STAT_ENERGY));
         const char *helpFloor = "[color=yellow]SPACE[/color] pick up";
         const char *helpInventory = "[color=yellow]SPACE[/color] use/equip        [color=yellow]D[/color] drop";
+        const char *helpInventory2 = "[color=yellow]S[/color] Sort";
         const int maxSelection = currentInventory.size() < maxItemsListed
                                     ? currentInventory.size() - 1 : maxItemsListed;
         terminal_color(textColour);
@@ -120,7 +122,10 @@ void doInventory(World &world, bool showFloor) {
         terminal_print(45, 0, "[font=italic]DESCRIPTION");
         terminal_print(0, 21, "[color=yellow]UP/DOWN[/color] select item    [color=yellow]TAB[/color] change view");
         if (world.player->isDead()) terminal_print(0, 22, "You are [color=red]DEAD[/color].");
-        else terminal_print(0, 22, showFloor ? helpFloor : helpInventory);
+        else {
+            terminal_print(0, 22, showFloor ? helpFloor : helpInventory);
+            if (!showFloor) terminal_print(23, 23, helpInventory2);
+        }
         terminal_print(0, 23, bulkString.c_str());
         terminal_print(0, 24, healthString.c_str());
 
@@ -207,6 +212,18 @@ void doInventory(World &world, bool showFloor) {
         if (key == TK_HOME) selection = 0;
         if ((key == TK_DOWN || key == TK_KP_2) && selection < maxSelection) ++selection;
         if (key == TK_END) selection = maxSelection;
+        if (key == TK_S && !showFloor && !world.player->isDead()) {
+            std::sort(currentInventory.begin(), currentInventory.end(), [](const Item *lhs, const Item *rhs) {
+                if (!lhs) return false;
+                if (!rhs) return true;
+                if (lhs->data.name == rhs->data.name) {
+                    if (lhs->isEquipped && !rhs->isEquipped) return true;
+                    return false;
+                }
+                return lhs->data.name < rhs->data.name;
+            });
+            selection = 0;
+        }
         if (key == TK_D && !showFloor && !world.player->isDead()) {
             if (selection >= 0 && selection <= maxSelection) {
                 Item *item = currentInventory[selection];
