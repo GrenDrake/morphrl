@@ -5,6 +5,7 @@ current
  * [feature] adds pushback and stunned effects; the ramming horns gain both
  * [feature] adds ability to regen health outside of combat
  * [feature] adds "rest until healed" (R) command for restoring health and energy
+ * [feature] adds option to sort player inventory
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)
@@ -13,6 +14,7 @@ current
  * [improvement] hostile actors will not longer spawn in stairway rooms (though they can still move into them)
  * [bugfix] actors that die from status effect now properly grant XP to their killer
  * [bugfix] special ability attacks now properly trigger on_hit effects
+ * [bugfix] dropping items now clears the equipped item flag
 
 alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.
