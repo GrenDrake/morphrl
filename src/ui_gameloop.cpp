@@ -39,7 +39,6 @@ const int ACT_EXAMINETILE = 4;
 const int ACT_CHANGEFLOOR = 5;
 const int ACT_MOVE = 6;
 const int ACT_WAIT = 7;
-const int ACT_ABILITY = 8;
 const int ACT_TAKEITEM = 9;
 const int ACT_REST = 10;
 const int ACT_INTERACTTILE = 11;
@@ -80,7 +79,6 @@ std::vector<KeyBinding> keyBindings{
     {   TK_UP,      ACT_MOVE,           Direction::North,   MODE_NORMAL },
     {   TK_DOWN,    ACT_MOVE,           Direction::South,   MODE_NORMAL },
     {   TK_SPACE,   ACT_WAIT,           Direction::Unknown, MODE_NORMAL },
-    {   TK_A,       ACT_ABILITY,        Direction::Unknown, MODE_NORMAL },
     {   TK_T,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
     {   TK_G,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
     {   TK_R,       ACT_REST,           Direction::Unknown, MODE_NORMAL },
