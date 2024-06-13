@@ -25,9 +25,14 @@ void debug_doTeleport(World &world);
 void debug_killNeighbours(World &world);
 
 
-const unsigned MODE_ALL = 0xFFFFFFFF;
-const unsigned MODE_DEAD = 1;
-const unsigned MODE_NORMAL = 2;
+const unsigned MODE_ALL             = 0xFFFFFFFF;
+const unsigned MODE_DEAD            = 0x00000001;
+const unsigned MODE_NORMAL          = 0x00000002;
+const unsigned MODE_EXAMINE_TILE    = 0x00000004;
+const unsigned MODE_CHOOSE_DIRECTION = 0x00000008;
+const unsigned MODE_CHOOSE_TARGET   = 0x00000010;
+const unsigned MODE_PICK_FROM_LIST  = 0x0000020;
+
 
 const int ACT_FULLQUIT = -2;
 const int ACT_NONE = -1;
@@ -226,9 +231,6 @@ struct ListItem {
     unsigned value;
 };
 
-enum class UIMode {
-    Normal, ExamineTile, ChooseDirection, ChooseTarget, PlayerDead, PickFromList
-};
 const int UI_DEBUG_TUNNEL = 10000;
 const int UI_USE_ABILITY  = 10001;
 const int UI_INTERACT_TILE  = 10002;
@@ -244,7 +246,7 @@ GameReturn gameloop(World &world) {
     const unsigned animDelay = configData.getIntValue("animation_delay", 300);
     std::string uiModeString;
     int uiModeAction = 0;
-    UIMode uiMode = UIMode::Normal;
+    unsigned uiMode = MODE_NORMAL;
     Coord cursorPos(-1, -1);
     bool shownDeathMessage = false;
     std::vector<Coord> targetArea;
@@ -260,8 +262,8 @@ GameReturn gameloop(World &world) {
         }
 
         world.player->verify();
-        if (uiMode == UIMode::Normal && world.player->isDead()) {
-            uiMode = UIMode::PlayerDead;
+        if (uiMode == MODE_NORMAL && world.player->isDead()) {
+            uiMode = MODE_DEAD;
             if (!shownDeathMessage) {
                 shownDeathMessage = true;
                 world.addMessage("You have [color=red]died[/color]! Press [color=yellow]ESCAPE[/color] to return to the menu.");
@@ -277,7 +279,7 @@ GameReturn gameloop(World &world) {
         // show log (we do this first so we can remove any extra bits that would
         // overlap other UI elements)
         unsigned yPos = 24;
-        if (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead) {
+        if (uiMode == MODE_NORMAL || uiMode == MODE_DEAD) {
             for (auto iter = world.messages.rbegin(); iter != world.messages.rend(); ++iter) {
                 dimensions_t dims = terminal_measure_ext(77, 5, iter->text.c_str());
                 if (dims.height > 1) yPos -= dims.height - 1;
@@ -286,7 +288,7 @@ GameReturn gameloop(World &world) {
                 --yPos;
                 if (yPos < 20) break;
             }
-        } else if (uiMode == UIMode::ExamineTile) {
+        } else if (uiMode == MODE_EXAMINE_TILE) {
             const std::string desc = previewMapSpace(world, cursorPos);
             terminal_print_ext(0, 20, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
             const Actor *actorAtPos = world.map->actorAt(cursorPos);
@@ -295,15 +297,15 @@ GameReturn gameloop(World &world) {
             } else {
                 terminal_print(0, 24, "[color=yellow]X[/color] to finish");
             }
-        } else if (uiMode == UIMode::ChooseTarget) {
+        } else if (uiMode == MODE_CHOOSE_TARGET) {
             const std::string desc = previewMapSpace(world, cursorPos);
             terminal_print_ext(0, 21, 80, 5, TK_ALIGN_DEFAULT, desc.c_str());
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose target space or [color=yellow]Z[/color] to cancel");
-        } else if (uiMode == UIMode::ChooseDirection) {
+        } else if (uiMode == MODE_CHOOSE_DIRECTION) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             terminal_print(0, 24, "Choose direction or [color=yellow]Z[/color] to cancel");
-        } else if (uiMode == UIMode::PickFromList) {
+        } else if (uiMode == MODE_PICK_FROM_LIST) {
             terminal_print_ext(0, 20, 80, 1, TK_ALIGN_DEFAULT, uiModeString.c_str());
             int xPos = 0, yPos = 21, counter = 1;
             for (unsigned i = 0; i < uiListOfThings.size(); ++i) {
@@ -329,9 +331,9 @@ GameReturn gameloop(World &world) {
 
                 terminal_color(fgColor);
                 terminal_bkcolor(bgColor);
-                if (uiMode == UIMode::ExamineTile && here == cursorPos) {
+                if (uiMode == MODE_EXAMINE_TILE && here == cursorPos) {
                     terminal_bkcolor(cursorColour);
-                } else if (uiMode == UIMode::ChooseTarget) {
+                } else if (uiMode == MODE_CHOOSE_TARGET) {
                     if (here == cursorPos) {
                         terminal_bkcolor(cursorColour);
                     } else if (vectorContains(targetArea, here)) terminal_bkcolor(targetLineColour);
@@ -392,7 +394,7 @@ GameReturn gameloop(World &world) {
         timer = clock();
 #endif
 
-        if (key == TK_MOUSE_RIGHT && (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead)) {
+        if (key == TK_MOUSE_RIGHT && (uiMode == MODE_NORMAL || uiMode == MODE_DEAD)) {
             int mx = terminal_state(TK_MOUSE_X);
             int my = terminal_state(TK_MOUSE_Y);
             if (my < 19) {
@@ -402,15 +404,13 @@ GameReturn gameloop(World &world) {
             continue;
         }
 
-        unsigned mode = MODE_NORMAL;
-        if (uiMode == UIMode::PlayerDead) mode = MODE_DEAD;
-        const KeyBinding &action = getBindingForKey(key, mode);
+        const KeyBinding &action = getBindingForKey(key, uiMode);
 
         if (action.action == ACT_FULLQUIT) return GameReturn::FullQuit;
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::Normal  UIMode::PlayerDead
-        if (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead) {
+        if (uiMode == MODE_NORMAL || uiMode == MODE_DEAD) {
             if (action.action == ACT_NONE) continue;
             if (action.action == ACT_MENU) break;
             if (action.action == ACT_LOG) doMessageLog(world);
@@ -420,11 +420,11 @@ GameReturn gameloop(World &world) {
             if (action.action == ACT_REST) restUntilHealed(world);
 
             if (action.action == ACT_EXAMINETILE) {
-                    uiMode = UIMode::ExamineTile;
+                    uiMode = MODE_EXAMINE_TILE;
                     cursorPos = world.player->position;
             }
             if (action.action == ACT_INTERACTTILE) {
-                uiMode = UIMode::ChooseDirection;
+                uiMode = MODE_CHOOSE_DIRECTION;
                 uiModeString = "Interact where?";
                 uiModeAction = UI_INTERACT_TILE;
             }
@@ -456,7 +456,7 @@ GameReturn gameloop(World &world) {
                         world.addMessage("You have no abilities you can use right now.");
                     } else {
                         uiListOfThings.push_back(ListItem{"Cancel", BAD_VALUE});
-                        uiMode = UIMode::PickFromList;
+                        uiMode = MODE_PICK_FROM_LIST;
                         uiModeAction = UI_USE_ABILITY;
                         uiModeString = "Use which ability?";
                     }
@@ -469,7 +469,7 @@ GameReturn gameloop(World &world) {
                 else world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
                 world.player->takeDamage(-99999, nullptr);
                 world.player->spendEnergy(-99999);
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
                 shownDeathMessage = false;
             } else if (action.action == ACT_DBG_TELEPORT)    debug_doTeleport(world);
             else if (action.action == ACT_DBG_ADDITEM)      debug_addThing(world, TT_ITEM);
@@ -480,7 +480,7 @@ GameReturn gameloop(World &world) {
                 world.addMessage("[color=cyan]DEBUG[/color] toggled FOV");
             } else if (action.action == ACT_DBG_KILLADJ) debug_killNeighbours(world);
             else if (action.action == ACT_DBG_TUNNEL) {
-                uiMode = UIMode::ChooseDirection;
+                uiMode = MODE_CHOOSE_DIRECTION;
                 uiModeString = "[color=cyan]DEBUG[/color] make tunnel";
                 uiModeAction = UI_DEBUG_TUNNEL;
             } else if (action.action == ACT_DBG_MAPWACTORS) {
@@ -498,7 +498,7 @@ GameReturn gameloop(World &world) {
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::ExamineTile
-        } else if (uiMode == UIMode::ExamineTile) {
+        } else if (uiMode == MODE_EXAMINE_TILE) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
                 int my = terminal_state(TK_MOUSE_Y);
@@ -508,10 +508,10 @@ GameReturn gameloop(World &world) {
                 }
             }
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
             }
             if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
                 const MapTile *tile = world.map->at(cursorPos);
                 if (tile && tile->isSeen && tile->actor) showActorInfo(world, tile->actor);
             }
@@ -522,9 +522,9 @@ GameReturn gameloop(World &world) {
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::PickFromList
-        } else if (uiMode == UIMode::PickFromList) {
+        } else if (uiMode == MODE_PICK_FROM_LIST) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
             }
             int choice = -1;
             if (key == TK_1 && uiListOfThings.size() >= 1) choice = 0;
@@ -538,11 +538,11 @@ GameReturn gameloop(World &world) {
             if (key == TK_9 && uiListOfThings.size() >= 9) choice = 8;
             if (key == TK_0 && uiListOfThings.size() >= 10) choice = 9;
             if (uiModeAction != UI_USE_ABILITY) {
-                world.addMessage("Unhandled action in UIMode::PickFromList");
+                world.addMessage("Unhandled action in MODE_PICK_FROM_LIST");
                 continue;
             }
             if (choice >= 0) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
                 unsigned ident = uiListOfThings[choice].value;
                 if (ident == BAD_VALUE) continue;
                 const AbilityData &data = getAbilityData(ident);
@@ -558,7 +558,7 @@ GameReturn gameloop(World &world) {
                         targetAreaRange = data.maxRange;
                         targetAreaType = data.areaType;
                         uiModeParam = ident;
-                        uiMode = UIMode::ChooseDirection;
+                        uiMode = MODE_CHOOSE_DIRECTION;
                         uiModeString = "Choose direction for " + data.name + ".";
                         targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
                     } else {
@@ -566,7 +566,7 @@ GameReturn gameloop(World &world) {
                         targetAreaRange = data.maxRange;
                         targetAreaType = data.areaType;
                         uiModeParam = ident;
-                        uiMode = UIMode::ChooseTarget;
+                        uiMode = MODE_CHOOSE_TARGET;
                         uiModeString = "Choose target for " + data.name + ".";
                         targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
                     }
@@ -575,7 +575,7 @@ GameReturn gameloop(World &world) {
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::ChooseTarget
-        } else if (uiMode == UIMode::ChooseTarget) {
+        } else if (uiMode == MODE_CHOOSE_TARGET) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
                 int my = terminal_state(TK_MOUSE_Y);
@@ -586,10 +586,10 @@ GameReturn gameloop(World &world) {
                 }
             }
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
             }
             if (key == TK_ENTER || key == TK_SPACE || key == TK_KP_ENTER) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
                 // DO THE THING
                 if (uiModeAction == UI_USE_ABILITY) {
                     const AbilityData &abilityData = getAbilityData(uiModeParam);
@@ -597,7 +597,7 @@ GameReturn gameloop(World &world) {
                     world.player->advanceSpeedCounter(abilityData.speedMult);
                     world.tick();
                 } else {
-                    world.addMessage("ERROR unhandled ui action in UIMode::ChooseTarget");
+                    world.addMessage("ERROR unhandled ui action in MODE_CHOOSE_TARGET");
                 }
             }
             Direction theDir = keyToDirection(key);
@@ -608,13 +608,13 @@ GameReturn gameloop(World &world) {
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::ChooseDirection
-        } else if (uiMode == UIMode::ChooseDirection) {
+        } else if (uiMode == MODE_CHOOSE_DIRECTION) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
             }
             Direction theDir = keyToDirection(key);
             if (theDir != Direction::Unknown) {
-                uiMode = UIMode::Normal;
+                uiMode = MODE_NORMAL;
                 switch(uiModeAction) {
                     case UI_DEBUG_TUNNEL: {
                         Coord where = world.player->position.shift(theDir);
