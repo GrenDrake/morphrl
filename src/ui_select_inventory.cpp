@@ -228,6 +228,7 @@ void doInventory(World &world, bool showFloor) {
             if (selection >= 0 && selection <= maxSelection) {
                 Item *item = currentInventory[selection];
                 world.player->removeItem(item);
+                item->isEquipped = false;
                 world.map->addItem(item, world.player->position);
                 world.addMessage("Dropped [color=yellow]" + item->getName(true) + "[/color].");
                 world.tick();
