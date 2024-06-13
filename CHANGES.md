@@ -15,6 +15,7 @@ current
  * [bugfix] actors that die from status effect now properly grant XP to their killer
  * [bugfix] special ability attacks now properly trigger on_hit effects
  * [bugfix] dropping items now clears the equipped item flag
+ * [bugfix] closing the game window in the main game screen now quits rather than returning to the menu
 
 alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.
