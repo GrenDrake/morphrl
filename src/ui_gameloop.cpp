@@ -287,7 +287,7 @@ void gameloop(World &world) {
         unsigned timeTaken = (newTimer - timer) * 1000 / CLOCKS_PER_SEC;
         timer = newTimer;
         terminal_printf(61, 2, "Tick time: %u", timeTaken);
-        terminal_printf(61, 2, "Since Combat: %u", world.player->turnsSinceCombatAction);
+        terminal_printf(61, 3, "Since Combat: %u", world.player->turnsSinceCombatAction);
 #endif
 
         terminal_refresh();
