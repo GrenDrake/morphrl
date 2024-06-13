@@ -9,7 +9,7 @@
 #include "morph.h"
 
 
-void gameloop(World &world);
+GameReturn gameloop(World &world);
 void doDebugCodex();
 
 RNG globalRNG;
@@ -182,20 +182,22 @@ int main(int argc, char *argv[]) {
                     if (!world) {
                         ui_alertBox("Error", "Could not create game world.");
                     } else {
-                        gameloop(*world);
-                        if (world->gameState == GameState::Victory) {
+                        GameReturn ret = gameloop(*world);
+                        if (ret == GameReturn::FullQuit || world->gameState == GameState::Victory) {
                             delete world;
                             world = nullptr;
+                            if (ret == GameReturn::FullQuit) done = true;
                         }
                         selection = 2;
                     }
                     break; }
                 case 2:
                     if (world) {
-                        gameloop(*world);
-                        if (world->gameState == GameState::Victory) {
+                        GameReturn ret = gameloop(*world);
+                        if (ret == GameReturn::FullQuit || world->gameState == GameState::Victory) {
                             delete world;
                             world = nullptr;
+                            if (ret == GameReturn::FullQuit) done = true;
                         }
                     } else {
                         ui_alertBox("Error", "No game in progress.");

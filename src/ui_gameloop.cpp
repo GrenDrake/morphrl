@@ -25,9 +25,11 @@ void debug_doTeleport(World &world);
 void debug_killNeighbours(World &world);
 
 
+const unsigned MODE_ALL = 0xFFFFFFFF;
 const unsigned MODE_DEAD = 1;
 const unsigned MODE_NORMAL = 2;
 
+const int ACT_FULLQUIT = -2;
 const int ACT_NONE = -1;
 const int ACT_MENU = 0;
 const int ACT_LOG = 1;
@@ -64,6 +66,8 @@ struct KeyBinding {
 };
 
 std::vector<KeyBinding> keyBindings{
+    {   TK_CLOSE,  ACT_FULLQUIT,        Direction::Unknown, MODE_ALL },
+    
     {   TK_ESCAPE,  ACT_MENU,           Direction::Unknown, MODE_DEAD|MODE_NORMAL },
     {   TK_L,       ACT_LOG,            Direction::Unknown, MODE_DEAD|MODE_NORMAL },
     {   TK_C,       ACT_CHARINFO,       Direction::Unknown, MODE_DEAD|MODE_NORMAL },
@@ -230,7 +234,7 @@ enum class UIMode {
 const int UI_DEBUG_TUNNEL = 10000;
 const int UI_USE_ABILITY  = 10001;
 const int UI_INTERACT_TILE  = 10002;
-void gameloop(World &world) {
+GameReturn gameloop(World &world) {
     const color_t black = color_from_argb(255, 0, 0, 0);
     const color_t cursorColour = color_from_argb(255, 127, 127, 127);
     const color_t targetLineColour = color_from_argb(255, 63, 63, 63);
@@ -254,7 +258,7 @@ void gameloop(World &world) {
     while (1) {
         if (world.gameState == GameState::Victory) {
             showDocument("ending.txt");
-            return;
+            return GameReturn::Normal;
         }
 
         world.player->verify();
@@ -400,10 +404,11 @@ void gameloop(World &world) {
             continue;
         }
 
-        if (key == TK_CLOSE)    break;
         unsigned mode = MODE_NORMAL;
         if (uiMode == UIMode::PlayerDead) mode = MODE_DEAD;
         const KeyBinding &action = getBindingForKey(key, mode);
+
+        if (action.action == ACT_FULLQUIT) return GameReturn::FullQuit;
 
         // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
         // UIMode::Normal  UIMode::PlayerDead
@@ -638,5 +643,5 @@ void gameloop(World &world) {
         }
     }
 
-    return;
+    return GameReturn::Normal;
 }

@@ -102,6 +102,11 @@ enum class Direction {
     North, Northeast, East, Southeast, South, Southwest, West, Northwest,
 };
 
+enum class GameReturn {
+    Normal,
+    FullQuit
+};
+
 struct Color {
     int r, g, b;
 };
