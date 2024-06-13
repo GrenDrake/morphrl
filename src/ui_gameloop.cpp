@@ -25,6 +25,87 @@ void debug_doTeleport(World &world);
 void debug_killNeighbours(World &world);
 
 
+const unsigned MODE_DEAD = 1;
+const unsigned MODE_NORMAL = 2;
+
+const int ACT_NONE = -1;
+const int ACT_MENU = 0;
+const int ACT_LOG = 1;
+const int ACT_CHARINFO = 2;
+const int ACT_INVENTORY = 3;
+const int ACT_EXAMINETILE = 4;
+const int ACT_CHANGEFLOOR = 5;
+const int ACT_MOVE = 6;
+const int ACT_WAIT = 7;
+const int ACT_ABILITY = 8;
+const int ACT_TAKEITEM = 9;
+const int ACT_REST = 10;
+const int ACT_INTERACTTILE = 11;
+const int ACT_USEABILITY = 12;
+
+const int ACT_DBG_FULLHEAL = 1000;
+const int ACT_DBG_TELEPORT = 1001;
+const int ACT_DBG_ADDITEM = 1002;
+const int ACT_DBG_ADDMUTATION = 1003;
+const int ACT_DBG_ADDSTATUS = 1004;
+const int ACT_DBG_DISABLEFOV = 1005;
+const int ACT_DBG_KILLADJ = 1006;
+const int ACT_DBG_TUNNEL = 1007;
+const int ACT_DBG_MAPWACTORS = 1008;
+const int ACT_DBG_MAP = 1009;
+const int ACT_DBG_XP = 1010;
+
+
+struct KeyBinding {
+    int key;
+    int action;
+    Direction dir;
+    unsigned forMode;
+};
+
+std::vector<KeyBinding> keyBindings{
+    {   TK_ESCAPE,  ACT_MENU,           Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_L,       ACT_LOG,            Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_C,       ACT_CHARINFO,       Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_I,       ACT_INVENTORY,      Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_X,       ACT_EXAMINETILE,    Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_COMMA,   ACT_CHANGEFLOOR,    Direction::Unknown, MODE_NORMAL },
+    {   TK_PERIOD,  ACT_CHANGEFLOOR,    Direction::Unknown, MODE_NORMAL },
+    {   TK_LEFT,    ACT_MOVE,           Direction::West,    MODE_NORMAL },
+    {   TK_RIGHT,   ACT_MOVE,           Direction::East,    MODE_NORMAL },
+    {   TK_UP,      ACT_MOVE,           Direction::North,   MODE_NORMAL },
+    {   TK_DOWN,    ACT_MOVE,           Direction::South,   MODE_NORMAL },
+    {   TK_SPACE,   ACT_WAIT,           Direction::Unknown, MODE_NORMAL },
+    {   TK_A,       ACT_ABILITY,        Direction::Unknown, MODE_NORMAL },
+    {   TK_T,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
+    {   TK_G,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
+    {   TK_R,       ACT_REST,           Direction::Unknown, MODE_NORMAL },
+    {   TK_O,       ACT_INTERACTTILE,   Direction::Unknown, MODE_NORMAL },
+    {   TK_A,       ACT_USEABILITY,     Direction::Unknown, MODE_NORMAL },
+
+#ifdef DEBUG
+    {   TK_F1,      ACT_DBG_FULLHEAL,   Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_F2,      ACT_DBG_TELEPORT,   Direction::Unknown, MODE_NORMAL },
+    {   TK_F3,      ACT_DBG_ADDITEM,    Direction::Unknown, MODE_NORMAL },
+    {   TK_F4,      ACT_DBG_ADDMUTATION,Direction::Unknown, MODE_NORMAL },
+    {   TK_F5,      ACT_DBG_ADDSTATUS,  Direction::Unknown, MODE_NORMAL },
+    {   TK_F6,      ACT_DBG_DISABLEFOV, Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_F7,      ACT_DBG_KILLADJ,    Direction::Unknown, MODE_NORMAL },
+    {   TK_F8,      ACT_DBG_TUNNEL,     Direction::Unknown, MODE_NORMAL },
+    {   TK_F10,     ACT_DBG_MAPWACTORS, Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_F11,     ACT_DBG_MAP,        Direction::Unknown, MODE_DEAD|MODE_NORMAL },
+    {   TK_F12,     ACT_DBG_XP,         Direction::Unknown, MODE_NORMAL },
+#endif
+};
+
+const KeyBinding NO_KEY{ 0, ACT_NONE };
+const KeyBinding& getBindingForKey(int keyPressed, unsigned currentMode) {
+    for (const KeyBinding &binding : keyBindings) {
+        if ((binding.forMode & currentMode) != currentMode) continue;
+        if (binding.key == keyPressed) return binding;
+    }
+    return NO_KEY;
+}
 
 
 const char *youveNeverSeenThatSpace = "You've never seen that space.";
@@ -308,25 +389,112 @@ void gameloop(World &world) {
 #ifdef DEBUG
         timer = clock();
 #endif
-        if (key == TK_CLOSE)    break;
-        if (uiMode == UIMode::PlayerDead) {
-            if (key == TK_ESCAPE)   break;
-            if (key == TK_L)        doMessageLog(world);
-            if (key == TK_C)        doCharInfo(world);
-            if (key == TK_I)        doInventory(world, false);
-            if (key == TK_X) {
-                uiMode = UIMode::ExamineTile;
-                cursorPos = world.player->position;
+
+        if (key == TK_MOUSE_RIGHT && (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead)) {
+            int mx = terminal_state(TK_MOUSE_X);
+            int my = terminal_state(TK_MOUSE_Y);
+            if (my < 19) {
+                Coord where(mx + offsetX, my + offsetY);
+                world.addMessage(previewMapSpace(world, where));
             }
+            continue;
+        }
+
+        if (key == TK_CLOSE)    break;
+        unsigned mode = MODE_NORMAL;
+        if (uiMode == UIMode::PlayerDead) mode = MODE_DEAD;
+        const KeyBinding &action = getBindingForKey(key, mode);
+
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // UIMode::Normal  UIMode::PlayerDead
+        if (uiMode == UIMode::Normal || uiMode == UIMode::PlayerDead) {
+            if (action.action == ACT_NONE) continue;
+            if (action.action == ACT_MENU) break;
+            if (action.action == ACT_LOG) doMessageLog(world);
+            if (action.action == ACT_CHARINFO) doCharInfo(world);
+            if (action.action == ACT_INVENTORY) doInventory(world, false);
+            if (action.action == ACT_TAKEITEM) tryPlayerTakeItem(world);
+            if (action.action == ACT_REST) restUntilHealed(world);
+
+            if (action.action == ACT_EXAMINETILE) {
+                    uiMode = UIMode::ExamineTile;
+                    cursorPos = world.player->position;
+            }
+            if (action.action == ACT_INTERACTTILE) {
+                uiMode = UIMode::ChooseDirection;
+                uiModeString = "Interact where?";
+                uiModeAction = UI_INTERACT_TILE;
+            }
+
+            if (action.action == ACT_WAIT) {
+                world.player->advanceSpeedCounter();
+                world.tick();
+            }
+            if (action.action == ACT_MOVE) {
+                tryMovePlayer(world, action.dir);
+            }
+            if (action.action == ACT_CHANGEFLOOR) tryPlayerChangeFloor(world);
+
+            if (action.action == ACT_USEABILITY) {
+                std::vector<unsigned> abilityList = world.player->getAbilityList();
+                if (abilityList.empty()) {
+                    world.addMessage("You have no special abilities.");
+                } else {
+                    uiListOfThings.clear();
+                    for (unsigned i : abilityList) {
+                        const AbilityData &data = getAbilityData(i);
+                        if (data.areaType == AR_PASSIVE) continue;
+                        if (data.energyCost <= world.player->energy) {
+                            std::string optionName = data.name + " (" + std::to_string(data.energyCost) + ")";
+                            uiListOfThings.push_back(ListItem{optionName, data.ident});
+                        }
+                    }
+                    if (uiListOfThings.empty()) {
+                        world.addMessage("You have no abilities you can use right now.");
+                    } else {
+                        uiListOfThings.push_back(ListItem{"Cancel", BAD_VALUE});
+                        uiMode = UIMode::PickFromList;
+                        uiModeAction = UI_USE_ABILITY;
+                        uiModeString = "Use which ability?";
+                    }
+                }
+            }
+
 #ifdef DEBUG
-            if (key == TK_F1) {
+            if (action.action == ACT_DBG_FULLHEAL) {
+                if (world.player->isDead()) world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
+                else world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
                 world.player->takeDamage(-99999, nullptr);
                 world.player->spendEnergy(-99999);
                 uiMode = UIMode::Normal;
                 shownDeathMessage = false;
-                world.addMessage("[color=cyan]DEBUG[/color] resurrecting player");
+            } else if (action.action == ACT_DBG_TELEPORT)    debug_doTeleport(world);
+            else if (action.action == ACT_DBG_ADDITEM)      debug_addThing(world, TT_ITEM);
+            else if (action.action == ACT_DBG_ADDMUTATION)      debug_addThing(world, TT_MUTATION);
+            else if (action.action == ACT_DBG_ADDSTATUS)      debug_addThing(world, TT_STATUS_EFFECT);
+            else if (action.action == ACT_DBG_DISABLEFOV) {
+                world.disableFOV = !world.disableFOV;
+                world.addMessage("[color=cyan]DEBUG[/color] toggled FOV");
+            } else if (action.action == ACT_DBG_KILLADJ) debug_killNeighbours(world);
+            else if (action.action == ACT_DBG_TUNNEL) {
+                uiMode = UIMode::ChooseDirection;
+                uiModeString = "[color=cyan]DEBUG[/color] make tunnel";
+                uiModeAction = UI_DEBUG_TUNNEL;
+            } else if (action.action == ACT_DBG_MAPWACTORS) {
+                debug_saveMapToPNG(*world.map, true);
+                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (including actors) to file");
+            } else if (action.action == ACT_DBG_MAP) {
+                debug_saveMapToPNG(*world.map, false);
+                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (layout only) to file");
+            } else if (action.action == ACT_DBG_XP) {
+                world.player->giveXP(50);
+                world.addMessage("[color=cyan]DEBUG[/color] granted XP points");
             }
+
 #endif
+
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // UIMode::ExamineTile
         } else if (uiMode == UIMode::ExamineTile) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
@@ -348,6 +516,9 @@ void gameloop(World &world) {
             if (theDir != Direction::Unknown) {
                 cursorPos = cursorPos.shift(theDir);
             }
+
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // UIMode::PickFromList
         } else if (uiMode == UIMode::PickFromList) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
@@ -398,6 +569,9 @@ void gameloop(World &world) {
                     }
                 }
             }
+
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // UIMode::ChooseTarget
         } else if (uiMode == UIMode::ChooseTarget) {
             if (key == TK_MOUSE_LEFT) {
                 int mx = terminal_state(TK_MOUSE_X);
@@ -428,6 +602,9 @@ void gameloop(World &world) {
                 cursorPos = cursorPos.shift(theDir);
                 targetArea = world.map->getEffectArea(world.player->position, cursorPos, targetAreaType, targetAreaRange, false, false);
             }
+
+        // ///// ///// ///// ///// ///// ///// ///// ///// ///// ///// /////
+        // UIMode::ChooseDirection
         } else if (uiMode == UIMode::ChooseDirection) {
             if (key == TK_ESCAPE || key == TK_X || key == TK_MOUSE_RIGHT) {
                 uiMode = UIMode::Normal;
@@ -456,95 +633,6 @@ void gameloop(World &world) {
                         logMessage(LOG_ERROR, "Unknown UI action " + std::to_string(uiModeAction));
                 }
             }
-        } else if (uiMode == UIMode::Normal) {
-            if (key == TK_ESCAPE)   break;
-            Direction theDir = keyToDirection(key);
-            if (theDir == Direction::Here) {
-                world.player->advanceSpeedCounter();
-                world.tick();
-            } else if (theDir != Direction::Unknown) {
-                tryMovePlayer(world, theDir);
-            }
-
-            if (key == TK_L)        doMessageLog(world);
-            if (key == TK_G)        tryPlayerTakeItem(world);
-            if (key == TK_R)        restUntilHealed(world);
-            if (key == TK_O) {
-                uiMode = UIMode::ChooseDirection;
-                uiModeString = "Interact where?";
-                uiModeAction = UI_INTERACT_TILE;
-            }
-            if (key == TK_COMMA)    tryPlayerChangeFloor(world);
-            if (key == TK_PERIOD)   tryPlayerChangeFloor(world);
-
-            if (key == TK_MOUSE_RIGHT) {
-                    int mx = terminal_state(TK_MOUSE_X);
-                    int my = terminal_state(TK_MOUSE_Y);
-                    if (my < 19) {
-                        Coord where(mx + offsetX, my + offsetY);
-                        world.addMessage(previewMapSpace(world, where));
-                    }
-            }
-
-            if (key == TK_A) {
-                std::vector<unsigned> abilityList = world.player->getAbilityList();
-                if (abilityList.empty()) {
-                    world.addMessage("You have no special abilities.");
-                } else {
-                    uiListOfThings.clear();
-                    for (unsigned i : abilityList) {
-                        const AbilityData &data = getAbilityData(i);
-                        if (data.areaType == AR_PASSIVE) continue;
-                        if (data.energyCost <= world.player->energy) {
-                            std::string optionName = data.name + " (" + std::to_string(data.energyCost) + ")";
-                            uiListOfThings.push_back(ListItem{optionName, data.ident});
-                        }
-                    }
-                    if (uiListOfThings.empty()) {
-                        world.addMessage("You have no abilities you can use right now.");
-                    } else {
-                        uiListOfThings.push_back(ListItem{"Cancel", BAD_VALUE});
-                        uiMode = UIMode::PickFromList;
-                        uiModeAction = UI_USE_ABILITY;
-                        uiModeString = "Use which ability?";
-                    }
-                }
-            }
-            if (key == TK_I)        doInventory(world, false);
-            if (key == TK_C)        doCharInfo(world);
-            if (key == TK_X) {
-                uiMode = UIMode::ExamineTile;
-                cursorPos = world.player->position;
-            }
-
-#ifdef DEBUG
-            if (key == TK_F1) {
-                world.player->takeDamage(-99999, nullptr);
-                world.player->spendEnergy(-99999);
-                world.addMessage("[color=cyan]DEBUG[/color] health and energy restored");
-            } else if (key == TK_F2)    debug_doTeleport(world);
-            else if (key == TK_F3)      debug_addThing(world, TT_ITEM);
-            else if (key == TK_F4)      debug_addThing(world, TT_MUTATION);
-            else if (key == TK_F5)      debug_addThing(world, TT_STATUS_EFFECT);
-            else if (key == TK_F6) {
-                world.disableFOV = !world.disableFOV;
-                world.addMessage("[color=cyan]DEBUG[/color] toggled FOV");
-            } else if (key == TK_F7) debug_killNeighbours(world);
-            else if (key == TK_F8) {
-                uiMode = UIMode::ChooseDirection;
-                uiModeString = "[color=cyan]DEBUG[/color] make tunnel";
-                uiModeAction = UI_DEBUG_TUNNEL;
-            } else if (key == TK_F10) {
-                debug_saveMapToPNG(*world.map, true);
-                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (including actors) to file");
-            } else if (key == TK_F11) {
-                debug_saveMapToPNG(*world.map, false);
-                world.addMessage("[color=cyan]DEBUG[/color] wrote dungeon map (layout only) to file");
-            } else if (key == TK_F12) {
-                world.player->giveXP(50);
-                world.addMessage("[color=cyan]DEBUG[/color] granted XP points");
-            }
-#endif
         } else {
             logMessage(LOG_ERROR, "unhandled UIMode " + std::to_string(static_cast<int>(uiMode)) + " in input");
         }
