@@ -25,53 +25,6 @@ void debug_doTeleport(World &world);
 void debug_killNeighbours(World &world);
 
 
-
-std::vector<KeyBinding> keyBindings{
-    {   TK_CLOSE,  ACT_FULLQUIT,        Direction::Unknown, MODE_ALL },
-    
-    {   TK_ESCAPE,  ACT_MENU,           Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_L,       ACT_LOG,            Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_C,       ACT_CHARINFO,       Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_I,       ACT_INVENTORY,      Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_X,       ACT_EXAMINETILE,    Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_COMMA,   ACT_CHANGEFLOOR,    Direction::Unknown, MODE_NORMAL },
-    {   TK_PERIOD,  ACT_CHANGEFLOOR,    Direction::Unknown, MODE_NORMAL },
-    {   TK_LEFT,    ACT_MOVE,           Direction::West,    MODE_NORMAL },
-    {   TK_RIGHT,   ACT_MOVE,           Direction::East,    MODE_NORMAL },
-    {   TK_UP,      ACT_MOVE,           Direction::North,   MODE_NORMAL },
-    {   TK_DOWN,    ACT_MOVE,           Direction::South,   MODE_NORMAL },
-    {   TK_SPACE,   ACT_WAIT,           Direction::Unknown, MODE_NORMAL },
-    {   TK_T,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
-    {   TK_G,       ACT_TAKEITEM,       Direction::Unknown, MODE_NORMAL },
-    {   TK_R,       ACT_REST,           Direction::Unknown, MODE_NORMAL },
-    {   TK_O,       ACT_INTERACTTILE,   Direction::Unknown, MODE_NORMAL },
-    {   TK_A,       ACT_USEABILITY,     Direction::Unknown, MODE_NORMAL },
-
-#ifdef DEBUG
-    {   TK_F1,      ACT_DBG_FULLHEAL,   Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_F2,      ACT_DBG_TELEPORT,   Direction::Unknown, MODE_NORMAL },
-    {   TK_F3,      ACT_DBG_ADDITEM,    Direction::Unknown, MODE_NORMAL },
-    {   TK_F4,      ACT_DBG_ADDMUTATION,Direction::Unknown, MODE_NORMAL },
-    {   TK_F5,      ACT_DBG_ADDSTATUS,  Direction::Unknown, MODE_NORMAL },
-    {   TK_F6,      ACT_DBG_DISABLEFOV, Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_F7,      ACT_DBG_KILLADJ,    Direction::Unknown, MODE_NORMAL },
-    {   TK_F8,      ACT_DBG_TUNNEL,     Direction::Unknown, MODE_NORMAL },
-    {   TK_F10,     ACT_DBG_MAPWACTORS, Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_F11,     ACT_DBG_MAP,        Direction::Unknown, MODE_DEAD|MODE_NORMAL },
-    {   TK_F12,     ACT_DBG_XP,         Direction::Unknown, MODE_NORMAL },
-#endif
-};
-
-const KeyBinding NO_KEY{ 0, ACT_NONE };
-const KeyBinding& getBindingForKey(int keyPressed, unsigned currentMode) {
-    for (const KeyBinding &binding : keyBindings) {
-        if ((binding.forMode & currentMode) != currentMode) continue;
-        if (binding.key == keyPressed) return binding;
-    }
-    return NO_KEY;
-}
-
-
 const char *youveNeverSeenThatSpace = "You've never seen that space.";
 std::string previewMapSpace(World &world, const Coord &where) {
     if (!world.map->isValidPosition(where)) {

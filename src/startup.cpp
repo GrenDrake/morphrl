@@ -1,7 +1,6 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -240,100 +239,19 @@ int main(int argc, char *argv[]) {
 }
 
 
-std::map<int, std::string> actionNames{
-    { ACT_FULLQUIT,     "Quit to OS" },
-    { ACT_NONE,         "None" },
-    { ACT_MENU,         "Return to Menu" },
-    { ACT_LOG,          "Message Log" },
-    { ACT_CHARINFO,     "Character Info" },
-    { ACT_INVENTORY,    "View Inventory" },
-    { ACT_EXAMINETILE,  "Examine Map" },
-    { ACT_CHANGEFLOOR,  "Ascend or Descend" },
-    { ACT_MOVE,         "Move" },
-    { ACT_WAIT,         "Wait" },
-    { ACT_TAKEITEM,     "Take Item" },
-    { ACT_REST,         "Rest Until Healed" },
-    { ACT_INTERACTTILE, "Interact" },
-    { ACT_USEABILITY,   "Use Ability" },
+void maybeSetHighlight(bool isSet, int x, int y, int w, int h) {
+    color_t fgColor = color_from_argb(255, 196, 196, 196);
+    color_t bgColor = color_from_argb(255, 0, 0, 0);
 
-    { ACT_DBG_FULLHEAL, "Full Heal (DEBUG)" },
-    { ACT_DBG_TELEPORT, "Teleport (DEBUG)" },
-    { ACT_DBG_ADDITEM, "Add Item (DEBUG)" },
-    { ACT_DBG_ADDMUTATION, "Add Mutation (DEBUG)" },
-    { ACT_DBG_ADDSTATUS, "Add Status Effect (DEBUG)" },
-    { ACT_DBG_DISABLEFOV, "Disable FOV (DEBUG)" },
-    { ACT_DBG_KILLADJ, "Kill Adjacent Actors (DEBUG)" },
-    { ACT_DBG_TUNNEL, "Make Tunnel (DEBUG)" },
-    { ACT_DBG_MAPWACTORS, "Write Map and Actors to File  (DEBUG)" },
-    { ACT_DBG_MAP, "Write Map to file (DEBUG)" },
-    { ACT_DBG_XP, "Give XP (DEBUG)" },
-};
-const std::string STR_UNKNOWN_ACTION = "Unknown Action";
-const std::string& getNameForAction(int action) {
-    auto iter = actionNames.find(action);
-    if (iter == actionNames.end()) return STR_UNKNOWN_ACTION;
-    return iter->second;
-}
-
-std::map<int, std::string> keyNames{
-    { TK_A,         "A" },
-    { TK_B,         "B" },
-    { TK_C,         "C" },
-    { TK_D,         "D" },
-    { TK_E,         "E" },
-    { TK_F,         "F" },
-    { TK_G,         "G" },
-    { TK_H,         "H" },
-    { TK_I,         "I" },
-    { TK_J,         "J" },
-    { TK_K,         "K" },
-    { TK_L,         "L" },
-    { TK_M,         "M" },
-    { TK_N,         "N" },
-    { TK_O,         "O" },
-    { TK_P,         "P" },
-    { TK_Q,         "Q" },
-    { TK_R,         "R" },
-    { TK_S,         "S" },
-    { TK_T,         "T" },
-    { TK_U,         "U" },
-    { TK_V,         "V" },
-    { TK_W,         "W" },
-    { TK_X,         "X" },
-    { TK_Y,         "Y" },
-    { TK_Z,         "Z" },
-    { TK_PERIOD,    "." },
-    { TK_COMMA,     "," },
-    { TK_SPACE,     "<SPACE>" },
-    { TK_LEFT,      "<LEFT>" },
-    { TK_RIGHT,     "<RIGHT>" },
-    { TK_UP,        "<UP>" },
-    { TK_DOWN,      "<DOWN>" },
-    { TK_ESCAPE,    "<ESCAPE>" },
-    { TK_CLOSE,     "<CLOSE>" },
-    { TK_F1,        "<F1>" },
-    { TK_F2,        "<F2>" },
-    { TK_F3,        "<F3>" },
-    { TK_F4,        "<F4>" },
-    { TK_F5,        "<F5>" },
-    { TK_F6,        "<F6>" },
-    { TK_F7,        "<F7>" },
-    { TK_F8,        "<F8>" },
-    { TK_F9,        "<F9>" },
-    { TK_F10,       "<F10>" },
-    { TK_F11,       "<F11>" },
-    { TK_F12,       "<F12>" },
-};
-const std::string& getNameForKey(int key) {
-    static std::string unknownKeyStr;
-    auto iter = keyNames.find(key);
-    if (iter == keyNames.end()) {
-        unknownKeyStr = "<" + std::to_string(key) + ">";
-        return unknownKeyStr;
+    if (isSet) {
+        terminal_color(bgColor);
+        terminal_bkcolor(fgColor);
+    } else {
+        terminal_color(fgColor);
+        terminal_bkcolor(bgColor);
     }
-    return iter->second;
+    if (x >= 0) terminal_clear_area(x, y, w, h);
 }
-
 
 GameReturn keyBindingsMenu() {
     std::vector<UIRect> mouseRegions;
@@ -345,13 +263,14 @@ GameReturn keyBindingsMenu() {
     int top = 0, selection = 0;
     const int maxToShow = 20;
     int menuItemCount = keyBindings.size() - 1;
+    int which = 0;
     while (!done) {
         mouseRegions.clear();
         terminal_color(fgColor);
         terminal_bkcolor(bgColor);
         terminal_clear();
         terminal_print(0, 0, "[font=italic]MorphRL[/font]: Delving the Mutagenic Dungeon");
-        terminal_print(0, 24, "ESC to return    UP / DOWN to Scroll List");
+        terminal_print(0, 24, "ESC to return    ENTER to rebind    UP / DOWN / LEFT / RIGHT to select binding");
 
         for (unsigned i = 0; i < keyBindings.size(); ++i) {
             top = selection - maxToShow / 2;
@@ -361,22 +280,23 @@ GameReturn keyBindingsMenu() {
             if (yLine > maxToShow + 2) break;
             const KeyBinding &binding = keyBindings[i];
 
-            if (i == static_cast<unsigned>(selection)) {
-                terminal_color(bgColor);
-                terminal_bkcolor(fgColor);
-                terminal_clear_area(0, yLine, 80, 1);
-            }
-            terminal_print(1, yLine, getNameForKey(binding.key).c_str());
+            bool thisRow = i == static_cast<unsigned>(selection);
+            maybeSetHighlight(thisRow && which == 0, 0, yLine, 14, 1);
+            terminal_print(1, yLine, getNameForKey(binding.key[0]).c_str());
+
+            maybeSetHighlight(thisRow && which == 1, 15, yLine, 14, 1);
+            if (binding.key[1] != 0) terminal_print(15, yLine, getNameForKey(binding.key[1]).c_str());
+
+            maybeSetHighlight(thisRow && which == 2, 30, yLine, 14, 1);
+            if (binding.key[2] != 0) terminal_print(30, yLine, getNameForKey(binding.key[2]).c_str());
+
+            maybeSetHighlight(false, -1, -1, 0, 0);
             if (binding.dir == Direction::Unknown) {
-                terminal_print(15, yLine, getNameForAction(binding.action).c_str());
+                terminal_print(45, yLine, getNameForAction(binding.action).c_str());
             } else {
                 std::stringstream text;
                 text << getNameForAction(binding.action) << " " << binding.dir;
-                terminal_print(15, yLine, text.str().c_str());
-            }
-            if (i == static_cast<unsigned>(selection)) {
-                terminal_color(fgColor);
-                terminal_bkcolor(bgColor);
+                terminal_print(45, yLine, text.str().c_str());
             }
         }
 
@@ -388,24 +308,35 @@ GameReturn keyBindingsMenu() {
         if (key == TK_END) selection = menuItemCount;
         if ((key == TK_DOWN || key == TK_KP_2) && selection < menuItemCount) ++selection;
 
+        if (key == TK_LEFT && which > 0) --which;
+        if (key == TK_RIGHT && which < 2) ++which;
+
         if (key == TK_MOUSE_LEFT) {
             // int mx = terminal_state(TK_MOUSE_X);
             int my = terminal_state(TK_MOUSE_Y);
             int pos = my - 2 + top;
-            if (pos >= 0 && pos <= menuItemCount) selection = pos;
-            // for (const UIRect &rect : mouseRegions) {
-                // if (mx < rect.x || mx >= rect.x + rect.w) continue;
-                // if (my < rect.y || my >= rect.y + rect.h) continue;
-                // selection = rect.ident;
-                // key = TK_SPACE;
-                // break;
-            // }
+            if (pos >= 0 && pos <= menuItemCount) {
+                selection = pos;
+            }
+        }
+
+        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
+            terminal_clear_area(0, 24, 80, 1);
+            terminal_print(0, 24, "Press new key for binding...");
+            terminal_refresh();
+            int key = 0;
+            do {
+                key = terminal_read();
+                if (key == TK_ESCAPE) { key = 0; break; }
+                if (key == TK_CLOSE) return GameReturn::FullQuit;
+            } while (key == 0);
+            if (key != 0) keyBindings[selection].key[which] = key;
         }
 
         if (key == TK_CLOSE) {
             return GameReturn::FullQuit;
         }
-        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER || key == TK_ESCAPE) {
+        if (key == TK_ESCAPE) {
             break;
         }
     }

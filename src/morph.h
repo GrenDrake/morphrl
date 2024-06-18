@@ -130,6 +130,7 @@ const int ACT_DBG_MAPWACTORS = 1008;
 const int ACT_DBG_MAP = 1009;
 const int ACT_DBG_XP = 1010;
 
+const int MAX_BINDINGS = 3; // maximum number of keybindings per action
 // special item numbers
 const int SIN_FISTS         = -2;
 
@@ -144,7 +145,7 @@ enum class GameReturn {
 };
 
 struct KeyBinding {
-    int key;
+    int key[MAX_BINDINGS];
     int action;
     Direction dir;
     unsigned forMode;
@@ -633,6 +634,10 @@ bool loadConfigData(const std::string &filename);
 
 extern ConfigData configData;
 extern RNG globalRNG;
+
+const KeyBinding& getBindingForKey(int keyPressed, unsigned currentMode);
+const std::string& getNameForAction(int action);
+const std::string& getNameForKey(int key);
 extern std::vector<KeyBinding> keyBindings;
 
 #endif // MORPH_H

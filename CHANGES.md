@@ -12,7 +12,7 @@ current
  * [improvement] multi-use consumables now have a visible number of remaining uses rather than a random chance to be used up
  * [improvement] displays warning on main game screen when over-burdened
  * [improvement] hostile actors will not longer spawn in stairway rooms (though they can still move into them)
- * [improvement] adds (rea-only) keybind menu
+ * [improvement] adds keybind menu and rebindable keys (these are currently not saved between sessions)
  * [bugfix] actors that die from status effect now properly grant XP to their killer
  * [bugfix] special ability attacks now properly trigger on_hit effects
  * [bugfix] dropping items now clears the equipped item flag
