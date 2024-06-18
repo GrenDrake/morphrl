@@ -209,16 +209,16 @@ int main(int argc, char *argv[]) {
                     }
                     break;
                 case 3:
-                    showDocument("story.txt");
+                    if (showDocument("story.txt") == GameReturn::FullQuit) done = true;
                     break;
                 case 4:
-                    showDocument("instructions.txt");
+                    if (showDocument("instructions.txt") == GameReturn::FullQuit) done = true;
                     break;
                 case 5:
                     if (keyBindingsMenu() == GameReturn::FullQuit) done = true;
                     break;
                 case 6:
-                    showDocument("credits.txt");
+                    if (showDocument("credits.txt") == GameReturn::FullQuit) done = true;
                     break;
                 case 7: // quit
                     done = true;

@@ -583,8 +583,8 @@ bool strToInt(const std::string &text, unsigned &result);
 bool strToInt(const std::string &text, int &result);
 void addUniqueToVector(std::vector<int> &v, int item);
 
-void showDocument(const std::string &filename);
-void showDocument(Document *document);
+GameReturn showDocument(const std::string &filename);
+GameReturn showDocument(Document *document);
 Document* loadDocument(const std::string &filename);
 
 Image* loadImage(const std::string &filename);

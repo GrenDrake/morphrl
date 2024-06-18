@@ -14,18 +14,20 @@ Document::~Document() {
     }
 }
 
-void showDocument(const std::string &filename) {
+GameReturn showDocument(const std::string &filename) {
     Document *document = loadDocument(filename);
     if (document) {
-        showDocument(document);
+        GameReturn ret = showDocument(document);
         delete document;
+        return ret;
     }
+    return GameReturn::Normal;
 }
 
-void showDocument(Document *document) {
+GameReturn showDocument(Document *document) {
     if (!document || (document->lines.empty())) {
         logMessage(LOG_ERROR, "Tried to show empty document");
-        return;
+            return GameReturn::Normal;
     }
 
     const color_t textColour = color_from_argb(255, 196, 196, 196);
@@ -81,7 +83,8 @@ void showDocument(Document *document) {
             if (topLine >= linesShown / 2) topLine -= linesShown / 2;
             else topLine = 0;
         }
-        if (key == TK_ESCAPE || key == TK_MOUSE_RIGHT) return;
+        if (key == TK_CLOSE) return GameReturn::FullQuit;
+        if (key == TK_ESCAPE || key == TK_MOUSE_RIGHT) return GameReturn::Normal;
     }
 }
 
