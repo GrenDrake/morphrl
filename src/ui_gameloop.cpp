@@ -25,49 +25,6 @@ void debug_doTeleport(World &world);
 void debug_killNeighbours(World &world);
 
 
-const unsigned MODE_ALL             = 0xFFFFFFFF;
-const unsigned MODE_DEAD            = 0x00000001;
-const unsigned MODE_NORMAL          = 0x00000002;
-const unsigned MODE_EXAMINE_TILE    = 0x00000004;
-const unsigned MODE_CHOOSE_DIRECTION = 0x00000008;
-const unsigned MODE_CHOOSE_TARGET   = 0x00000010;
-const unsigned MODE_PICK_FROM_LIST  = 0x0000020;
-
-
-const int ACT_FULLQUIT = -2;
-const int ACT_NONE = -1;
-const int ACT_MENU = 0;
-const int ACT_LOG = 1;
-const int ACT_CHARINFO = 2;
-const int ACT_INVENTORY = 3;
-const int ACT_EXAMINETILE = 4;
-const int ACT_CHANGEFLOOR = 5;
-const int ACT_MOVE = 6;
-const int ACT_WAIT = 7;
-const int ACT_TAKEITEM = 9;
-const int ACT_REST = 10;
-const int ACT_INTERACTTILE = 11;
-const int ACT_USEABILITY = 12;
-
-const int ACT_DBG_FULLHEAL = 1000;
-const int ACT_DBG_TELEPORT = 1001;
-const int ACT_DBG_ADDITEM = 1002;
-const int ACT_DBG_ADDMUTATION = 1003;
-const int ACT_DBG_ADDSTATUS = 1004;
-const int ACT_DBG_DISABLEFOV = 1005;
-const int ACT_DBG_KILLADJ = 1006;
-const int ACT_DBG_TUNNEL = 1007;
-const int ACT_DBG_MAPWACTORS = 1008;
-const int ACT_DBG_MAP = 1009;
-const int ACT_DBG_XP = 1010;
-
-
-struct KeyBinding {
-    int key;
-    int action;
-    Direction dir;
-    unsigned forMode;
-};
 
 std::vector<KeyBinding> keyBindings{
     {   TK_CLOSE,  ACT_FULLQUIT,        Direction::Unknown, MODE_ALL },

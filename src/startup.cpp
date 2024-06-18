@@ -1,6 +1,8 @@
 #include <cstdint>
 #include <ctime>
 #include <iostream>
+#include <map>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -10,6 +12,7 @@
 
 
 GameReturn gameloop(World &world);
+GameReturn keyBindingsMenu();
 void doDebugCodex();
 
 RNG globalRNG;
@@ -92,9 +95,9 @@ int main(int argc, char *argv[]) {
     terminal_setf("italic font: DejaVuSansMono-Oblique.ttf, size=%d;", fontSize);
 
 #ifdef DEBUG
-    const int menuItemCount = 7;
+    const int menuItemCount = 8;
 #else
-    const int menuItemCount = 6;
+    const int menuItemCount = 7;
 #endif
     std::vector<UIRect> mouseRegions;
     World *world = nullptr;
@@ -122,13 +125,15 @@ int main(int argc, char *argv[]) {
         mouseRegions.push_back(UIRect{8, 19, 20, 1, 3});
         terminal_print(8, 20, "Instructions");
         mouseRegions.push_back(UIRect{8, 20, 20, 1, 4});
-        terminal_print(8, 21, "Credits");
+        terminal_print(8, 21, "Key Bindings");
         mouseRegions.push_back(UIRect{8, 21, 20, 1, 5});
-        terminal_print(8, 22, "Quit");
+        terminal_print(8, 22, "Credits");
         mouseRegions.push_back(UIRect{8, 22, 20, 1, 6});
-#ifdef DEBUG
-        terminal_print(8, 23, "Data Codex ([color=yellow]DEBUG[/color])");
+        terminal_print(8, 23, "Quit");
         mouseRegions.push_back(UIRect{8, 23, 20, 1, 7});
+#ifdef DEBUG
+        terminal_print(8, 24, "Data Codex ([color=yellow]DEBUG[/color])");
+        mouseRegions.push_back(UIRect{8, 24, 20, 1, 8});
 #endif
         terminal_print(5, 16+selection, "->");
         terminal_color(fgColorDark);
@@ -210,13 +215,16 @@ int main(int argc, char *argv[]) {
                     showDocument("instructions.txt");
                     break;
                 case 5:
+                    if (keyBindingsMenu() == GameReturn::FullQuit) done = true;
+                    break;
+                case 6:
                     showDocument("credits.txt");
                     break;
-                case 6: // quit
+                case 7: // quit
                     done = true;
                     break;
 
-                case 7:
+                case 8:
                     doDebugCodex();
                     break;
             }
@@ -229,4 +237,178 @@ int main(int argc, char *argv[]) {
 
     PHYSFS_deinit();
     return 0;
+}
+
+
+std::map<int, std::string> actionNames{
+    { ACT_FULLQUIT,     "Quit to OS" },
+    { ACT_NONE,         "None" },
+    { ACT_MENU,         "Return to Menu" },
+    { ACT_LOG,          "Message Log" },
+    { ACT_CHARINFO,     "Character Info" },
+    { ACT_INVENTORY,    "View Inventory" },
+    { ACT_EXAMINETILE,  "Examine Map" },
+    { ACT_CHANGEFLOOR,  "Ascend or Descend" },
+    { ACT_MOVE,         "Move" },
+    { ACT_WAIT,         "Wait" },
+    { ACT_TAKEITEM,     "Take Item" },
+    { ACT_REST,         "Rest Until Healed" },
+    { ACT_INTERACTTILE, "Interact" },
+    { ACT_USEABILITY,   "Use Ability" },
+
+    { ACT_DBG_FULLHEAL, "Full Heal (DEBUG)" },
+    { ACT_DBG_TELEPORT, "Teleport (DEBUG)" },
+    { ACT_DBG_ADDITEM, "Add Item (DEBUG)" },
+    { ACT_DBG_ADDMUTATION, "Add Mutation (DEBUG)" },
+    { ACT_DBG_ADDSTATUS, "Add Status Effect (DEBUG)" },
+    { ACT_DBG_DISABLEFOV, "Disable FOV (DEBUG)" },
+    { ACT_DBG_KILLADJ, "Kill Adjacent Actors (DEBUG)" },
+    { ACT_DBG_TUNNEL, "Make Tunnel (DEBUG)" },
+    { ACT_DBG_MAPWACTORS, "Write Map and Actors to File  (DEBUG)" },
+    { ACT_DBG_MAP, "Write Map to file (DEBUG)" },
+    { ACT_DBG_XP, "Give XP (DEBUG)" },
+};
+const std::string STR_UNKNOWN_ACTION = "Unknown Action";
+const std::string& getNameForAction(int action) {
+    auto iter = actionNames.find(action);
+    if (iter == actionNames.end()) return STR_UNKNOWN_ACTION;
+    return iter->second;
+}
+
+std::map<int, std::string> keyNames{
+    { TK_A,         "A" },
+    { TK_B,         "B" },
+    { TK_C,         "C" },
+    { TK_D,         "D" },
+    { TK_E,         "E" },
+    { TK_F,         "F" },
+    { TK_G,         "G" },
+    { TK_H,         "H" },
+    { TK_I,         "I" },
+    { TK_J,         "J" },
+    { TK_K,         "K" },
+    { TK_L,         "L" },
+    { TK_M,         "M" },
+    { TK_N,         "N" },
+    { TK_O,         "O" },
+    { TK_P,         "P" },
+    { TK_Q,         "Q" },
+    { TK_R,         "R" },
+    { TK_S,         "S" },
+    { TK_T,         "T" },
+    { TK_U,         "U" },
+    { TK_V,         "V" },
+    { TK_W,         "W" },
+    { TK_X,         "X" },
+    { TK_Y,         "Y" },
+    { TK_Z,         "Z" },
+    { TK_PERIOD,    "." },
+    { TK_COMMA,     "," },
+    { TK_SPACE,     "<SPACE>" },
+    { TK_LEFT,      "<LEFT>" },
+    { TK_RIGHT,     "<RIGHT>" },
+    { TK_UP,        "<UP>" },
+    { TK_DOWN,      "<DOWN>" },
+    { TK_ESCAPE,    "<ESCAPE>" },
+    { TK_CLOSE,     "<CLOSE>" },
+    { TK_F1,        "<F1>" },
+    { TK_F2,        "<F2>" },
+    { TK_F3,        "<F3>" },
+    { TK_F4,        "<F4>" },
+    { TK_F5,        "<F5>" },
+    { TK_F6,        "<F6>" },
+    { TK_F7,        "<F7>" },
+    { TK_F8,        "<F8>" },
+    { TK_F9,        "<F9>" },
+    { TK_F10,       "<F10>" },
+    { TK_F11,       "<F11>" },
+    { TK_F12,       "<F12>" },
+};
+const std::string& getNameForKey(int key) {
+    static std::string unknownKeyStr;
+    auto iter = keyNames.find(key);
+    if (iter == keyNames.end()) {
+        unknownKeyStr = "<" + std::to_string(key) + ">";
+        return unknownKeyStr;
+    }
+    return iter->second;
+}
+
+
+GameReturn keyBindingsMenu() {
+    std::vector<UIRect> mouseRegions;
+    const std::string versionString = "Version: Alpha-2";
+    bool done = false;
+    color_t fgColor = color_from_argb(255, 196, 196, 196);
+    color_t fgColorDark = color_from_argb(255, 98, 98, 98);
+    color_t bgColor = color_from_argb(255, 0, 0, 0);
+    int top = 0, selection = 0;
+    const int maxToShow = 20;
+    int menuItemCount = keyBindings.size() - 1;
+    while (!done) {
+        mouseRegions.clear();
+        terminal_color(fgColor);
+        terminal_bkcolor(bgColor);
+        terminal_clear();
+        terminal_print(0, 0, "[font=italic]MorphRL[/font]: Delving the Mutagenic Dungeon");
+        terminal_print(0, 24, "ESC to return    UP / DOWN to Scroll List");
+
+        for (unsigned i = 0; i < keyBindings.size(); ++i) {
+            top = selection - maxToShow / 2;
+            if (top < 0) top = 0;
+            int yLine = i + 2 - top;
+            if (yLine < 2) continue;
+            if (yLine > maxToShow + 2) break;
+            const KeyBinding &binding = keyBindings[i];
+
+            if (i == static_cast<unsigned>(selection)) {
+                terminal_color(bgColor);
+                terminal_bkcolor(fgColor);
+                terminal_clear_area(0, yLine, 80, 1);
+            }
+            terminal_print(1, yLine, getNameForKey(binding.key).c_str());
+            if (binding.dir == Direction::Unknown) {
+                terminal_print(15, yLine, getNameForAction(binding.action).c_str());
+            } else {
+                std::stringstream text;
+                text << getNameForAction(binding.action) << " " << binding.dir;
+                terminal_print(15, yLine, text.str().c_str());
+            }
+            if (i == static_cast<unsigned>(selection)) {
+                terminal_color(fgColor);
+                terminal_bkcolor(bgColor);
+            }
+        }
+
+        terminal_refresh();
+
+        int key = terminal_read();
+        if (key == TK_HOME) selection = 0;
+        if ((key == TK_UP || key == TK_KP_8) && selection > 0) --selection;
+        if (key == TK_END) selection = menuItemCount;
+        if ((key == TK_DOWN || key == TK_KP_2) && selection < menuItemCount) ++selection;
+
+        if (key == TK_MOUSE_LEFT) {
+            // int mx = terminal_state(TK_MOUSE_X);
+            int my = terminal_state(TK_MOUSE_Y);
+            int pos = my - 2 + top;
+            if (pos >= 0 && pos <= menuItemCount) selection = pos;
+            // for (const UIRect &rect : mouseRegions) {
+                // if (mx < rect.x || mx >= rect.x + rect.w) continue;
+                // if (my < rect.y || my >= rect.y + rect.h) continue;
+                // selection = rect.ident;
+                // key = TK_SPACE;
+                // break;
+            // }
+        }
+
+        if (key == TK_CLOSE) {
+            return GameReturn::FullQuit;
+        }
+        if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER || key == TK_ESCAPE) {
+            break;
+        }
+    }
+
+    return GameReturn::Normal;
 }
