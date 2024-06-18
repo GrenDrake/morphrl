@@ -129,7 +129,7 @@ std::vector<KeyBinding> keyBindings{
 
 
 const std::string STR_UNKNOWN_ACTION = "Unknown Action";
-const KeyBinding NO_KEY{ 0, ACT_NONE };
+const KeyBinding NO_KEY{ { 0 }, ACT_NONE };
 
 
 const KeyBinding& getBindingForKey(int keyPressed, unsigned currentMode) {
