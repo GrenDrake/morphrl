@@ -12,10 +12,12 @@ current
  * [improvement] multi-use consumables now have a visible number of remaining uses rather than a random chance to be used up
  * [improvement] displays warning on main game screen when over-burdened
  * [improvement] hostile actors will not longer spawn in stairway rooms (though they can still move into them)
+ * [improvement] adds (rea-only) keybind menu
  * [bugfix] actors that die from status effect now properly grant XP to their killer
  * [bugfix] special ability attacks now properly trigger on_hit effects
  * [bugfix] dropping items now clears the equipped item flag
  * [bugfix] closing the game window in the main game screen now quits rather than returning to the menu
+ * [bugfix] window close button now quit while in document viewer (previously it did nothing)
 
 alpha-2 (Dec 9, 2023)
  * [feature] adds game config file. Currently only the "fontSize" option is supported, with larger font sizes creating larger windows and vice versa.
