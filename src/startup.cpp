@@ -312,11 +312,17 @@ GameReturn keyBindingsMenu() {
         if (key == TK_RIGHT && which < 2) ++which;
 
         if (key == TK_MOUSE_LEFT) {
-            // int mx = terminal_state(TK_MOUSE_X);
+            int mx = terminal_state(TK_MOUSE_X);
             int my = terminal_state(TK_MOUSE_Y);
             int pos = my - 2 + top;
             if (pos >= 0 && pos <= menuItemCount) {
+                int xPos = -1;
+                if (mx >= 0 && mx <= 14) xPos = 0;
+                if (mx >= 15 && mx <= 29) xPos = 1;
+                if (mx >= 30 && mx <= 44) xPos = 2;
+                if (xPos < 0) continue;
                 selection = pos;
+                which = xPos;
             }
         }
 
