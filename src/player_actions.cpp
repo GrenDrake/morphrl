@@ -84,6 +84,22 @@ void restUntilHealed(World &world) {
     if (hostiles) world.addMessage("You are interrupted!");
 }
 
+Direction findDirectionForInteractable(World &world) {
+    const Coord &initial = world.player->position;
+    Direction dest = Direction::Unknown;
+    Direction d = Direction::North;
+    do {
+        const Coord &target = initial.shift(d);
+        const TileData &tileData = getTileData(world.map->floorAt(target));
+        if (tileData.interactTo != 0) {
+            if (dest != Direction::Unknown) return Direction::Unknown;
+            dest = d;
+        }
+        d = rotate45(d);
+    } while (d != Direction::North);
+    return dest;
+}
+
 void tryPlayerInteractTile(World &world, Direction dir) {
     const Coord targetPosition = world.player->position.shift(dir);
     const TileData &tileData = getTileData(world.map->floorAt(targetPosition));

@@ -18,6 +18,7 @@ void restUntilHealed(World &world);
 void tryMovePlayer(World &world, Direction dir);
 void tryPlayerTakeItem(World &world);
 void tryPlayerChangeFloor(World &world);
+Direction findDirectionForInteractable(World &world);
 void tryPlayerInteractTile(World &world, Direction dir);
 
 void debug_addThing(World &world, int thingType);
@@ -334,9 +335,14 @@ GameReturn gameloop(World &world) {
                     cursorPos = world.player->position;
             }
             if (action.action == ACT_INTERACTTILE) {
-                uiMode = MODE_CHOOSE_DIRECTION;
-                uiModeString = "Interact where?";
-                uiModeAction = UI_INTERACT_TILE;
+                Direction d = findDirectionForInteractable(world);
+                if (d != Direction::Unknown) {
+                    tryPlayerInteractTile(world, d);
+                } else {
+                    uiMode = MODE_CHOOSE_DIRECTION;
+                    uiModeString = "Interact where?";
+                    uiModeAction = UI_INTERACT_TILE;
+                }
             }
 
             if (action.action == ACT_WAIT) {
