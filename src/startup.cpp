@@ -321,6 +321,11 @@ GameReturn keyBindingsMenu() {
         }
 
         if (key == TK_SPACE || key == TK_ENTER || key == TK_KP_ENTER) {
+            if (which == 0) {
+                if (keyBindings[selection].action == ACT_FULLQUIT ||
+                    keyBindings[selection].action == ACT_MENU)
+                    continue;
+            }
             terminal_clear_area(0, 24, 80, 1);
             terminal_print(0, 24, "Press new key for binding...");
             terminal_refresh();
@@ -329,6 +334,7 @@ GameReturn keyBindingsMenu() {
                 key = terminal_read();
                 if (key == TK_ESCAPE) { key = 0; break; }
                 if (key == TK_CLOSE) return GameReturn::FullQuit;
+                if (getNameForKey(key) == "") key = 0;
             } while (key == 0);
             if (key != 0) keyBindings[selection].key[which] = key;
         }
