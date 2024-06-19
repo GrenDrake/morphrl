@@ -94,6 +94,8 @@ const int EFFECT_PUSHBACK = 7;
 
 const int XP_PER_LEVEL      = 100;
 
+const int AI_HOSTILE        = 0; // standard enemy ai
+const int AI_PASSIVE        = 1; // do nothing
 
 const unsigned MODE_ALL             = 0xFFFFFFFF;
 const unsigned MODE_DEAD            = 0x00000001;
@@ -269,6 +271,9 @@ struct ActorData {
     int baseStats[STAT_BASE_COUNT];
     std::vector<SpawnLine> initialItems;
     std::vector<SpawnLine> initialMutations;
+    int aiMode;
+    bool isFragile;
+    bool allowRefresh;
 };
 
 struct ItemData {

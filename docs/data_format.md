@@ -31,6 +31,9 @@ Creates an actor definition with the specified ident value. This ident must be u
 | base_stats    | 0 0 0 0     | The base stats for creatures of this type, in order of strength, agility, speed, and toughness. |
 | item          | &mdash;     | One or more spawnlines for items that actors of this type may be created holding. Equippable items will be automatically equipped, though if conflicting items are generated only the first will be equipped. See [spawn lines](#spawn-lines) for more information on this property's arguments. |
 | mutation      | &mdash;     | One or more spawnlines for mutations this actor may possess when created. If conflicting mutations are added, later mutations will overwrite earlier ones. See [spawn lines](#spawn-lines) for more information on this property's arguments. |
+| ai_mode       | AI_HOSTILE  | The AI code used for this actor, such as AI_HOSTILE or AI_PASSIVE. |
+| fragile       | &mdash;     | A "fragile" actor is automatically hit and killed by any attack made on it. |
+| no_refresh    | &mdash;     | Prevents this actor from being spawn while "refreshing" the population of a dungeon level. |
 
 
 ## @dungeon [symbol] [ident]

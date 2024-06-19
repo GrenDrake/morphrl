@@ -8,9 +8,10 @@
 @dungeon - 44
     name the_Upper_Levels
     actorCount      40
-    actor           0 33 ACTOR_GOBLIN
-    actor           0 33 ACTOR_KOBOLD
-    actor           0 33 ACTOR_DIRERAT
+    actor           0 25 ACTOR_GOBLIN
+    actor           0 25 ACTOR_KOBOLD
+    actor           0 25 ACTOR_DIRERAT
+    actor           0 25 ACTOR_CHEST
     itemCount       40
     item            0  8 ITM_POTION_LESSER_HEALING
     item            0  3 ITM_POTION_GREATER_HEALING

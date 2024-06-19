@@ -8,6 +8,18 @@ void doInventory(World &world, bool showFloor);
 
 std::string buildCombatMessage(Actor *attacker, Actor *victim, const AttackData &attackData, bool showCalc) {
     std::stringstream s;
+
+    if (victim->data.isFragile) {
+        if (attacker->isPlayer) s << "[color=yellow]You[/color] destroy [color=yellow]";
+        else                    s << "[color=yellow]" << ucFirst(attacker->getName(true)) << "[/color] destroys [color=yellow]";
+        s << victim->getName() << "[/color]! ";
+        s << attackData.effectsMessage;
+        if (!attackData.drops.empty()) {
+            s << "They drop " << makeItemList(attackData.drops, 4) << ". ";
+        }
+        return s.str();
+    }
+
     if (attacker->isPlayer) s << "[color=yellow]You[/color] attack [color=yellow]";
     else                    s << "[color=yellow]" << ucFirst(attacker->getName(true)) << "[/color] attacks [color=yellow]";
     s << victim->getName() << "[/color] with ";

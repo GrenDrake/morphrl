@@ -347,6 +347,9 @@ std::vector<DataDef> actorPropData{
     { "base_evasion",   1 },
     { "base_speed",     1 },
     { "base_toughness", 1 },
+    { "ai_mode",        1 },
+    { "fragile",        0 },
+    { "no_refresh",     0 },
 };
 bool processActorData(RawData &rawData, const DataTemp *rawActor) {
     if (!rawActor || rawActor->typeName != "@actor") {
@@ -359,6 +362,9 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
     resultData.glyph = '?';
     resultData.r = 255; resultData.g = 255; resultData.b = 255;
     resultData.baseLevel = 1;
+    resultData.isFragile = false;
+    resultData.aiMode = AI_HOSTILE;
+    resultData.allowRefresh = true;
     for (int i = 0; i < STAT_BASE_COUNT; ++i) {
         resultData.baseStats[i] = 1;
     }
@@ -410,6 +416,12 @@ bool processActorData(RawData &rawData, const DataTemp *rawActor) {
                 resultData.baseStats[STAT_SPEED] = dataAsInt(rawData, prop.origin, prop.value[0]);
             } else if (prop.name == "base_toughness") {
                 resultData.baseStats[STAT_TOUGHNESS] = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "ai_mode") {
+                resultData.aiMode = dataAsInt(rawData, prop.origin, prop.value[0]);
+            } else if (prop.name == "fragile") {
+                resultData.isFragile = true;
+            } else if (prop.name == "no_refresh") {
+                resultData.allowRefresh = false;
             } else {
                 rawData.addError(prop.origin, "unhandled property name " + prop.name);
             }

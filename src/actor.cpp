@@ -361,36 +361,53 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
 
     turnsSinceCombatAction = 0;
     target->turnsSinceCombatAction = 0;
-    data.roll = 1 + globalRNG.upto(20);
-    data.toHit = getStat(STAT_ACCURACY);
-    data.evasion = target->getStat(STAT_EVASION);
-    int damageBonus = getStat(STAT_DAMAGE_BONUS);
-
-    if (weapon) {
-        // attacking with specific weapon (for ability-based attacks, etc.)
-        const Item *actualWeapon = getCurrentWeapon();
-        // remove normal weapon stats
-        data.toHit -= actualWeapon->getStatBonus(STAT_ACCURACY);
-        damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS);
-        // add special weapon stats
-        data.toHit += weapon->getStatBonus(STAT_ACCURACY);
-        damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS);
-    }
-
-    if (data.roll + data.toHit > data.evasion) {
-        int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
-        if (damageRange < 1) damageRange = 1;
-        data.damageMin = data.weapon->data.minDamage;
-        data.damageMax = data.weapon->data.maxDamage;
-        data.damageBonus = getStat(STAT_STRENGTH) + damageBonus;
-        data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
-        data.damage += damageBonus;
-        if (data.damage < 1) data.damage = 1;
-        target->takeDamage(data.damage, this);
+    if (target->data.isFragile) {
+        target->takeDamage(9999, this);
         data.effectsMessage = triggerOnHitEffects(target, data.weapon);
         if (target->isDead() && !target->isPlayer) {
             for (Item *item : target->inventory) data.drops.push_back(item);
             target->dropAllItems();
+        }
+        data.roll = 20;
+        data.toHit = 0;
+        data.evasion = 0;
+        data.damageMin = 9999;
+        data.damageMax = 9999;
+        data.damageBonus = 0;
+        data.damage = 9999;
+
+    } else {
+        data.roll = 1 + globalRNG.upto(20);
+        data.toHit = getStat(STAT_ACCURACY);
+        data.evasion = target->getStat(STAT_EVASION);
+        int damageBonus = getStat(STAT_DAMAGE_BONUS);
+
+        if (weapon) {
+            // attacking with specific weapon (for ability-based attacks, etc.)
+            const Item *actualWeapon = getCurrentWeapon();
+            // remove normal weapon stats
+            data.toHit -= actualWeapon->getStatBonus(STAT_ACCURACY);
+            damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS);
+            // add special weapon stats
+            data.toHit += weapon->getStatBonus(STAT_ACCURACY);
+            damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS);
+        }
+
+        if (data.roll + data.toHit > data.evasion) {
+            int damageRange = data.weapon->data.maxDamage - data.weapon->data.minDamage + 1;
+            if (damageRange < 1) damageRange = 1;
+            data.damageMin = data.weapon->data.minDamage;
+            data.damageMax = data.weapon->data.maxDamage;
+            data.damageBonus = getStat(STAT_STRENGTH) + damageBonus;
+            data.damage = data.weapon->data.minDamage + globalRNG.upto(damageRange) + getStat(STAT_STRENGTH);
+            data.damage += damageBonus;
+            if (data.damage < 1) data.damage = 1;
+            target->takeDamage(data.damage, this);
+            data.effectsMessage = triggerOnHitEffects(target, data.weapon);
+            if (target->isDead() && !target->isPlayer) {
+                for (Item *item : target->inventory) data.drops.push_back(item);
+                target->dropAllItems();
+            }
         }
     }
     return data;

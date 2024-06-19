@@ -55,6 +55,9 @@
 @define MUT_SLOT_BREATH     7
 @define MUT_SLOT_LEGS       8
 
+@define AI_HOSTILE          0
+@define AI_PASSIVE          1
+
 # include sub-files
 @include abilities.dat
 @include statuses.dat

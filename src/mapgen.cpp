@@ -371,6 +371,25 @@ void addExtraDoors(Dungeon &d) {
     d.floorAt(where, TILE_CLOSED_DOOR);
 }
 
+const ActorData INVALID_SPAWN { BAD_VALUE };
+const ActorData& pickActorFromSpawnLine(const std::vector<SpawnLine> &lines, bool forRefresh) {
+    int iterations = 25;
+    do {
+        int roll = globalRNG.upto(100);
+        for (const SpawnLine &line : lines) {
+            if (roll < line.spawnChance) {
+                const ActorData& data = getActorData(line.ident);
+                if (data.allowRefresh || !forRefresh) {
+                    return data;
+                }
+            }
+            roll -= line.spawnChance;
+        }
+        --iterations;
+    } while (iterations > 0);
+    return INVALID_SPAWN;
+}
+
 void spawnActors(Dungeon &d, bool forRefresh) {
     unsigned targetCount = d.data.actorCount;
     if (forRefresh) targetCount = targetCount / 4;
@@ -393,18 +412,14 @@ void spawnActors(Dungeon &d, bool forRefresh) {
         } while (!isGood && iterations > 0);
         if (!isGood) continue;
 
-        int roll = globalRNG.upto(100);
-        for (const SpawnLine &line : d.data.actorSpawns) {
-            if (roll < line.spawnChance) {
-                Actor *actor = Actor::create(getActorData(line.ident));
-                if (actor) {
-                    actor->reset();
-                    actor->speedCounter = initialSpeedCounter + 1;
-                    d.addActor(actor, c);
-                }
-                break;
+        const ActorData &actorData = pickActorFromSpawnLine(d.data.actorSpawns, forRefresh);
+        if (actorData.ident != BAD_VALUE) {
+            Actor *actor = Actor::create(getActorData(actorData.ident));
+            if (actor) {
+                actor->reset();
+                actor->speedCounter = initialSpeedCounter + 1;
+                d.addActor(actor, c);
             }
-            roll -= line.spawnChance;
         }
     }
 }

@@ -546,6 +546,10 @@ void Dungeon::tick(World &world) {
             clearDeadActors();
             return; // skip player
         }
+        if (actor->data.aiMode == AI_PASSIVE) {
+            actor->advanceSpeedCounter();
+            continue;
+        }
 
         actor->advanceSpeedCounter();
         const MapTile *tile = at(actor->position);

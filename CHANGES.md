@@ -6,6 +6,7 @@ current
  * [feature] adds ability to regen health outside of combat
  * [feature] adds "rest until healed" (R) command for restoring health and energy
  * [feature] adds option to sort player inventory
+ * [feature] adds chests containing random loot to the dungeon
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)

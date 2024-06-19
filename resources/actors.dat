@@ -11,8 +11,27 @@
     base_accuracy   0
     base_speed      0
     base_toughness  0
+    ai_mode         AI_PASSIVE
     item            0 100 ITM_POTION_LESSER_HEALING
     item            0 100 ITM_DAGGER
+
+
+# ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
+# Level 11
+@actor ACTOR_CHEST 11
+    glyph           =
+    name            chest
+    description     A_sturdy_wooden_box,_used_to_securely_store_equipment._Or_it_used_to_be,_anyway;_now_it's_a_rather_decrepit_wooden_box_that_you_could_probably_smash_with_a_single_blow.
+    colour          165 42 42
+    base_evasion    -99
+    ai_mode         AI_PASSIVE
+    fragile
+    no_refresh
+    item            0 33 ITM_POTION_LESSER_HEALING
+    item            0 33 ITM_DAGGER
+    item            0 33 ITM_TALIS_EVASION
+    item            0 33 ITM_TALIS_HEALTH
+
 
 
 # ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### ##### #####
