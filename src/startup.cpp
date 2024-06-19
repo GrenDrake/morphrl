@@ -82,6 +82,7 @@ int main(int argc, char *argv[]) {
     PHYSFS_mount("resources", "/", 1);
     PHYSFS_mount("gamedata.dat", "/", 1);
     if (!loadAllData()) return 1;
+    loadKeybinds();
 
     int fontSize = configData.getIntValue("fontsize", 24);
 
@@ -346,9 +347,11 @@ GameReturn keyBindingsMenu() {
         }
 
         if (key == TK_CLOSE) {
+            saveKeybinds();
             return GameReturn::FullQuit;
         }
         if (key == TK_ESCAPE) {
+            saveKeybinds();
             break;
         }
     }

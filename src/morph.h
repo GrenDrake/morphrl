@@ -638,6 +638,8 @@ extern RNG globalRNG;
 const KeyBinding& getBindingForKey(int keyPressed, unsigned currentMode);
 const std::string& getNameForAction(int action);
 const std::string& getNameForKey(int key);
+bool loadKeybinds();
+bool saveKeybinds();
 extern std::vector<KeyBinding> keyBindings;
 
 #endif // MORPH_H

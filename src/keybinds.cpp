@@ -1,6 +1,3 @@
-#include <cstdint>
-#include <ctime>
-#include <iostream>
 #include <map>
 #include <sstream>
 #include <string>
@@ -197,3 +194,65 @@ const std::string& getNameForKey(int key) {
     return iter->second;
 }
 
+KeyBinding fakeKeyBinding{ { 0 }, ACT_NONE };
+KeyBinding& getBindingForAction(int action, Direction dir, unsigned forMode) {
+    for (KeyBinding &binding : keyBindings) {
+        if (binding.action == action) return binding;
+    }
+    fakeKeyBinding.action = ACT_NONE;
+    return fakeKeyBinding;
+}
+
+bool loadKeybinds() {
+    PHYSFS_File *f = PHYSFS_openRead("/saves/keybinds.dat");
+    if (!f) {
+        auto code = PHYSFS_getLastErrorCode();
+        std::string errMsg = "Failed to open saved keybinds: ";
+        errMsg += PHYSFS_getErrorByCode(code);
+        logMessage(LOG_ERROR, errMsg);
+        return false;
+    }
+
+    unsigned action, dir, forMode, key0, key1, key2;
+
+    while (!PHYSFS_eof(f)) {
+        PHYSFS_readULE32(f, &action);
+        PHYSFS_readULE32(f, &dir);
+        PHYSFS_readULE32(f, &forMode);
+        PHYSFS_readULE32(f, &key0);
+        PHYSFS_readULE32(f, &key1);
+        PHYSFS_readULE32(f, &key2);
+
+        KeyBinding &binding = getBindingForAction(action, static_cast<Direction>(dir), forMode);
+        if (binding.action == ACT_NONE) {
+            logMessage(LOG_ERROR, "Tried to load keybinding for non-existant action " + std::to_string(action) + ".");
+        } else {
+            binding.key[0] = key0;
+            binding.key[1] = key1;
+            binding.key[2] = key2;
+        }
+    }
+
+    return true;
+}
+
+bool saveKeybinds() {
+    PHYSFS_File *f = PHYSFS_openWrite("keybinds.dat");
+    if (!f) {
+        auto code = PHYSFS_getLastErrorCode();
+        std::string errMsg = "Failed to write keybinds: ";
+        errMsg += PHYSFS_getErrorByCode(code);
+        logMessage(LOG_ERROR, errMsg);
+        return false;
+    }
+    for (const KeyBinding &binding : keyBindings) {
+        PHYSFS_writeULE32(f, binding.action);
+        PHYSFS_writeULE32(f, static_cast<unsigned>(binding.dir));
+        PHYSFS_writeULE32(f, binding.forMode);
+        PHYSFS_writeULE32(f, binding.key[0]);
+        PHYSFS_writeULE32(f, binding.key[1]);
+        PHYSFS_writeULE32(f, binding.key[2]);
+    }
+    PHYSFS_close(f);
+    return true;
+}
