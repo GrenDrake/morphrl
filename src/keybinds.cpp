@@ -197,7 +197,10 @@ const std::string& getNameForKey(int key) {
 KeyBinding fakeKeyBinding{ { 0 }, ACT_NONE };
 KeyBinding& getBindingForAction(int action, Direction dir, unsigned forMode) {
     for (KeyBinding &binding : keyBindings) {
-        if (binding.action == action) return binding;
+        if (binding.action != action) continue;
+        if (binding.dir != dir) continue;
+        if (binding.forMode != forMode) continue;
+        return binding;
     }
     fakeKeyBinding.action = ACT_NONE;
     return fakeKeyBinding;
