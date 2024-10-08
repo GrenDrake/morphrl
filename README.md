@@ -10,7 +10,6 @@ While I'd been considering creating the game for some time, what prompted it's a
 MorphRL is built using C++ and expects the following libraries to be available:
   * BearLibTerminal    http://foo.wyrd.name/en:bearlibterminal
   * PhysicsFS          https://www.icculus.org/physfs/
-  * libfov             https://github.com/google-code-export/libfov
   * stb                https://github.com/nothings/stb
 
 Building the game is done using the included makefile; this will likely need to be edited to accommodate the install location of the aforementioned libraries.
