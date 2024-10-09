@@ -59,9 +59,11 @@ const int ET_GIVE_ABILITY = 1;  // grants a specific ability as long as the sour
 const int ET_ON_HIT = 2;        // triggers a special effect every time the actor makes a successful attack
 const int ET_ON_USE = 3;        // triggers a special effect when the item is used from the inventory (item may be destroyed)
 const int ET_ON_TICK = 4;       // triggers a special effect at the end of the actor's turn, every turn
-const int ET_UNARMED_ATTACK = 5;
-const int ET_NO_MUTATION = 6;
-const int ET_STUN = 7;
+const int ET_UNARMED_ATTACK = 5;// grants specific weapon attack when unarmed (used for "natural weapons", etc.)
+const int ET_NO_MUTATION = 6;   // repersents the absence of a mutation; rather than being applied, should remove any
+                                // existing mutation in the same mutation slot
+const int ET_STUN = 7;          // subject is stunned and unable to act
+const int ET_BOOST_UNARMED = 8; // as ET_BOOST, but only when unarmed
 
 const unsigned STATUS_UNLIMITED_DURATION = 4294967295;
 
@@ -377,6 +379,7 @@ struct Actor {
     bool tryEquipItem(Item *item);
     int getTalismanCount() const;
     bool hasVictoryArtifact() const;
+    bool isArmed() const;
     const Item* getCurrentWeapon() const;
     std::string triggerOnHitEffects(Actor *target, const Item *weapon);
     AttackData meleeAttackWithWeapon(Actor *target, const Item *weapon);
@@ -415,7 +418,7 @@ struct Item {
     Item(const ItemData &data);
 
     std::string getName(bool definitive = false) const;
-    int getStatBonus(int statNumber) const;
+    int getStatBonus(int statNumber, bool isArmed) const;
 
     const ItemData &data;
     Coord position;

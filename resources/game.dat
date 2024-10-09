@@ -13,6 +13,7 @@
 @define ET_UNARMED_ATTACK   5
 @define ET_NO_MUTATION      6
 @define ET_STUN             7
+@define ET_BOOST_UNARMED    8
 
 # actor stats
 @define STAT_STRENGTH       0

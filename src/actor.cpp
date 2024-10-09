@@ -111,7 +111,7 @@ int Actor::getStatStatusBonus(int statNumber) const {
     for (const StatusItem *status : statusEffects) {
         if (!status) continue;
         for (const EffectData &data : status->data.effects) {
-            if (data.trigger != ET_BOOST) continue;
+            if (data.trigger != ET_BOOST && (data.trigger != ET_BOOST_UNARMED || isArmed())) continue;
             if (data.effectId == statNumber) {
                 bonus += data.effectStrength;
             }
@@ -126,7 +126,7 @@ int Actor::getStatMutationBonus(int statNumber) const {
     for (const MutationItem *mutation : mutations) {
         if (!mutation) continue;
         for (const EffectData &data : mutation->data.effects) {
-            if (data.trigger != ET_BOOST) continue;
+            if (data.trigger != ET_BOOST && (data.trigger != ET_BOOST_UNARMED || isArmed())) continue;
             if (data.effectId == statNumber) {
                 bonus += data.effectStrength;
             }
@@ -136,7 +136,7 @@ int Actor::getStatMutationBonus(int statNumber) const {
     const Item *weapon = getCurrentWeapon();
     if (!weapon || weapon->isEquipped) return bonus;
     for (const EffectData &data : weapon->data.effects) {
-        if (data.trigger != ET_BOOST) continue;
+        if (data.trigger != ET_BOOST && (data.trigger != ET_BOOST_UNARMED || isArmed())) continue;
         if (data.effectId == statNumber) {
             bonus += data.effectStrength;
         }
@@ -149,7 +149,7 @@ int Actor::getStatItemBonus(int statNumber) const {
     int bonus = 0;
     for (const Item *item : inventory) {
         if (!item->isEquipped) continue; // items only provide static bonuses when equipped
-        bonus += item->getStatBonus(statNumber);
+        bonus += item->getStatBonus(statNumber, isArmed());
     }
     return bonus;
 }
@@ -295,6 +295,15 @@ bool Actor::hasVictoryArtifact() const {
     return false;
 }
 
+bool Actor::isArmed() const {
+    for (const Item *item : inventory) {
+        if (item && item->data.type == ItemData::Weapon && item->isEquipped) {
+            return true;
+        }
+    }
+    return false;
+}
+
 static std::vector<Item*> unarmedWeapons;
 const Item* Actor::getCurrentWeapon() const {
     // first check if the actor is wielding a weapon; if so, just return that one
@@ -386,11 +395,11 @@ AttackData Actor::meleeAttackWithWeapon(Actor *target, const Item *weapon) {
             // attacking with specific weapon (for ability-based attacks, etc.)
             const Item *actualWeapon = getCurrentWeapon();
             // remove normal weapon stats
-            data.toHit -= actualWeapon->getStatBonus(STAT_ACCURACY);
-            damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS);
+            data.toHit -= actualWeapon->getStatBonus(STAT_ACCURACY, isArmed());
+            damageBonus -= actualWeapon->getStatBonus(STAT_DAMAGE_BONUS, isArmed());
             // add special weapon stats
-            data.toHit += weapon->getStatBonus(STAT_ACCURACY);
-            damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS);
+            data.toHit += weapon->getStatBonus(STAT_ACCURACY, isArmed());
+            damageBonus += weapon->getStatBonus(STAT_DAMAGE_BONUS, isArmed());
         }
 
         if (data.roll + data.toHit > data.evasion) {

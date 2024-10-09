@@ -15,7 +15,7 @@ std::string Item::getName(bool definitive) const {
     else            return "a " + data.name;
 }
 
-int Item::getStatBonus(int statNumber) const {
+int Item::getStatBonus(int statNumber, bool isArmed) const {
     // items can never provide a static bonus to current bulk (use the bulk_max
     // stat instead) or to current XP
     if (statNumber == STAT_BULK) return 0;
@@ -23,6 +23,9 @@ int Item::getStatBonus(int statNumber) const {
     int result = 0;
     for (const EffectData &effect : data.effects) {
         if (effect.trigger == ET_BOOST && effect.effectId == statNumber) {
+            result += effect.effectStrength;
+        }
+        if (!isArmed && effect.trigger == ET_BOOST_UNARMED && effect.effectId == statNumber) {
             result += effect.effectStrength;
         }
     }

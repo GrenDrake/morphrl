@@ -129,6 +129,13 @@ std::string EffectData::toString() const {
         else text += "[color=red]";
         text += std::to_string(effectStrength) + "[/color] " + statName(effectId);
         return text;
+    } else if (trigger == ET_BOOST_UNARMED) {
+        std::string text;
+        if (effectStrength >= 0) text += "[color=cyan]+";
+        else text += "[color=red]";
+        text += std::to_string(effectStrength) + "[/color] " + statName(effectId);
+        text += " when unarmed";
+        return text;
     } else if (trigger == ET_UNARMED_ATTACK) {
         const ItemData &itemData = getItemData(effectId);
         std::string text = "unarmed attack [color=yellow]";

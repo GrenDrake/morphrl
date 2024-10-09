@@ -7,6 +7,7 @@ current
  * [feature] adds "rest until healed" (R) command for restoring health and energy
  * [feature] adds option to sort player inventory
  * [feature] adds chests containing random loot to the dungeon
+ * [feature] adds effect trigger "boost when unarmed" for equipment and mutations
  * [balance] splits agility stat into evasion and accuracy
  * [improvement] display name of status effect when taking damage from it
  * [improvement] don't get duplicate mutations or lose features you don't have (this should also reduce or eliminate "nothing happens" results from mutations)
@@ -15,6 +16,7 @@ current
  * [improvement] hostile actors will not longer spawn in stairway rooms (though they can still move into them)
  * [improvement] adds keybind menu and rebindable keys
  * [improvement] the interact action now automatically selects a target if exactly one valid target exists
+ * [improvement] implements own FOV code, removing the dependancy on libfov
  * [bugfix] actors that die from status effect now properly grant XP to their killer
  * [bugfix] special ability attacks now properly trigger on_hit effects
  * [bugfix] dropping items now clears the equipped item flag
